@@ -1,218 +1,344 @@
-# Paradox AntiCheat
+<p align="center">
+  <h1 align="center">🛡️ Paradox AntiCheat</h1>
+  <p align="center">
+    A comprehensive anti-cheat and server moderation plugin for <strong>Endstone</strong> (Minecraft Bedrock Edition)
+  </p>
+  <p align="center">
+    <img src="https://img.shields.io/badge/Endstone-v0.11+-00C853?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAyTDIgN2wxMCA1IDEwLTV6TTIgMTdsMTAgNSAxMC01TTIgMTJsMTAgNSAxMC01Ii8+PC9zdmc+&logoColor=white" alt="Endstone v0.11+">
+    <img src="https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.9+">
+    <img src="https://img.shields.io/badge/Minecraft-Bedrock_Edition-62B47A?style=for-the-badge&logo=minecraft&logoColor=white" alt="Minecraft Bedrock">
+    <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
+  </p>
+  <p align="center">
+    <a href="https://github.com/TheN1NJ4LL0/endstone-paradox/releases/latest">
+      <img src="https://img.shields.io/github/v/release/TheN1NJ4LL0/endstone-paradox?style=for-the-badge&color=blue&label=Download" alt="Latest Release">
+    </a>
+    <img src="https://img.shields.io/github/downloads/TheN1NJ4LL0/endstone-paradox/total?style=for-the-badge&color=brightgreen&label=Downloads" alt="Total Downloads">
+  </p>
+</p>
 
-A comprehensive anti-cheat and server moderation plugin for **Endstone** (Minecraft Bedrock Edition).
-
-Paradox provides 16 detection modules, 31 admin commands, a full GUI management interface, and a persistent SQLite-backed configuration system — all running as a native Endstone Python plugin.
+---
 
 > **Originally created by [Visual1mpact](https://github.com/Visual1mpact/Paradox_AntiCheat)**
-> Ported to Endstone by **TheN1NJ4LL0**
+> — Ported to Endstone by [**TheN1NJ4LL0**](https://github.com/TheN1NJ4LL0)
 
-📦 **GitHub:** [https://github.com/TheN1NJ4LL0/endstone-paradox](https://github.com/TheN1NJ4LL0/endstone-paradox)
-📥 **Download:** [Latest Release](https://github.com/TheN1NJ4LL0/endstone-paradox/releases/latest)
-
-This is a full Python port of the original [Paradox AntiCheat](https://github.com/Visual1mpact/Paradox_AntiCheat) for Minecraft Bedrock Edition, rebuilt from the ground up as a native Endstone plugin with SQLite persistence, SHA-256 authentication, and protocol-level detection.
+A full Python port of the original [Paradox AntiCheat](https://github.com/Visual1mpact/Paradox_AntiCheat), rebuilt from the ground up as a native Endstone plugin with SQLite persistence, SHA-256 authentication, protocol-level detection, and a complete in-game GUI.
 
 ---
 
-## Features
+## 📋 Table of Contents
 
-### 🛡️ Anti-Cheat Detection Modules
+- [Quick Start](#-quick-start)
+- [Features](#-features)
+- [Commands](#-commands)
+- [GUI System](#-gui-system)
+- [Configuration](#-configuration)
+- [Architecture](#-architecture)
+- [FAQ](#-faq)
+- [License](#-license)
 
-| Module | Description |
-|--------|-------------|
-| **Fly** | Ground tracking, velocity analysis, trident exemption |
-| **KillAura** | Attack timing statistics, facing angle validation |
-| **Reach** | Movement interpolation, distance analysis |
-| **AutoClicker** | Sliding-window CPS tracking (configurable max) |
-| **Scaffold** | Rapid block placement + axis pattern detection |
-| **X-Ray** | Per-ore mining rate thresholds with admin alerts |
-| **GameMode** | Unauthorized gamemode change blocking |
-| **Namespoof** | Name length, character, and duplicate validation |
-| **Self-Infliction** | Self-damage exploit detection |
-| **AFK** | Position-based idle detection with kick + warnings |
-| **Vision** | Rotation snap-count analysis for aimbot detection |
-| **World Border** | Configurable radius enforcement with teleport-back |
-| **Rate Limiter** | Packet flood detection with automatic DoS lockdown |
-| **Packet Monitor** | Per-type frequency monitoring and spam alerts |
-| **PvP Manager** | Per-player toggles, combat tagging, combat log detection |
-| **Lag Clear** | Scheduled entity cleanup with 30-second warnings |
+---
 
-All modules can be individually toggled with `/ac-<module>` commands and managed through the GUI.
+## � Quick Start
 
-### 🔐 Security System
+### Step 1 — Download
 
-- **4-level clearance system** — Level 1 (default) through Level 4 (full admin)
-- **SHA-256 password hashing** — First `/ac-op` sets the password; subsequent uses verify it
-- **Level 4 exemptions** — Admins are exempt from all detection modules
-- **Admin notifications** — All security events broadcast to Level 4 players
+Grab the latest `.whl` file from the **[Releases page](https://github.com/TheN1NJ4LL0/endstone-paradox/releases/latest)**.
 
-### 💾 Persistence
+### Step 2 — Install
 
-All data is stored in **SQLite** with WAL mode for concurrent access:
-- Bans, allowlists, and whitelists
-- Module enable/disable states
-- Player homes, ranks, and channels
+Drop the `.whl` file into your Endstone server's `plugins/` folder:
+
+```
+your-server/
+├── endstone.toml
+├── plugins/
+│   └── endstone_paradox-1.0.0-py3-none-any.whl   ← drop it here
+└── ...
+```
+
+### Step 3 — Start the Server
+
+Start (or restart) your Endstone server. You'll see Paradox load in the console:
+
+```
+[ParadoxAC] Paradox AntiCheat v1.0.0 loaded!
+[ParadoxAC] Database initialized at plugins/ParadoxAC/paradox.db
+[ParadoxAC] 14 detection modules registered.
+```
+
+### Step 4 — Set Your Admin Password
+
+Join the server and run:
+
+```
+/ac-op YourSecretPassword
+```
+
+> **⚠️ Important:** The **first time** you run `/ac-op`, the password you type becomes your permanent admin password (hashed with SHA-256). All future `/ac-op` attempts must use this same password.
+
+You now have **Level 4 clearance** — full admin access to all Paradox commands and the GUI.
+
+### Step 5 — Open the GUI
+
+```
+/ac-gui
+```
+
+This opens the full admin panel where you can manage **everything** — modules, players, moderation, settings, and more — without memorizing any commands.
+
+---
+
+## ✨ Features
+
+### 🛡️ 16 Detection Modules
+
+| Module | What It Detects |
+|--------|-----------------|
+| **Fly** | Flight/hover hacks — ground tracking, velocity analysis, trident exemption |
+| **KillAura** | Combat bots — attack timing, facing angle validation |
+| **Reach** | Extended reach hacks — movement interpolation, distance checks |
+| **AutoClicker** | Click bots — sliding-window CPS tracking (configurable threshold) |
+| **Scaffold** | Speed bridging — rapid block placement + axis pattern analysis |
+| **X-Ray** | Mining hacks — per-ore mining rate thresholds with alerts |
+| **GameMode** | Unauthorized gamemode changes — instant blocking |
+| **Namespoof** | Name manipulation — length, character, and duplicate checks |
+| **Self-Infliction** | Self-damage exploits |
+| **AFK** | Idle players — position tracking with warnings before kick |
+| **Vision** | Aimbot/snap aim — rotation snap-count analysis |
+| **World Border** | Border enforcement — configurable radius with teleport-back |
+| **Rate Limiter** | Packet floods — automatic DoS lockdown |
+| **Packet Monitor** | Packet spam — per-type frequency monitoring |
+| **PvP Manager** | PvP system — per-player toggles, combat tagging, log detection |
+| **Lag Clear** | Entity cleanup — scheduled clearing with 30-second warnings |
+
+Every module can be toggled individually via commands **or** the GUI.
+
+### 🔐 4-Level Security System
+
+| Level | Name | Access |
+|-------|------|--------|
+| 1 | Standard | Utility commands (home, tpr, pvp, channels) |
+| 2 | Moderator | Player management (kick, freeze, warn) |
+| 3 | Admin | Settings and module control |
+| 4 | Owner | Full access — all commands, exempt from detection |
+
+- **SHA-256 password hashing** — your password is never stored in plain text
+- **Security broadcasts** — all admin actions are reported to Level 4 players
+- **Lockdown mode** — restrict all commands to Level 4 only
+
+### 💾 SQLite Persistence
+
+Everything saves automatically and survives server restarts:
+
+- Bans, allowlists, whitelists
+- Module states (enabled/disabled)
+- Player homes, ranks, channels
 - Frozen/vanished player lists
-- Namespoof logs
-- Configuration settings
-
-### 🖥️ Full GUI System
-
-`/ac-gui` opens a complete admin panel with **8 sections** — every single command and feature is accessible from the GUI:
-
-| Section | What You Can Do |
-|---------|----------------|
-| **Modules** | Toggle all 14 detection modules on/off with a single tap |
-| **Moderation** | Vanish, lockdown, kick, ban, unban, freeze, punish (warn/mute/kick/ban), despawn entities, allowlist, whitelist, spoof log, change prefix |
-| **Players** | Select any online player → kick, ban, freeze, warn, teleport to/from, set rank, view inventory |
-| **Utilities** | Homes (set/delete/update/teleport), random TP, PvP toggle (personal + global), chat channels (create/join/leave/send), TPA, ranks, about |
-| **Security** | Dashboard showing lockdown, frozen, vanished, banned counts + opsec report |
-| **Settings** | Lockdown, AFK timeout, lagclear interval, max CPS, world border radius, global PvP — all in one form |
-| **Commands** | Enable/disable any of the 31 Paradox commands |
-| **Database** | Browse and inspect all database tables |
+- Namespoof detection logs
+- All configuration settings
 
 ---
 
-## Commands
+## 📖 Commands
 
 ### Moderation
 
 | Command | Description |
 |---------|-------------|
-| `/ac-op [password]` | Authenticate with password to gain security clearance |
-| `/ac-deop [player]` | Revoke your or another player's security clearance |
+| `/ac-op [password]` | Authenticate to gain security clearance |
+| `/ac-deop [player]` | Revoke your or another player's clearance |
 | `/ac-ban <player> [reason]` | Ban a player with an optional reason |
 | `/ac-unban <name>` | Unban a player by name |
-| `/ac-kick <player> [reason]` | Kick a player from the server with an optional reason |
+| `/ac-kick <player> [reason]` | Kick a player with an optional reason |
 | `/ac-freeze <player>` | Freeze or unfreeze a player in place |
 | `/ac-vanish` | Toggle invisibility — hide from all players |
-| `/ac-lockdown` | Toggle server lockdown — only Level 4 can use commands |
+| `/ac-lockdown` | Toggle server lockdown (Level 4 only) |
 | `/ac-punish <player> [action]` | Punish a player (warn/mute/kick/ban) |
-| `/ac-tpa <player>` | Send a teleport request to another player |
-| `/ac-allowlist [args]` | Manage allow list: add/remove/list players |
-| `/ac-whitelist [args]` | Manage whitelist: add/remove/list players |
-| `/ac-opsec` | View security dashboard with admin clearance levels |
+| `/ac-tpa <player>` | Send a teleport request |
+| `/ac-allowlist [add\|remove\|list]` | Manage the allow list |
+| `/ac-whitelist [add\|remove\|list]` | Manage the whitelist |
+| `/ac-opsec` | View security dashboard |
 | `/ac-despawn [type] [radius]` | Despawn entities by type within radius |
-| `/ac-modules` | View all detection modules and their on/off status |
-| `/ac-spooflog` | View log of detected name spoofing attempts |
-| `/ac-command [args]` | Enable or disable a Paradox command |
-| `/ac-prefix [prefix]` | Change the Paradox chat prefix display |
+| `/ac-modules` | View all modules and their status |
+| `/ac-spooflog` | View name spoofing logs |
+| `/ac-command [enable\|disable] [cmd]` | Enable or disable a command |
+| `/ac-prefix [prefix]` | Change the chat prefix |
 
 ### Detection Toggles
 
 | Command | Description |
 |---------|-------------|
-| `/ac-fly` | Toggle fly/hover hack detection on or off |
-| `/ac-killaura` | Toggle kill aura detection on or off |
-| `/ac-reach` | Toggle reach hack detection on or off |
-| `/ac-autoclicker [maxcps]` | Toggle autoclicker detection, optionally set max CPS |
-| `/ac-scaffold` | Toggle scaffold/fast-bridge detection on or off |
-| `/ac-xray` | Toggle X-ray mining detection on or off |
-| `/ac-gamemode` | Toggle illegal gamemode change detection on or off |
-| `/ac-afk [timeout]` | Toggle AFK detection, optionally set timeout in seconds |
-| `/ac-vision` | Toggle aimbot/snap detection on or off |
-| `/ac-worldborder [args]` | Set world border radius and center position |
-| `/ac-lagclear [interval]` | Toggle periodic entity clearing, optionally set interval |
-| `/ac-ratelimit` | Toggle packet rate limiting on or off |
-| `/ac-namespoof` | Toggle name spoofing detection on or off |
-| `/ac-packetmonitor` | Toggle packet spam monitoring on or off |
+| `/ac-fly` | Toggle fly/hover detection |
+| `/ac-killaura` | Toggle kill aura detection |
+| `/ac-reach` | Toggle reach hack detection |
+| `/ac-autoclicker [maxcps]` | Toggle autoclicker detection (optionally set max CPS) |
+| `/ac-scaffold` | Toggle scaffold detection |
+| `/ac-xray` | Toggle X-ray detection |
+| `/ac-gamemode` | Toggle gamemode change detection |
+| `/ac-afk [timeout]` | Toggle AFK detection (optionally set timeout) |
+| `/ac-vision` | Toggle aimbot/snap detection |
+| `/ac-worldborder [radius] [x] [z]` | Set world border radius and center |
+| `/ac-lagclear [interval]` | Toggle lag clear (optionally set interval) |
+| `/ac-ratelimit` | Toggle packet rate limiting |
+| `/ac-namespoof` | Toggle name spoofing detection |
+| `/ac-packetmonitor` | Toggle packet spam monitoring |
 
 ### Utility
 
 | Command | Description |
 |---------|-------------|
-| `/ac-home [args]` | Manage homes: set/delete/list or teleport by name (max 5) |
-| `/ac-tpr [radius]` | Teleport to a random location, optionally set radius |
-| `/ac-pvp [args]` | Toggle PvP: use alone or with global/status/help |
-| `/ac-channels [args]` | Private chat: create/join/leave/list/send channels |
-| `/ac-invsee <player>` | View another player's inventory contents |
+| `/ac-home [set\|delete\|list\|help] [name]` | Manage home locations (max 5 per player) |
+| `/ac-tpr [radius]` | Teleport to a random location |
+| `/ac-pvp [global\|status\|help]` | Toggle PvP (personal or global) |
+| `/ac-channels [create\|join\|leave\|list\|send]` | Private chat channels |
+| `/ac-invsee <player>` | View a player's inventory |
 | `/ac-rank <player> [rank]` | Set or view a player's display rank |
-| `/ac-debug-db [args]` | Inspect or modify the Paradox database directly |
-| `/ac-gui` | Open the Paradox admin GUI menu |
-| `/ac-about` | View Paradox AntiCheat version and info |
+| `/ac-debug-db [table] [key]` | Inspect the database directly |
+| `/ac-gui` | Open the full admin GUI |
+| `/ac-about` | View plugin version and info |
 
 ---
 
-## Installation
+## 🖥️ GUI System
 
-### Requirements
+Type `/ac-gui` to open the complete admin panel. **Every feature is accessible from here** — you never need to memorize a command.
 
-- **Endstone** server v0.11+
-- **Python** 3.9+
+### Main Menu
 
-### From Release (Recommended)
-
-1. Download `endstone_paradox-1.0.0-py3-none-any.whl` from the [Releases page](https://github.com/TheN1NJ4LL0/endstone-paradox/releases/latest)
-2. Drop the `.whl` file into your Endstone server's `plugins/` folder
-3. Restart the server
-
-### From Source
-
-```bash
-git clone https://github.com/TheN1NJ4LL0/endstone-paradox.git
-cd endstone-paradox
-pip install build
-python -m build --wheel
-# Copy dist/endstone_paradox-1.0.0-py3-none-any.whl to your server's plugins/ folder
+```
+┌──────────────────────────────────┐
+│     🛡️ Paradox AntiCheat         │
+│──────────────────────────────────│
+│  ✅ Modules        │  ⚔️ Moderation │
+│  👥 Players        │  🔧 Utilities   │
+│  🔒 Security       │  ⚙️ Settings    │
+│  📋 Commands       │  💾 Database    │
+└──────────────────────────────────┘
 ```
 
----
-
-## Configuration
-
-All settings are stored in and managed through the SQLite database at `plugins/ParadoxAC/paradox.db`. Use `/ac-debug-db`, `/ac-gui` → **Settings**, or the individual commands to adjust values.
-
-### Key Config Values
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `afk_timeout` | 600 | Seconds before AFK kick |
-| `lagclear_interval` | 300 | Seconds between lag clears |
-| `max_cps` | 20 | Maximum clicks per second |
-| `worldborder_radius` | 10000 | World border radius |
-| `global_pvp` | true | Global PvP toggle |
+| Section | What You Can Do |
+|---------|-----------------|
+| **Modules** | Toggle all 14 detection modules on/off with a single tap |
+| **Moderation** | Vanish, lockdown, kick, ban, unban, freeze, punish, despawn entities, manage allow/white lists, view spoof logs, change prefix |
+| **Players** | Select any online player → kick, ban, freeze, warn, teleport to/from them, set rank, view inventory — all from one screen |
+| **Utilities** | Homes (set, delete, update, teleport), random TP, PvP toggle (personal + global), chat channels (create, join, leave, send), TPA, ranks |
+| **Security** | Live dashboard: lockdown status, frozen/vanished/banned counts, per-player clearance levels, opsec report |
+| **Settings** | Lockdown toggle, AFK timeout, lagclear interval, max CPS, world border radius, global PvP — all in one form |
+| **Commands** | Enable/disable any of the 31 commands — see status at a glance |
+| **Database** | Browse all database tables, inspect entries |
 
 ---
 
-## Architecture
+## ⚙️ Configuration
+
+Settings are managed through commands, the GUI, or directly via the database.
+
+### Key Settings
+
+| Setting | Default | How to Change |
+|---------|---------|---------------|
+| AFK Timeout | 600 sec | `/ac-afk 300` or GUI → Settings |
+| Lag Clear Interval | 300 sec | `/ac-lagclear 120` or GUI → Settings |
+| Max CPS | 20 | `/ac-autoclicker 25` or GUI → Settings |
+| World Border Radius | 10000 | `/ac-worldborder 5000` or GUI → Settings |
+| Global PvP | Enabled | `/ac-pvp global` or GUI → Settings |
+
+### Database Location
+
+```
+plugins/ParadoxAC/paradox.db
+```
+
+All data is stored in SQLite with WAL mode. Use `/ac-debug-db` or the GUI's Database section to inspect tables directly.
+
+---
+
+## 🏗️ Architecture
 
 ```
 endstone-paradox/
-├── pyproject.toml
+├── pyproject.toml              # Build configuration
 ├── README.md
 └── src/endstone_paradox/
     ├── __init__.py
-    ├── paradox.py          # Main plugin entry point (31 commands)
-    ├── database.py         # SQLite persistence layer
-    ├── security.py         # 4-level clearance system
-    ├── modules/            # 16 detection modules
-    │   ├── base.py         # Abstract base class
-    │   ├── fly.py
-    │   ├── killaura.py
-    │   ├── reach.py
-    │   ├── autoclicker.py
-    │   ├── scaffold.py
-    │   ├── xray.py
-    │   ├── gamemode.py
-    │   ├── namespoof.py
-    │   ├── self_infliction.py
-    │   ├── afk.py
-    │   ├── vision.py
-    │   ├── world_border.py
-    │   ├── lag_clear.py
-    │   ├── rate_limit.py
-    │   ├── packet_monitor.py
-    │   └── pvp_manager.py
+    ├── paradox.py              # Main plugin (31 commands, event handlers)
+    ├── database.py             # SQLite persistence (WAL mode)
+    ├── security.py             # 4-level clearance + SHA-256 auth
+    ├── modules/                # 16 detection modules
+    │   ├── base.py             #   Abstract base class
+    │   ├── fly.py              #   Flight/hover detection
+    │   ├── killaura.py         #   Combat bot detection
+    │   ├── reach.py            #   Reach hack detection
+    │   ├── autoclicker.py      #   CPS tracking
+    │   ├── scaffold.py         #   Speed bridge detection
+    │   ├── xray.py             #   X-ray mining detection
+    │   ├── gamemode.py         #   Gamemode change blocking
+    │   ├── namespoof.py        #   Name validation
+    │   ├── self_infliction.py  #   Self-damage detection
+    │   ├── afk.py              #   AFK idle tracking
+    │   ├── vision.py           #   Aimbot detection
+    │   ├── world_border.py     #   Border enforcement
+    │   ├── lag_clear.py        #   Entity cleanup
+    │   ├── rate_limit.py       #   Packet flood detection
+    │   ├── packet_monitor.py   #   Packet spam alerts
+    │   └── pvp_manager.py      #   PvP toggle system
     ├── commands/
-    │   ├── moderation/     # 18 admin commands
-    │   ├── settings/       # Module toggle handler
-    │   └── utility/        # 9 utility commands
+    │   ├── moderation/         # 18 admin/moderation commands
+    │   ├── settings/           # Module toggle handler
+    │   └── utility/            # 9 utility commands
     └── gui/
-        └── form_generator.py  # Full GUI (700+ lines, 8 sections)
+        └── form_generator.py   # Full GUI (8 sections, 700+ lines)
 ```
 
 ---
 
-## License
+## ❓ FAQ
 
-MIT
+<details>
+<summary><strong>How do I set up admin access for the first time?</strong></summary>
+
+Join the server and type `/ac-op YourPassword`. The first password you use becomes the permanent admin password. You'll get Level 4 clearance (full access). To give other players admin, share the password — they can use `/ac-op` with it too.
+</details>
+
+<details>
+<summary><strong>Can I use the GUI for everything?</strong></summary>
+
+Yes! Type `/ac-gui` and you have full access to every feature. You can toggle modules, kick/ban/freeze players, manage homes, toggle PvP, manage channels, change settings, enable/disable commands, and browse the database — all without typing a single command.
+</details>
+
+<details>
+<summary><strong>How do I disable a specific detection module?</strong></summary>
+
+Either use the command (e.g., `/ac-fly` to toggle fly detection) or open `/ac-gui` → **Modules** and tap the module to toggle it.
+</details>
+
+<details>
+<summary><strong>How do I reset my admin password?</strong></summary>
+
+Delete the `security` table entry in the database. You can use `/ac-debug-db security password` to inspect it, then restart the server and run `/ac-op NewPassword` to set a fresh password.
+</details>
+
+<details>
+<summary><strong>How do homes work?</strong></summary>
+
+Each player can save up to 5 homes. Use `/ac-home set MyBase` to save your location, `/ac-home MyBase` to teleport back, `/ac-home list` to see all homes, and `/ac-home delete MyBase` to remove one. Or use `/ac-gui` → **Utilities** → **Homes** for a visual interface.
+</details>
+
+<details>
+<summary><strong>What happens during a lockdown?</strong></summary>
+
+When lockdown is active (`/ac-lockdown` or via GUI), only Level 4 admins can use commands. All other players are restricted until lockdown is disabled.
+</details>
+
+---
+
+## 📄 License
+
+MIT — see [LICENSE](LICENSE) for details.
+
+---
+
+<p align="center">
+  <sub>Made with ❤️ by <a href="https://github.com/TheN1NJ4LL0">TheN1NJ4LL0</a> — based on <a href="https://github.com/Visual1mpact/Paradox_AntiCheat">Paradox AntiCheat</a> by Visual1mpact</sub>
+</p>
