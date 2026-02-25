@@ -48,9 +48,11 @@ class BaseModule(ABC):
 
     def stop(self):
         """Stop the module."""
+        was_running = self.running
         self.running = False
         self._task = None  # Let GC handle task cancellation
-        self.on_stop()
+        if was_running:
+            self.on_stop()
 
     def _schedule_check(self):
         """Schedule the periodic check task."""
