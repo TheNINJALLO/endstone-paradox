@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-invsee Command
-
-View another player's inventory (as a formatted text display).
-"""
+# invsee_cmd - /ac-invsee Command
 
 
 def handle_invsee(plugin, sender, args) -> bool:

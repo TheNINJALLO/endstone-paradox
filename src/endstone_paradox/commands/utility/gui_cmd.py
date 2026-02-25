@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-gui Command
-
-Open the main Paradox GUI menu using Endstone's ActionForm.
-"""
+# gui_cmd - /ac-gui Command
 
 from endstone_paradox.gui.form_generator import build_main_menu
 

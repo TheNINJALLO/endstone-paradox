@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-rank Command
-
-Player rank management: set custom display ranks.
-"""
+# rank_cmd - /ac-rank Command
 
 
 def handle_rank(plugin, sender, args) -> bool:

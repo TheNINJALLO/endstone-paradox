@@ -1,1 +1,1 @@
-"""Paradox AntiCheat - Modules Package"""
+# __init__ - Modules Package

@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-channels Command
-
-Private chat channels: create, join, leave, list, and send messages.
-"""
+# channels_cmd - /ac-channels Command
 
 
 def handle_channels(plugin, sender, args) -> bool:

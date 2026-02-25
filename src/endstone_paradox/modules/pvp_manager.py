@@ -1,9 +1,4 @@
-"""
-Paradox AntiCheat - PvP Manager Module
-
-Manages per-player PvP toggles, combat cooldowns, combat logging
-protection, and health restoration on invalid PvP.
-"""
+# pvp_manager.py - Per-player PvP toggles, combat logging, cooldowns
 
 import time
 from endstone_paradox.modules.base import BaseModule

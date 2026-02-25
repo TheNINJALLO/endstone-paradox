@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-spooflog Command
-
-View namespoof detection logs.
-"""
+# spooflog_cmd - /ac-spooflog Command
 
 
 def handle_spooflog(plugin, sender, args) -> bool:

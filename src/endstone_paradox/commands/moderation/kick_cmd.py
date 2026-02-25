@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-kick Command
-
-Kick a player from the server.
-"""
+# kick_cmd - /ac-kick Command
 
 
 def handle_kick(plugin, sender, args) -> bool:

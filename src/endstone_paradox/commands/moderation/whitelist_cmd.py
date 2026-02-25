@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-whitelist Command
-
-Manage the server whitelist (alias for allowlist with different table).
-"""
+# whitelist_cmd - /ac-whitelist Command
 
 
 def handle_whitelist(plugin, sender, args) -> bool:

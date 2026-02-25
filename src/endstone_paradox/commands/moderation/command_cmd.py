@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-command Command
-
-Enable or disable specific commands.
-"""
+# command_cmd - /ac-command Command
 
 
 def handle_command(plugin, sender, args) -> bool:

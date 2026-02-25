@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-tpa Command
-
-Send teleport requests to other players.
-"""
+# tpa_cmd - /ac-tpa Command
 
 import time
 

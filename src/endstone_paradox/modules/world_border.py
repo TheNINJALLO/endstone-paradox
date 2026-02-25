@@ -1,9 +1,4 @@
-"""
-Paradox AntiCheat - World Border Module
-
-Enforces a configurable world border. Teleports players back
-if they exceed the boundary.
-"""
+# world_border.py - Configurable world border enforcement
 
 import math
 from endstone_paradox.modules.base import BaseModule

@@ -1,9 +1,4 @@
-"""
-Paradox AntiCheat - GUI Form Generator
-
-Creates ActionForm and ModalForm menus for the Paradox Admin GUI.
-Every command and feature is accessible from this GUI.
-"""
+# form_generator - GUI Form Generator
 
 import json
 import time

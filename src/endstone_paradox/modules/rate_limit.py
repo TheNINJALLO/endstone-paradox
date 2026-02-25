@@ -1,9 +1,4 @@
-"""
-Paradox AntiCheat - Rate Limit Module
-
-Monitors incoming packets and enforces rate limits.
-Detects DoS attacks and can trigger server lockdown.
-"""
+# rate_limit.py - Packet rate limiter + DoS detection
 
 import time
 from collections import deque

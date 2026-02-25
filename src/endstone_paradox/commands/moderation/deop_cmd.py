@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-deop Command
-
-Revoke a player's security clearance.
-"""
+# deop_cmd - /ac-deop Command
 
 from endstone_paradox.security import SecurityClearance
 

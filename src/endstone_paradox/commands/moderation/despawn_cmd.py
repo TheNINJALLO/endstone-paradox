@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-despawn Command
-
-Remove entities by type and/or radius.
-"""
+# despawn_cmd - /ac-despawn Command
 
 
 def handle_despawn(plugin, sender, args) -> bool:

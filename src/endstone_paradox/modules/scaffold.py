@@ -1,9 +1,4 @@
-"""
-Paradox AntiCheat - Scaffold Detection Module
-
-Detects scaffolding hacks by monitoring rapid block placements
-and checking for suspicious placement patterns (constant axes).
-"""
+# scaffold.py - Detects speed-bridging via placement rate + axis patterns
 
 import time
 from collections import deque

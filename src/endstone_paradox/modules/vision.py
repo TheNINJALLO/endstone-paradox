@@ -1,9 +1,4 @@
-"""
-Paradox AntiCheat - Vision Detection Module
-
-Detects look-direction anomalies that may indicate aimbots or
-freecam exploits by tracking rapid yaw/pitch changes.
-"""
+# vision.py - Aimbot/snap detection via yaw/pitch change tracking
 
 import math
 import time

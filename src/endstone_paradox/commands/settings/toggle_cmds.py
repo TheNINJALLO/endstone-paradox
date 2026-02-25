@@ -1,10 +1,4 @@
-"""
-Paradox AntiCheat - Settings Toggle Commands
-
-Unified handler for all /ac-<module> toggle commands.
-Maps the command name to the corresponding module and toggles it.
-Some modules accept additional configuration arguments.
-"""
+# toggle_cmds - Settings Toggle Commands
 
 
 # Map command names to module names

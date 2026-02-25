@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-debug-db Command
-
-Direct SQLite database inspection and modification for admins.
-"""
+# debug_db_cmd - /ac-debug-db Command
 
 
 def handle_debug_db(plugin, sender, args) -> bool:

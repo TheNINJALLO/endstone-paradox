@@ -1,9 +1,5 @@
-"""
-Paradox AntiCheat - X-Ray Detection Module
-
-Detects X-ray by monitoring the rate of ore blocks broken per time window.
-Uses configurable thresholds per ore type.
-"""
+# xray.py - Ore mining rate tracker
+# Flags players mining too many ores in a time window.
 
 import time
 from collections import defaultdict
@@ -11,14 +7,12 @@ from endstone_paradox.modules.base import BaseModule
 
 
 class XrayModule(BaseModule):
-    """Detects X-ray hacks via ore mining rate analysis."""
-
     name = "xray"
 
-    TIME_WINDOW = 300.0  # 5 minutes
-    NOTIFY_COOLDOWN = 60.0  # Don't re-alert for same player within 60s
+    TIME_WINDOW = 300.0    # 5 min window
+    NOTIFY_COOLDOWN = 60.0 # don't spam alerts
 
-    # Ore thresholds: max blocks per TIME_WINDOW before alert (generous for strip mining)
+    # max ore breaks per window before flagging (generous for strip mining)
     ORE_THRESHOLDS = {
         "diamond_ore": 20,
         "deepslate_diamond_ore": 20,
@@ -37,8 +31,8 @@ class XrayModule(BaseModule):
     }
 
     def on_start(self):
-        self._mine_data = {}     # UUID -> {ore_type: [timestamps]}
-        self._last_notify = {}   # UUID -> timestamp
+        self._mine_data = {}     # uuid -> {ore: [timestamps]}
+        self._last_notify = {}   # uuid -> timestamp
 
     def on_stop(self):
         self._mine_data.clear()
@@ -50,7 +44,6 @@ class XrayModule(BaseModule):
         self._last_notify.pop(uuid_str, None)
 
     def on_block_break(self, event):
-        """Monitor ore block breaks."""
         player = event.player
         if player is None:
             return
@@ -66,18 +59,16 @@ class XrayModule(BaseModule):
         uuid_str = str(player.unique_id)
         now = time.time()
 
-        # Track the break
         player_data = self._mine_data.setdefault(uuid_str, defaultdict(list))
         timestamps = player_data[block_type]
         timestamps.append(now)
 
-        # Clean old entries
+        # clean old
         while timestamps and (now - timestamps[0]) > self.TIME_WINDOW:
             timestamps.pop(0)
 
         threshold = self.ORE_THRESHOLDS[block_type]
         if len(timestamps) >= threshold:
-            # Check notification cooldown
             last = self._last_notify.get(uuid_str, 0)
             if now - last >= self.NOTIFY_COOLDOWN:
                 self._last_notify[uuid_str] = now

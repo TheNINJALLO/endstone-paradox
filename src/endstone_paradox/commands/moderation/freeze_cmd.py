@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-freeze Command
-
-Freeze/unfreeze a player (prevent all movement).
-"""
+# freeze_cmd - /ac-freeze Command
 
 
 def handle_freeze(plugin, sender, args) -> bool:

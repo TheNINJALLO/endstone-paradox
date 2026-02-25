@@ -1,1 +1,1 @@
-"""Paradox AntiCheat - Settings Commands"""
+# __init__ - Settings Commands

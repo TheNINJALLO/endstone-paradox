@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-tpr Command
-
-Random teleport within a configurable radius.
-"""
+# tpr_cmd - /ac-tpr Command
 
 import random
 

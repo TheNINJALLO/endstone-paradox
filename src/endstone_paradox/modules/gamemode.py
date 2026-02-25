@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - GameMode Detection Module
-
-Detects unauthorized gamemode changes for non-admin players.
-"""
+# gamemode.py - Blocks unauthorized gamemode changes
 
 from endstone import GameMode
 from endstone_paradox.modules.base import BaseModule

@@ -1,17 +1,4 @@
-"""
-Paradox AntiCheat - /ac-home Command
-
-Set, delete, list, and teleport to home locations.
-Homes are stored per-player in the database.
-
-Usage:
-  /ac-home              - Teleport to your default home
-  /ac-home <name>       - Teleport to a named home
-  /ac-home set [name]   - Save current location as home
-  /ac-home delete <name> - Delete a home
-  /ac-home list         - List all your homes
-  /ac-home help         - Show usage info
-"""
+# home_cmd - /ac-home Command
 
 import json
 

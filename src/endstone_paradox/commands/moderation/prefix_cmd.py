@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-prefix Command
-
-Change the display prefix used in Paradox messages.
-"""
+# prefix_cmd - /ac-prefix Command
 
 
 def handle_prefix(plugin, sender, args) -> bool:

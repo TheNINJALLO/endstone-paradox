@@ -1,9 +1,4 @@
-"""
-Paradox AntiCheat - Reach Detection Module
-
-Detects reach hacks by tracking player movement history and using
-interpolation to estimate positions at the time of a hit.
-"""
+# reach.py - Reach detection via movement interpolation + distance checks
 
 import math
 import time

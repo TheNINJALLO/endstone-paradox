@@ -1,4 +1,4 @@
-"""Paradox AntiCheat - Comprehensive anti-cheat and moderation system for Endstone."""
+# __init__ - Comprehensive anti-cheat and moderation system for Endstone.
 
 from .paradox import ParadoxPlugin
 

@@ -1,9 +1,4 @@
-"""
-Paradox AntiCheat - /ac-vanish Command
-
-Toggle admin invisibility. Vanished players are hidden from
-other players using effects and the vanished_players list.
-"""
+# vanish_cmd - /ac-vanish Command
 
 
 def handle_vanish(plugin, sender, args) -> bool:

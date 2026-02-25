@@ -1,9 +1,4 @@
-"""
-Paradox AntiCheat - /ac-lockdown Command
-
-Toggle server lockdown mode. When active, only Level 4 players
-can join or use commands.
-"""
+# lockdown_cmd - /ac-lockdown Command
 
 
 def handle_lockdown(plugin, sender, args) -> bool:

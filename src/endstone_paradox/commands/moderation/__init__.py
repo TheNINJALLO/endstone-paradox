@@ -1,1 +1,1 @@
-"""Paradox AntiCheat - Moderation Commands"""
+# __init__ - Moderation Commands

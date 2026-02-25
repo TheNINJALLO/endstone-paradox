@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-allowlist Command
-
-Manage the server allow list.
-"""
+# allowlist_cmd - /ac-allowlist Command
 
 
 def handle_allowlist(plugin, sender, args) -> bool:

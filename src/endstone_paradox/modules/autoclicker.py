@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - AutoClicker Detection Module
-
-Detects autoclicker hacks by measuring clicks per second (CPS).
-"""
+# autoclicker.py - CPS-based autoclicker detection
 
 import time
 from collections import deque

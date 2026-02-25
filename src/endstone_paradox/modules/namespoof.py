@@ -1,9 +1,4 @@
-"""
-Paradox AntiCheat - Namespoof Detection Module
-
-Validates player names for length, allowed characters, and duplicates.
-Kicks or bans offenders based on configuration.
-"""
+# namespoof.py - Name validation (length, chars, duplicates)
 
 import re
 import time

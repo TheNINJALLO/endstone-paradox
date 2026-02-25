@@ -1,1 +1,1 @@
-"""Paradox AntiCheat - GUI Package"""
+# __init__ - GUI Package

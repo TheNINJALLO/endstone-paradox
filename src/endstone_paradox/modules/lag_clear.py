@@ -1,9 +1,4 @@
-"""
-Paradox AntiCheat - Lag Clear Module
-
-Periodically removes ground items and optionally other entities
-to reduce server lag.
-"""
+# lag_clear.py - Periodic ground item cleanup
 
 import time
 from endstone_paradox.modules.base import BaseModule

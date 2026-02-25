@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - AFK Detection Module
-
-Detects idle players and kicks them after a configurable timeout.
-"""
+# afk.py - Kick idle players after configurable timeout
 
 import time
 from endstone_paradox.modules.base import BaseModule

@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-unban Command
-
-Remove a player's ban from the database.
-"""
+# unban_cmd - /ac-unban Command
 
 
 def handle_unban(plugin, sender, args) -> bool:

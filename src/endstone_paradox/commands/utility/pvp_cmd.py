@@ -1,12 +1,4 @@
-"""
-Paradox AntiCheat - /ac-pvp Command
-
-Toggle PvP for the sending player or globally.
-Usage:
-  /ac-pvp         - Toggle your personal PvP on/off
-  /ac-pvp global  - Toggle PvP for the entire server (Level 4 only)
-  /ac-pvp status  - View current PvP status
-"""
+# pvp_cmd - /ac-pvp Command
 
 
 def handle_pvp(plugin, sender, args) -> bool:

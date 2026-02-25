@@ -1,9 +1,4 @@
-"""
-Paradox AntiCheat - Self-Infliction Detection Module
-
-Detects when players attempt to damage themselves, which may indicate
-exploit attempts or client modifications.
-"""
+# self_infliction.py - Detects self-damage exploit attempts
 
 from endstone_paradox.modules.base import BaseModule
 

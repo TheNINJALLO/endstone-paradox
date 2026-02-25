@@ -1,9 +1,4 @@
-"""
-Paradox AntiCheat - /ac-opsec Command
-
-Display the security dashboard: online admins, clearance levels,
-recent security events.
-"""
+# opsec_cmd - /ac-opsec Command
 
 
 def handle_opsec(plugin, sender, args) -> bool:

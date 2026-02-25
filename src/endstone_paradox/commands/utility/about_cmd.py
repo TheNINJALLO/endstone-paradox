@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-about Command
-
-Display plugin information, credits, and version.
-"""
+# about_cmd - /ac-about Command
 
 
 def handle_about(plugin, sender, args) -> bool:

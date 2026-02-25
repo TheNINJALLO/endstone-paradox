@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-modules Command
-
-Display module status dashboard with toggle info.
-"""
+# modules_cmd - /ac-modules Command
 
 
 def handle_modules(plugin, sender, args) -> bool:

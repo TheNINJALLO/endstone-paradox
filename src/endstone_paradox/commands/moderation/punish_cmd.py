@@ -1,9 +1,4 @@
-"""
-Paradox AntiCheat - /ac-punish Command
-
-Apply a configurable punishment to a player.
-Actions: warn, kick, tempban, ban, smite (lightning)
-"""
+# punish_cmd - /ac-punish Command
 
 import time
 

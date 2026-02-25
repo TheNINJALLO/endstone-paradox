@@ -1,8 +1,4 @@
-"""
-Paradox AntiCheat - /ac-ban Command
-
-Ban a player from the server. Stores ban persistently in SQLite.
-"""
+# ban_cmd - /ac-ban Command
 
 import time
 

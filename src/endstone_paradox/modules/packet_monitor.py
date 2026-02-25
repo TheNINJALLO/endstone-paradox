@@ -1,9 +1,4 @@
-"""
-Paradox AntiCheat - Packet Monitor Module
-
-Monitors packet types and frequency for diagnostic purposes.
-Warns in console when packet spam is detected.
-"""
+# packet_monitor.py - Diagnostic packet frequency monitoring
 
 import time
 from collections import defaultdict, deque

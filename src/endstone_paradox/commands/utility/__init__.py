@@ -1,1 +1,1 @@
-"""Paradox AntiCheat - Utility Commands"""
+# __init__ - Utility Commands

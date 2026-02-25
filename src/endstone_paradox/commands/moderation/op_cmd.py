@@ -1,9 +1,4 @@
-"""
-Paradox AntiCheat - /ac-op Command
-
-Grant security clearance using a password.
-First usage sets the password; subsequent uses verify against it.
-"""
+# op_cmd - /ac-op Command
 
 from endstone_paradox.security import SecurityClearance, hash_password, verify_password
 
