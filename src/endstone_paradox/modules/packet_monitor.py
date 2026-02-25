@@ -16,7 +16,7 @@ class PacketMonitorModule(BaseModule):
     name = "packetmonitor"
     check_interval = 100  # Cleanup every 5 seconds
 
-    SPAM_THRESHOLD = 250   # Packets per type per 5 seconds
+    SPAM_THRESHOLD = 1000  # Packets per type per 5 seconds (generous for Bedrock)
     WINDOW_SIZE = 5.0      # Analysis window
 
     # Common/noisy packet types to ignore

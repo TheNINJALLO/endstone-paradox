@@ -17,10 +17,10 @@ class KillAuraModule(BaseModule):
     name = "killaura"
 
     # Detection thresholds
-    MIN_ATTACKS = 5          # Minimum attacks to analyze
-    TIME_WINDOW = 3.0        # Seconds to track attacks
-    MIN_STD_DEV = 0.02       # Minimum standard deviation (too consistent = bot)
-    MAX_ANGLE = 90.0         # Max angle between facing and target (degrees)
+    MIN_ATTACKS = 8          # Minimum attacks to analyze (need more data)
+    TIME_WINDOW = 5.0        # Seconds to track attacks
+    MIN_STD_DEV = 0.008      # Minimum standard deviation (only truly robotic timing)
+    MAX_ANGLE = 120.0        # Max angle — Bedrock hit detection is generous
 
     def on_start(self):
         self._attack_data = {}  # UUID -> deque of timestamps

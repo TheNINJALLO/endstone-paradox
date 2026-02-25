@@ -18,9 +18,9 @@ class VisionModule(BaseModule):
     check_interval = 5  # Check every 0.25 seconds
 
     MAX_ROTATION_SPEED = 180.0  # Degrees per tick (impossibly fast)
-    SNAP_THRESHOLD = 90.0       # Sudden snap angle (degrees)
-    SNAP_COUNT_LIMIT = 5        # Max snaps in window before flag
-    WINDOW_SIZE = 2.0           # Analysis window (seconds)
+    SNAP_THRESHOLD = 150.0      # Sudden snap angle — only catches near-instant 180s
+    SNAP_COUNT_LIMIT = 8        # Max snaps in window before flag
+    WINDOW_SIZE = 3.0           # Analysis window (seconds)
 
     def on_start(self):
         self._rotation_data = {}  # UUID -> {last_yaw, last_pitch, snaps: deque}

@@ -17,7 +17,7 @@ class ReachModule(BaseModule):
     name = "reach"
     check_interval = 5  # Track positions every 0.25 seconds
 
-    MAX_ATTACK_DISTANCE = 3.5   # Blocks (with some tolerance)
+    MAX_ATTACK_DISTANCE = 6.0   # Blocks — generous for Bedrock latency (vanilla ~3)
     HISTORY_SIZE = 20           # Number of position samples to keep
 
     def on_start(self):

@@ -15,9 +15,9 @@ class ScaffoldModule(BaseModule):
 
     name = "scaffold"
 
-    MAX_PLACEMENTS = 6       # Max blocks in the time window
-    TIME_WINDOW = 1.0        # Seconds
-    AXIS_THRESHOLD = 2       # Number of constant axes to flag (e.g. same Y and X)
+    MAX_PLACEMENTS = 12      # Max blocks in the time window (fast builders can do 8+/s)
+    TIME_WINDOW = 1.5        # Seconds
+    AXIS_THRESHOLD = 3       # All 3 axes must be constant to flag (very strict = fewer FPs)
 
     def on_start(self):
         self._placement_data = {}  # UUID -> deque of (time, x, y, z)

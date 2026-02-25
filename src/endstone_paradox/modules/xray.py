@@ -18,22 +18,22 @@ class XrayModule(BaseModule):
     TIME_WINDOW = 300.0  # 5 minutes
     NOTIFY_COOLDOWN = 60.0  # Don't re-alert for same player within 60s
 
-    # Ore thresholds: max blocks per TIME_WINDOW before alert
+    # Ore thresholds: max blocks per TIME_WINDOW before alert (generous for strip mining)
     ORE_THRESHOLDS = {
-        "diamond_ore": 10,
-        "deepslate_diamond_ore": 10,
-        "ancient_debris": 5,
-        "emerald_ore": 12,
-        "deepslate_emerald_ore": 12,
-        "gold_ore": 15,
-        "deepslate_gold_ore": 15,
-        "nether_gold_ore": 20,
-        "iron_ore": 25,
-        "deepslate_iron_ore": 25,
-        "lapis_ore": 15,
-        "deepslate_lapis_ore": 15,
-        "redstone_ore": 20,
-        "deepslate_redstone_ore": 20,
+        "diamond_ore": 20,
+        "deepslate_diamond_ore": 20,
+        "ancient_debris": 10,
+        "emerald_ore": 24,
+        "deepslate_emerald_ore": 24,
+        "gold_ore": 30,
+        "deepslate_gold_ore": 30,
+        "nether_gold_ore": 40,
+        "iron_ore": 50,
+        "deepslate_iron_ore": 50,
+        "lapis_ore": 30,
+        "deepslate_lapis_ore": 30,
+        "redstone_ore": 40,
+        "deepslate_redstone_ore": 40,
     }
 
     def on_start(self):

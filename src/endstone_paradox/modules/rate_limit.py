@@ -15,12 +15,12 @@ class RateLimitModule(BaseModule):
 
     name = "ratelimit"
 
-    MAX_PACKETS_PER_WINDOW = 500  # Max packets in the time window (Bedrock clients send 200+ normally)
-    WINDOW_SIZE = 1.0             # 1 second
-    VIOLATION_THRESHOLD = 10      # Violations before kick (not ban)
-    DOS_PLAYER_THRESHOLD = 5     # Players violating simultaneously = DoS
-    DOS_TIME_WINDOW = 5.0        # Window for DoS detection
-    LOCKDOWN_DURATION = 60       # Lockdown duration in seconds
+    MAX_PACKETS_PER_WINDOW = 2000  # Max packets in the time window (Bedrock sends 500+ normally)
+    WINDOW_SIZE = 1.0              # 1 second
+    VIOLATION_THRESHOLD = 20       # Violations before kick (very generous)
+    DOS_PLAYER_THRESHOLD = 5      # Players violating simultaneously = DoS
+    DOS_TIME_WINDOW = 10.0        # Window for DoS detection
+    LOCKDOWN_DURATION = 60        # Lockdown duration in seconds
 
     def on_start(self):
         self._packet_counts = {}   # UUID -> deque of timestamps

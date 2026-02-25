@@ -14,7 +14,7 @@ class AutoClickerModule(BaseModule):
 
     name = "autoclicker"
 
-    MAX_CPS = 20            # Maximum allowed clicks per second
+    MAX_CPS = 30            # Maximum allowed clicks per second (high-end mice can do 20+)
     WINDOW_SIZE = 1.0       # Time window in seconds
 
     def on_start(self):

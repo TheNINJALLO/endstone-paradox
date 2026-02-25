@@ -49,7 +49,7 @@ class SelfInflictionModule(BaseModule):
 
                 event.is_cancelled = True
 
-                if count >= 3:
+                if count >= 5:
                     self.alert_admins(
                         f"§c{actor.name}§e flagged for self-infliction "
                         f"(count={count})"

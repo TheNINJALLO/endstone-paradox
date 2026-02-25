@@ -238,8 +238,7 @@ class ParadoxPlugin(Plugin):
 
         # Modules that are OFF by default (need server-specific calibration)
         default_off = {
-            "fly", "killaura", "reach", "autoclicker", "scaffold",
-            "xray", "vision", "selfinfliction", "ratelimit", "packetmonitor",
+            "ratelimit", "packetmonitor",
         }
 
         for name, cls in module_classes.items():

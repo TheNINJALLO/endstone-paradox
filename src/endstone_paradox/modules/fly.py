@@ -15,7 +15,7 @@ class FlyModule(BaseModule):
     """Detects illegal flying and airborne movement."""
 
     name = "fly"
-    check_interval = 10  # Check every 0.5 seconds (10 ticks)
+    check_interval = 20  # Check every 1 second (20 ticks)
 
     def on_start(self):
         self._player_data = {}  # UUID -> {landing: Location, hover_time: int, trident_used: bool}
@@ -76,9 +76,9 @@ class FlyModule(BaseModule):
         # Get velocity for analysis
         vel = player.velocity
         h_speed = math.sqrt(vel.x ** 2 + vel.z ** 2)
-        v_threshold = 0.15
-        h_threshold = 0.15
-        hover_threshold = 4  # 2 seconds at 10-tick interval
+        v_threshold = 0.5   # Generous to avoid flagging normal jumps/falls
+        h_threshold = 0.5   # Generous to avoid flagging normal sprinting
+        hover_threshold = 5  # 5 seconds at 1-second interval
 
         # Check for suspicious airborne movement
         is_suspicious = (
