@@ -5,7 +5,7 @@ Creates ActionForm and ModalForm menus for the Paradox Admin GUI.
 Uses Endstone's form system to provide an interactive management interface.
 """
 
-from endstone.form import ActionForm, ModalForm
+from endstone.form import ActionForm, ModalForm, Toggle, TextInput
 
 
 def build_main_menu(plugin, player):
@@ -202,22 +202,32 @@ def _show_security_info(plugin, player):
 
 def _show_settings_menu(plugin, player):
     """Show server settings form."""
+    import json
     form = ModalForm(title="§l§bServer Settings")
 
-    form.add_toggle("Lockdown Mode", default=plugin._lockdown_active)
-    form.add_text_input("AFK Timeout (seconds)",
-                        default=str(plugin.db.get("config", "afk_timeout", 600)))
-    form.add_text_input("Lag Clear Interval (seconds)",
-                        default=str(plugin.db.get("config", "lagclear_interval", 300)))
-    form.add_text_input("Max CPS",
-                        default=str(plugin.db.get("config", "max_cps", 30)))
+    form.add_control(Toggle("Lockdown Mode", plugin._lockdown_active))
+    form.add_control(TextInput(
+        "AFK Timeout (seconds)", "600",
+        str(plugin.db.get("config", "afk_timeout", 600))
+    ))
+    form.add_control(TextInput(
+        "Lag Clear Interval (seconds)", "300",
+        str(plugin.db.get("config", "lagclear_interval", 300))
+    ))
+    form.add_control(TextInput(
+        "Max CPS", "30",
+        str(plugin.db.get("config", "max_cps", 30))
+    ))
 
-    def on_submit(p, data):
-        if data is None:
+    def on_submit(p, response):
+        if response is None:
             # Cancelled — go back to main menu
             p.send_form(build_main_menu(plugin, p))
             return
         try:
+            # Parse the JSON response string
+            data = json.loads(response) if isinstance(response, str) else response
+
             # Lockdown
             if data[0] != plugin._lockdown_active:
                 plugin._lockdown_active = data[0]
@@ -252,6 +262,7 @@ def _show_settings_menu(plugin, player):
 
     form.on_submit = on_submit
     player.send_form(form)
+
 
 
 # ─── Database Viewer ─────────────────────────────────────────

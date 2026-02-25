@@ -28,9 +28,12 @@ class RateLimitModule(BaseModule):
         self._dos_violations = deque()  # timestamps of rate limit violations
 
     def on_stop(self):
-        self._packet_counts.clear()
-        self._violations.clear()
-        self._dos_violations.clear()
+        if hasattr(self, '_packet_counts'):
+            self._packet_counts.clear()
+        if hasattr(self, '_violations'):
+            self._violations.clear()
+        if hasattr(self, '_dos_violations'):
+            self._dos_violations.clear()
 
     def on_player_leave(self, player):
         uuid_str = str(player.unique_id)

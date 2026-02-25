@@ -31,7 +31,8 @@ class PacketMonitorModule(BaseModule):
         self._packet_data = {}  # UUID -> {packet_type: deque of timestamps}
 
     def on_stop(self):
-        self._packet_data.clear()
+        if hasattr(self, '_packet_data'):
+            self._packet_data.clear()
 
     def on_player_leave(self, player):
         self._packet_data.pop(str(player.unique_id), None)
