@@ -53,7 +53,22 @@ class ParadoxPlugin(Plugin):
 
     def on_enable(self):
         """Called when the plugin is enabled."""
-        self.logger.info("§2[§7Paradox§2]§r Initializing Paradox AntiCheat...")
+        # Print startup banner
+        self.logger.info("")
+        self.logger.info("§2════════════════════════════════════════════════════════")
+        self.logger.info("")
+        self.logger.info("  §f§l ██████   █████  ██████   █████  ██████   ██████  ██   ██")
+        self.logger.info("  §f§l ██   ██ ██   ██ ██   ██ ██   ██ ██   ██ ██    ██  ██ ██")
+        self.logger.info("  §f§l ██████  ███████ ██████  ███████ ██   ██ ██    ██   ███")
+        self.logger.info("  §f§l ██      ██   ██ ██   ██ ██   ██ ██   ██ ██    ██  ██ ██")
+        self.logger.info("  §f§l ██      ██   ██ ██   ██ ██   ██ ██████   ██████  ██   ██")
+        self.logger.info("")
+        self.logger.info("  §7AntiCheat §ev1.0.0")
+        self.logger.info("  §7Designed by §fVisual1mpact")
+        self.logger.info("  §7Ported to Endstone by §a§lTheN1NJ4LL0")
+        self.logger.info("")
+        self.logger.info("§2════════════════════════════════════════════════════════")
+        self.logger.info("")
 
         # Initialize database
         data_folder = Path(self.data_folder)
@@ -80,7 +95,7 @@ class ParadoxPlugin(Plugin):
         # Initialize and start all enabled modules
         self._init_modules()
 
-        self.logger.info("§2[§7Paradox§2]§a Paradox AntiCheat v1.0.0 enabled!")
+        self.logger.info("§2[§7Paradox§2]§a Loaded successfully!")
         self.logger.info(f"§2[§7Paradox§2]§7 Database: {self.db._db_path}")
         self.logger.info(f"§2[§7Paradox§2]§7 Modules loaded: {len(self._modules)}")
 

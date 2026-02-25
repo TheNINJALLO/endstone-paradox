@@ -15,11 +15,11 @@ class RateLimitModule(BaseModule):
 
     name = "ratelimit"
 
-    MAX_PACKETS_PER_WINDOW = 50   # Max packets in the time window
+    MAX_PACKETS_PER_WINDOW = 500  # Max packets in the time window (Bedrock clients send 200+ normally)
     WINDOW_SIZE = 1.0             # 1 second
-    VIOLATION_THRESHOLD = 3       # Violations before ban
-    DOS_PLAYER_THRESHOLD = 3     # Players violating simultaneously = DoS
-    DOS_TIME_WINDOW = 2.0        # Window for DoS detection
+    VIOLATION_THRESHOLD = 10      # Violations before kick (not ban)
+    DOS_PLAYER_THRESHOLD = 5     # Players violating simultaneously = DoS
+    DOS_TIME_WINDOW = 5.0        # Window for DoS detection
     LOCKDOWN_DURATION = 60       # Lockdown duration in seconds
 
     def on_start(self):
@@ -70,15 +70,10 @@ class RateLimitModule(BaseModule):
             event.is_cancelled = True
 
             if violations >= self.VIOLATION_THRESHOLD:
-                # Ban the player
-                self.plugin.db.set("bans", uuid_str, {
-                    "name": player.name,
-                    "reason": "Rate limit violation (flood)",
-                    "time": now,
-                })
-                player.kick("§cBanned: Packet flooding detected.")
+                # Kick the player (not ban — avoids false positives)
+                player.kick("§cKicked: Excessive packet rate detected.")
                 self.alert_admins(
-                    f"§c{player.name}§e banned for packet flooding "
+                    f"§c{player.name}§e kicked for packet flooding "
                     f"({violations} violations)"
                 )
                 self._violations.pop(uuid_str, None)

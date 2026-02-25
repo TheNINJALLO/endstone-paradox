@@ -12,6 +12,9 @@ dependencies = [
     "bedrock-protocol-packets",
 ]
 
+[project.entry-points."endstone"]
+paradox = "endstone_paradox:ParadoxPlugin"
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/endstone_paradox"]
 
