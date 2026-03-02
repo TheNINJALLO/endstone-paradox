@@ -7,20 +7,20 @@
     <img src="https://img.shields.io/badge/Endstone-v0.11+-00C853?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAyTDIgN2wxMCA1IDEwLTV6TTIgMTdsMTAgNSAxMC01TTIgMTJsMTAgNSAxMC01Ii8+PC9zdmc+&logoColor=white" alt="Endstone v0.11+">
     <img src="https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.9+">
     <img src="https://img.shields.io/badge/Minecraft-Bedrock_Edition-62B47A?style=for-the-badge&logo=minecraft&logoColor=white" alt="Minecraft Bedrock">
-    <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
+    <img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=for-the-badge" alt="GPL-3.0 License">
   </p>
   <p align="center">
-    <a href="https://github.com/TheN1NJ4LL0/endstone-paradox/releases/latest">
-      <img src="https://img.shields.io/github/v/release/TheN1NJ4LL0/endstone-paradox?style=for-the-badge&color=blue&label=Download" alt="Latest Release">
+    <a href="https://github.com/TheNINJALLO/endstone-paradox/releases/latest">
+      <img src="https://img.shields.io/github/v/release/TheNINJALLO/endstone-paradox?style=for-the-badge&color=blue&label=Download" alt="Latest Release">
     </a>
-    <img src="https://img.shields.io/github/downloads/TheN1NJ4LL0/endstone-paradox/total?style=for-the-badge&color=brightgreen&label=Downloads" alt="Total Downloads">
+    <img src="https://img.shields.io/github/downloads/TheNINJALLO/endstone-paradox/total?style=for-the-badge&color=brightgreen&label=Downloads" alt="Total Downloads">
   </p>
 </p>
 
 ---
 
 > **Originally created by [Visual1mpact](https://github.com/Visual1mpact/Paradox_AntiCheat)**
-> — Ported to Endstone by [**TheN1NJ4LL0**](https://github.com/TheN1NJ4LL0)
+> — Ported to Endstone by [**TheNINJALLO**](https://github.com/TheNINJALLO)
 
 A full Python port of the original [Paradox AntiCheat](https://github.com/Visual1mpact/Paradox_AntiCheat), rebuilt from the ground up as a native Endstone plugin with SQLite persistence, SHA-256 authentication, protocol-level detection, and a complete in-game GUI.
 
@@ -43,7 +43,7 @@ A full Python port of the original [Paradox AntiCheat](https://github.com/Visual
 
 ### Step 1 — Download
 
-Grab the latest `.whl` file from the **[Releases page](https://github.com/TheN1NJ4LL0/endstone-paradox/releases/latest)**.
+Grab the latest `.whl` file from the **[Releases page](https://github.com/TheNINJALLO/endstone-paradox/releases/latest)**.
 
 ### Step 2 — Install
 
@@ -335,10 +335,10 @@ When lockdown is active (`/ac-lockdown` or via GUI), only Level 4 admins can use
 
 ## 📄 License
 
-MIT — see [LICENSE](LICENSE) for details.
+GPL-3.0 — see [LICENSE](LICENSE) for details. Originally licensed under GPL-3.0 by [Visual1mpact](https://github.com/Visual1mpact/Paradox_AntiCheat).
 
 ---
 
 <p align="center">
-  <sub>Made with ❤️ by <a href="https://github.com/TheN1NJ4LL0">TheN1NJ4LL0</a> — based on <a href="https://github.com/Visual1mpact/Paradox_AntiCheat">Paradox AntiCheat</a> by Visual1mpact</sub>
+  <sub>Made with ❤️ by <a href="https://github.com/TheNINJALLO">TheNINJALLO</a> — based on <a href="https://github.com/Visual1mpact/Paradox_AntiCheat">Paradox AntiCheat</a> by Visual1mpact</sub>
 </p>
