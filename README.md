@@ -11,16 +11,16 @@
   </p>
   <p align="center">
     <a href="https://github.com/TheN1NJ4LL0/endstone-paradox/releases/latest">
-      <img src="https://img.shields.io/github/v/release/TheN1NJ4LL0/endstone-paradox?style=for-the-badge&color=blue&label=Download" alt="Latest Release">
+      <img src="https://img.shields.io/github/v/release/TheNINJALLO/endstone-paradox?style=for-the-badge&color=blue&label=Download" alt="Latest Release">
     </a>
-    <img src="https://img.shields.io/github/downloads/TheN1NJ4LL0/endstone-paradox/total?style=for-the-badge&color=brightgreen&label=Downloads" alt="Total Downloads">
+    <img src="https://img.shields.io/github/downloads/TheNINJALLO/endstone-paradox/total?style=for-the-badge&color=brightgreen&label=Downloads" alt="Total Downloads">
   </p>
 </p>
 
 ---
 
 > **Originally created by [Visual1mpact](https://github.com/Visual1mpact/Paradox_AntiCheat)**
-> — Ported to Endstone by [**TheN1NJ4LL0**](https://github.com/TheN1NJ4LL0)
+> — Ported to Endstone by [**TheN1NJ4LL0**](https://github.com/TheNINJALLO)
 
 A full Python port of the original [Paradox AntiCheat](https://github.com/Visual1mpact/Paradox_AntiCheat), rebuilt from the ground up as a native Endstone plugin with SQLite persistence, SHA-256 authentication, protocol-level detection, and a complete in-game GUI.
 
@@ -43,7 +43,7 @@ A full Python port of the original [Paradox AntiCheat](https://github.com/Visual
 
 ### Step 1 — Download
 
-Grab the latest `.whl` file from the **[Releases page](https://github.com/TheN1NJ4LL0/endstone-paradox/releases/latest)**.
+Grab the latest `.whl` file from the **[Releases page](https://github.com/TheNINJALLO/endstone-paradox/releases/latest)**.
 
 ### Step 2 — Install
 
@@ -340,5 +340,5 @@ MIT — see [LICENSE](LICENSE) for details.
 ---
 
 <p align="center">
-  <sub>Made with ❤️ by <a href="https://github.com/TheN1NJ4LL0">TheN1NJ4LL0</a> — based on <a href="https://github.com/Visual1mpact/Paradox_AntiCheat">Paradox AntiCheat</a> by Visual1mpact</sub>
+  <sub>Made with ❤️ by <a href="https://github.com/TheNINJALLO">TheN1NJ4LL0</a> — based on <a href="https://github.com/Visual1mpact/Paradox_AntiCheat">Paradox AntiCheat</a> by Visual1mpact</sub>
 </p>
