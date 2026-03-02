@@ -9,14 +9,21 @@ from endstone_paradox.modules.base import BaseModule
 class KillAuraModule(BaseModule):
     name = "killaura"
 
-    # tuning constants
-    MIN_ATTACKS = 8        # need enough data to analyze
-    TIME_WINDOW = 5.0      # seconds
-    MIN_STD_DEV = 0.008    # only flags truly robotic timing
-    MAX_ANGLE = 120.0      # bedrock hit detection is pretty generous
+    # Base tuning constants (at sensitivity 5)
+    BASE_MIN_ATTACKS = 8        # need enough data to analyze
+    BASE_TIME_WINDOW = 5.0      # seconds
+    BASE_MIN_STD_DEV = 0.008    # only flags truly robotic timing
+    BASE_MAX_ANGLE = 120.0      # bedrock hit detection is pretty generous
 
     def on_start(self):
         self._attack_data = {}  # uuid -> deque of timestamps
+        self._apply_sensitivity()
+
+    def _apply_sensitivity(self):
+        self.MIN_ATTACKS = max(3, int(self._scale(self.BASE_MIN_ATTACKS)))
+        self.TIME_WINDOW = self.BASE_TIME_WINDOW
+        self.MIN_STD_DEV = self._scale(self.BASE_MIN_STD_DEV)
+        self.MAX_ANGLE = self._scale(self.BASE_MAX_ANGLE)
 
     def on_stop(self):
         self._attack_data.clear()

@@ -12,13 +12,19 @@ class VisionModule(BaseModule):
     name = "vision"
     check_interval = 5  # Check every 0.25 seconds
 
-    MAX_ROTATION_SPEED = 180.0  # Degrees per tick (impossibly fast)
-    SNAP_THRESHOLD = 150.0      # Sudden snap angle — only catches near-instant 180s
-    SNAP_COUNT_LIMIT = 8        # Max snaps in window before flag
-    WINDOW_SIZE = 3.0           # Analysis window (seconds)
+    # Base thresholds (at sensitivity 5)
+    BASE_SNAP_THRESHOLD = 150.0      # Sudden snap angle
+    BASE_SNAP_COUNT_LIMIT = 8        # Max snaps in window before flag
+    BASE_WINDOW_SIZE = 3.0           # Analysis window (seconds)
 
     def on_start(self):
         self._rotation_data = {}  # UUID -> {last_yaw, last_pitch, snaps: deque}
+        self._apply_sensitivity()
+
+    def _apply_sensitivity(self):
+        self.SNAP_THRESHOLD = self._scale(self.BASE_SNAP_THRESHOLD)
+        self.SNAP_COUNT_LIMIT = max(3, int(self._scale(self.BASE_SNAP_COUNT_LIMIT)))
+        self.WINDOW_SIZE = self._scale(self.BASE_WINDOW_SIZE)
 
     def on_stop(self):
         self._rotation_data.clear()
@@ -65,7 +71,7 @@ class VisionModule(BaseModule):
                 if len(data["snaps"]) >= self.SNAP_COUNT_LIMIT:
                     self.alert_admins(
                         f"§c{player.name}§e flagged for suspicious aim "
-                        f"({len(data['snaps'])} rapid snaps in {self.WINDOW_SIZE}s)"
+                        f"({len(data['snaps'])} rapid snaps in {self.WINDOW_SIZE:.1f}s)"
                     )
                     data["snaps"].clear()
             except Exception:

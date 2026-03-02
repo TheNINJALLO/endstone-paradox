@@ -10,12 +10,18 @@ class ScaffoldModule(BaseModule):
 
     name = "scaffold"
 
-    MAX_PLACEMENTS = 12      # Max blocks in the time window (fast builders can do 8+/s)
-    TIME_WINDOW = 1.5        # Seconds
-    AXIS_THRESHOLD = 3       # All 3 axes must be constant to flag (very strict = fewer FPs)
+    # Base thresholds (at sensitivity 5)
+    BASE_MAX_PLACEMENTS = 12      # Max blocks in the time window
+    BASE_TIME_WINDOW = 1.5        # Seconds
+    AXIS_THRESHOLD = 3            # All 3 axes must be constant to flag
 
     def on_start(self):
         self._placement_data = {}  # UUID -> deque of (time, x, y, z)
+        self._apply_sensitivity()
+
+    def _apply_sensitivity(self):
+        self.MAX_PLACEMENTS = max(5, int(self._scale(self.BASE_MAX_PLACEMENTS)))
+        self.TIME_WINDOW = self._scale(self.BASE_TIME_WINDOW)
 
     def on_stop(self):
         self._placement_data.clear()
@@ -65,6 +71,6 @@ class ScaffoldModule(BaseModule):
 
             self.alert_admins(
                 f"§c{player.name}§e flagged for Scaffolding "
-                f"({len(placements)} blocks in {self.TIME_WINDOW}s)"
+                f"({len(placements)} blocks in {self.TIME_WINDOW:.1f}s)"
             )
             self._placement_data[uuid_str].clear()

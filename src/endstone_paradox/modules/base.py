@@ -5,7 +5,12 @@ from abc import ABC, abstractmethod
 
 class BaseModule(ABC):
     """Base class all Paradox modules inherit from. Handles start/stop
-    lifecycle and optional periodic task scheduling."""
+    lifecycle, optional periodic task scheduling, and sensitivity control."""
+
+    # Sensitivity scale: 1 (lenient) → 5 (default) → 10 (strict)
+    DEFAULT_SENSITIVITY = 5
+    MIN_SENSITIVITY = 1
+    MAX_SENSITIVITY = 10
 
     def __init__(self, plugin):
         self.plugin = plugin
@@ -13,6 +18,7 @@ class BaseModule(ABC):
         self.logger = plugin.logger
         self.running = False
         self._task = None
+        self._sensitivity = self.DEFAULT_SENSITIVITY
 
     @property
     @abstractmethod
@@ -24,10 +30,56 @@ class BaseModule(ABC):
         """Ticks between periodic checks. 20 ticks = 1 second."""
         return 20
 
+    @property
+    def sensitivity(self) -> int:
+        return self._sensitivity
+
+    def set_sensitivity(self, level: int):
+        """Set sensitivity (1-10) and persist to DB."""
+        level = max(self.MIN_SENSITIVITY, min(self.MAX_SENSITIVITY, level))
+        self._sensitivity = level
+        self.db.set("config", f"sensitivity_{self.name}", level)
+        self._apply_sensitivity()
+
+    def _load_sensitivity(self):
+        """Load sensitivity from DB, falling back to default."""
+        stored = self.db.get("config", f"sensitivity_{self.name}")
+        if stored is not None:
+            self._sensitivity = max(self.MIN_SENSITIVITY, min(self.MAX_SENSITIVITY, int(stored)))
+        else:
+            self._sensitivity = self.DEFAULT_SENSITIVITY
+        self._apply_sensitivity()
+
+    def _apply_sensitivity(self):
+        """Override in subclasses to recalculate thresholds based on self._sensitivity.
+        Called after sensitivity changes. Default implementation does nothing."""
+        pass
+
+    def _scale(self, base_value: float, invert: bool = False) -> float:
+        """Scale a threshold value based on current sensitivity.
+
+        Args:
+            base_value: The value at sensitivity 5 (default).
+            invert: If True, higher sensitivity = higher value (e.g. for counts/limits).
+                    If False, higher sensitivity = lower value (e.g. for thresholds/tolerances).
+
+        Returns the scaled value.
+        """
+        # Maps sensitivity 1→2.0x, 5→1.0x, 10→0.33x (or inverted)
+        factor = 1.0 + (5 - self._sensitivity) * 0.2
+        factor = max(0.33, min(2.0, factor))
+        if invert:
+            # Higher sensitivity = higher value (stricter counts, more detections)
+            return base_value / factor
+        else:
+            # Higher sensitivity = lower value (tighter tolerances)
+            return base_value * factor
+
     def start(self):
         if self.running:
             return
         self.running = True
+        self._load_sensitivity()
         self.on_start()
         if hasattr(self, "check") and callable(self.check):
             self._schedule_check()

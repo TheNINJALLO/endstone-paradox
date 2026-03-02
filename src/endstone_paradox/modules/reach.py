@@ -12,11 +12,15 @@ class ReachModule(BaseModule):
     name = "reach"
     check_interval = 5  # Track positions every 0.25 seconds
 
-    MAX_ATTACK_DISTANCE = 6.0   # Blocks — generous for Bedrock latency (vanilla ~3)
-    HISTORY_SIZE = 20           # Number of position samples to keep
+    BASE_MAX_ATTACK_DISTANCE = 6.0   # Blocks — generous for Bedrock latency (vanilla ~3)
+    HISTORY_SIZE = 20                 # Number of position samples to keep
 
     def on_start(self):
         self._move_history = {}  # UUID -> deque of (time, x, y, z, vx, vy, vz)
+        self._apply_sensitivity()
+
+    def _apply_sensitivity(self):
+        self.MAX_ATTACK_DISTANCE = self._scale(self.BASE_MAX_ATTACK_DISTANCE)
 
     def on_stop(self):
         self._move_history.clear()
@@ -72,7 +76,7 @@ class ReachModule(BaseModule):
                 event.is_cancelled = True
                 self.alert_admins(
                     f"§c{actor.name}§e flagged for Reach "
-                    f"(dist={distance:.2f}, max={self.MAX_ATTACK_DISTANCE})"
+                    f"(dist={distance:.2f}, max={self.MAX_ATTACK_DISTANCE:.1f})"
                 )
         except Exception:
             pass

@@ -72,6 +72,19 @@ def _handle_module_config(plugin, sender, module_name, args):
     if module is None:
         return
 
+    # Universal: handle 'sensitivity N' for any module
+    if len(args) >= 2 and args[0].lower() == "sensitivity":
+        try:
+            level = int(args[1])
+            module.set_sensitivity(level)
+            sender.send_message(
+                f"§2[§7Paradox§2]§a Module '{module_name}' sensitivity set to {module.sensitivity}/10."
+            )
+            return
+        except ValueError:
+            sender.send_message("§2[§7Paradox§2]§c Invalid sensitivity value (1-10).")
+            return
+
     if module_name == "autoclicker" and args:
         try:
             max_cps = int(args[0])
@@ -109,3 +122,17 @@ def _handle_module_config(plugin, sender, module_name, args):
             sender.send_message(f"§2[§7Paradox§2]§a Lag clear interval set to {interval}s.")
         except ValueError:
             sender.send_message("§2[§7Paradox§2]§c Invalid interval value.")
+
+    else:
+        # For modules without specific config, try to parse a bare number as sensitivity
+        try:
+            level = int(args[0])
+            if 1 <= level <= 10:
+                module.set_sensitivity(level)
+                sender.send_message(
+                    f"§2[§7Paradox§2]§a Module '{module_name}' sensitivity set to {module.sensitivity}/10."
+                )
+            else:
+                sender.send_message("§2[§7Paradox§2]§c Sensitivity must be 1-10.")
+        except ValueError:
+            sender.send_message(f"§2[§7Paradox§2]§c Unknown argument: {args[0]}")

@@ -114,6 +114,18 @@ This opens the full admin panel where you can manage **everything** — modules,
 
 Every module can be toggled individually via commands **or** the GUI.
 
+#### 🎚️ Module Sensitivity
+
+All detection modules support a **sensitivity scale from 1 to 10**:
+
+| Sensitivity | Behavior |
+|:-----------:|----------|
+| **1** | Very lenient — fewer false positives, may miss subtle cheats |
+| **5** | Default — balanced detection |
+| **10** | Very strict — catches more, but may flag edge cases |
+
+Adjust per module via command (`/ac-fly sensitivity 8`) or the GUI → **Modules** → select a module → **Adjust Sensitivity**.
+
 ### 🔐 4-Level Security System
 
 | Level | Name | Access |
@@ -125,7 +137,9 @@ Every module can be toggled individually via commands **or** the GUI.
 
 - **SHA-256 password hashing** — your password is never stored in plain text
 - **Security broadcasts** — all admin actions are reported to Level 4 players
-- **Lockdown mode** — restrict all commands to Level 4 only
+- **Two-tier lockdown mode:**
+  - **Level 1** — Only Level 4 (Owner) can stay and use commands
+  - **Level 2** — Level 4 + Level 3 (Moderator) can stay and use commands
 
 ### 💾 SQLite Persistence
 
@@ -153,7 +167,9 @@ Everything saves automatically and survives server restarts:
 | `/ac-kick <player> [reason]` | Kick a player with an optional reason |
 | `/ac-freeze <player>` | Freeze or unfreeze a player in place |
 | `/ac-vanish` | Toggle invisibility — hide from all players |
-| `/ac-lockdown` | Toggle server lockdown (Level 4 only) |
+| `/ac-lockdown` | Toggle server lockdown |
+| `/ac-lockdown level 1` | Set lockdown to Level 4 only |
+| `/ac-lockdown level 2` | Set lockdown to Level 4 + Level 3 |
 | `/ac-punish <player> [action]` | Punish a player (warn/mute/kick/ban) |
 | `/ac-tpa <player>` | Send a teleport request |
 | `/ac-allowlist [add\|remove\|list]` | Manage the allow list |
@@ -170,6 +186,7 @@ Everything saves automatically and survives server restarts:
 | Command | Description |
 |---------|-------------|
 | `/ac-fly` | Toggle fly/hover detection |
+| `/ac-fly sensitivity 7` | Set fly detection sensitivity (1-10) |
 | `/ac-killaura` | Toggle kill aura detection |
 | `/ac-reach` | Toggle reach hack detection |
 | `/ac-autoclicker [maxcps]` | Toggle autoclicker detection (optionally set max CPS) |
@@ -183,6 +200,8 @@ Everything saves automatically and survives server restarts:
 | `/ac-ratelimit` | Toggle packet rate limiting |
 | `/ac-namespoof` | Toggle name spoofing detection |
 | `/ac-packetmonitor` | Toggle packet spam monitoring |
+
+> **Tip:** Any detection command accepts `sensitivity N` — e.g., `/ac-killaura sensitivity 3` for lenient or `/ac-xray sensitivity 9` for strict.
 
 ### Utility
 
@@ -219,8 +238,8 @@ Type `/ac-gui` to open the complete admin panel. **Every feature is accessible f
 
 | Section | What You Can Do |
 |---------|-----------------|
-| **Modules** | Toggle all 14 detection modules on/off with a single tap |
-| **Moderation** | Vanish, lockdown, kick, ban, unban, freeze, punish, despawn entities, manage allow/white lists, view spoof logs, change prefix |
+| **Modules** | Toggle all 16 detection modules on/off, adjust sensitivity per-module with a slider (1-10) |
+| **Moderation** | Vanish, lockdown, lockdown level selector (L4 only / L4+L3), kick, ban, unban, freeze, punish, despawn entities, manage allow/white lists, view spoof logs, change prefix |
 | **Players** | Select any online player → kick, ban, freeze, warn, teleport to/from them, set rank, view inventory — all from one screen |
 | **Utilities** | Homes (set, delete, update, teleport), random TP, PvP toggle (personal + global), chat channels (create, join, leave, send), TPA, ranks |
 | **Security** | Live dashboard: lockdown status, frozen/vanished/banned counts, per-player clearance levels, opsec report |
@@ -243,6 +262,8 @@ Settings are managed through commands, the GUI, or directly via the database.
 | Max CPS | 20 | `/ac-autoclicker 25` or GUI → Settings |
 | World Border Radius | 10000 | `/ac-worldborder 5000` or GUI → Settings |
 | Global PvP | Enabled | `/ac-pvp global` or GUI → Settings |
+| Module Sensitivity | 5 (per module) | `/ac-fly sensitivity 8` or GUI → Modules → module → Sensitivity |
+| Lockdown Level | 1 (L4 only) | `/ac-lockdown level 2` or GUI → Moderation → Lockdown Level |
 
 ### Database Location
 
@@ -328,7 +349,11 @@ Each player can save up to 5 homes. Use `/ac-home set MyBase` to save your locat
 <details>
 <summary><strong>What happens during a lockdown?</strong></summary>
 
-When lockdown is active (`/ac-lockdown` or via GUI), only Level 4 admins can use commands. All other players are restricted until lockdown is disabled.
+When lockdown is active (`/ac-lockdown` or via GUI), access is restricted based on the lockdown level:
+- **Level 1** (default): Only Level 4 (Owner) can use commands and stay on the server.
+- **Level 2**: Level 4 + Level 3 (Moderator) can stay and use commands.
+
+Set the level with `/ac-lockdown level 2` or via GUI → **Moderation** → **Lockdown Level**.
 </details>
 
 ---

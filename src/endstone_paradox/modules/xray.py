@@ -9,11 +9,11 @@ from endstone_paradox.modules.base import BaseModule
 class XrayModule(BaseModule):
     name = "xray"
 
-    TIME_WINDOW = 300.0    # 5 min window
-    NOTIFY_COOLDOWN = 60.0 # don't spam alerts
+    BASE_TIME_WINDOW = 300.0    # 5 min window
+    NOTIFY_COOLDOWN = 60.0      # don't spam alerts
 
-    # max ore breaks per window before flagging (generous for strip mining)
-    ORE_THRESHOLDS = {
+    # Base ore thresholds at sensitivity 5 (generous for strip mining)
+    BASE_ORE_THRESHOLDS = {
         "diamond_ore": 20,
         "deepslate_diamond_ore": 20,
         "ancient_debris": 10,
@@ -33,6 +33,14 @@ class XrayModule(BaseModule):
     def on_start(self):
         self._mine_data = {}     # uuid -> {ore: [timestamps]}
         self._last_notify = {}   # uuid -> timestamp
+        self._apply_sensitivity()
+
+    def _apply_sensitivity(self):
+        # Higher sensitivity = lower thresholds (flags sooner)
+        self.TIME_WINDOW = self._scale(self.BASE_TIME_WINDOW)
+        self.ORE_THRESHOLDS = {}
+        for ore, base in self.BASE_ORE_THRESHOLDS.items():
+            self.ORE_THRESHOLDS[ore] = max(3, int(self._scale(base)))
 
     def on_stop(self):
         self._mine_data.clear()

@@ -34,7 +34,7 @@ class ParadoxPlugin(Plugin):
         "ac-kick": {"description": "Kick a player from the server with an optional reason", "usages": ["/ac-kick <player: player> [reason: message]"], "permissions": ["paradox.kick"]},
         "ac-freeze": {"description": "Freeze or unfreeze a player in place", "usages": ["/ac-freeze <player: player>"], "permissions": ["paradox.freeze"]},
         "ac-vanish": {"description": "Toggle invisibility - hide from all players", "usages": ["/ac-vanish"], "permissions": ["paradox.vanish"]},
-        "ac-lockdown": {"description": "Toggle server lockdown - only Level 4 can use commands", "usages": ["/ac-lockdown"], "permissions": ["paradox.lockdown"]},
+        "ac-lockdown": {"description": "Toggle server lockdown, or set lockdown level (1=L4 only, 2=L4+L3)", "usages": ["/ac-lockdown [level: int]"], "permissions": ["paradox.lockdown"]},
         "ac-punish": {"description": "Punish a player (warn/mute/kick/ban)", "usages": ["/ac-punish <player: player> [action: message]"], "permissions": ["paradox.punish"]},
         "ac-tpa": {"description": "Send a teleport request to another player", "usages": ["/ac-tpa <player: player>"], "permissions": ["paradox.tpa"]},
         "ac-allowlist": {"description": "Manage allow list: add/remove/list players", "usages": ["/ac-allowlist [args: message]"], "permissions": ["paradox.allowlist"]},
@@ -115,6 +115,7 @@ class ParadoxPlugin(Plugin):
         self._frozen_players = set()
         self._vanished_players = set()
         self._lockdown_active = False
+        self._lockdown_level = 1       # 1 = L4 only, 2 = L4+L3
 
         self._command_handlers = {}
 
@@ -133,7 +134,7 @@ class ParadoxPlugin(Plugin):
         self.logger.info("  §f§l ██      ██   ██ ██   ██ ██   ██ ██   ██ ██    ██  ██ ██")
         self.logger.info("  §f§l ██      ██   ██ ██   ██ ██   ██ ██████   ██████  ██   ██")
         self.logger.info("")
-        self.logger.info("  §7AntiCheat §ev1.1.0")
+        self.logger.info("  §7AntiCheat §ev1.2.0")
         self.logger.info("  §7Designed by §fVisual1mpact")
         self.logger.info("  §7Ported to Endstone by §a§lTheN1NJ4LL0")
         self.logger.info("")
@@ -145,6 +146,7 @@ class ParadoxPlugin(Plugin):
         self.security = SecurityManager(self.db)
 
         self._lockdown_active = self.db.get("config", "lockdown", False)
+        self._lockdown_level = self.db.get("config", "lockdown_level", 1)
 
         # restore frozen/vanished from last session
         frozen = self.db.get_all("frozen_players")
@@ -353,9 +355,10 @@ class ParadoxPlugin(Plugin):
                     sender.send_message("§2[§7Paradox§2]§c Insufficient security clearance.")
                     return False
 
-            # lockdown: only L4 can run commands
+            # lockdown: restrict commands based on lockdown level
             if self._lockdown_active and cmd_name != "ac-lockdown":
-                if not self.security.is_level4(sender):
+                from endstone_paradox.commands.moderation.lockdown_cmd import _player_meets_lockdown
+                if not _player_meets_lockdown(self, sender):
                     sender.send_message("§2[§7Paradox§2]§c Server is in lockdown mode.")
                     return False
 
@@ -413,9 +416,11 @@ class ParadoxPlugin(Plugin):
                 player.kick("§cYou are not on the allow list.")
                 return
 
-        if self._lockdown_active and not self.security.is_level4(player):
-            player.kick("§cServer is currently in lockdown mode.")
-            return
+        if self._lockdown_active:
+            from endstone_paradox.commands.moderation.lockdown_cmd import _player_meets_lockdown
+            if not _player_meets_lockdown(self, player):
+                player.kick("§cServer is currently in lockdown mode.")
+                return
 
         # update player record
         player_data = self.db.get("players", uuid_str, {})

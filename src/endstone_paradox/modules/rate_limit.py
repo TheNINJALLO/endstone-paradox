@@ -99,9 +99,10 @@ class RateLimitModule(BaseModule):
             f"{self.LOCKDOWN_DURATION}s!"
         )
 
-        # Kick all non-Level4 players
+        # Kick all players below lockdown threshold
+        from endstone_paradox.commands.moderation.lockdown_cmd import _player_meets_lockdown
         for player in self.plugin.server.online_players:
-            if not self.plugin.security.is_level4(player):
+            if not _player_meets_lockdown(self.plugin, player):
                 player.kick("§cServer lockdown: DoS attack detected.")
 
         # Schedule lockdown release

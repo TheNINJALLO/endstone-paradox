@@ -65,17 +65,18 @@ def _show_module_menu(plugin, player):
 
     form = ActionForm(
         title="§l§aModule Management",
-        content=f"§7Active: §a{running}§7/{total} modules\n§7Tap a module to toggle it on/off:",
+        content=f"§7Active: §a{running}§7/{total} modules\n§7Tap a module to configure:",
     )
 
     for name, module in sorted(plugin._modules.items()):
+        sens = module.sensitivity
         if module.running:
-            label = f"§a§l{name}\n§r§2Enabled"
+            label = f"§a§l{name}\n§r§2Enabled §7| Sensitivity: §e{sens}/10"
         else:
-            label = f"§c§l{name}\n§r§4Disabled"
+            label = f"§c§l{name}\n§r§4Disabled §7| Sensitivity: §e{sens}/10"
         form.add_button(
             label,
-            on_click=lambda p, n=name: _toggle_module(plugin, p, n)
+            on_click=lambda p, n=name: _show_module_config(plugin, p, n)
         )
 
     form.add_button(
@@ -85,12 +86,69 @@ def _show_module_menu(plugin, player):
     player.send_form(form)
 
 
+def _show_module_config(plugin, player, module_name):
+    """Show per-module config: toggle + sensitivity slider."""
+    module = plugin.get_module(module_name)
+    if module is None:
+        return
+
+    status = "§aEnabled" if module.running else "§cDisabled"
+    toggle_label = "§c§lDisable Module" if module.running else "§a§lEnable Module"
+
+    form = ActionForm(
+        title=f"§l§a{module_name}",
+        content=f"§7Status: {status}\n§7Sensitivity: §e{module.sensitivity}/10\n\n§71 = Lenient (fewer flags)\n§75 = Default\n§710 = Strict (more flags)",
+    )
+
+    form.add_button(
+        f"{toggle_label}\n§r§7Toggle this module on/off",
+        on_click=lambda p: _toggle_module(plugin, p, module_name)
+    )
+    form.add_button(
+        f"§e§lAdjust Sensitivity\n§r§7Current: {module.sensitivity}/10",
+        on_click=lambda p: _show_sensitivity_form(plugin, p, module_name)
+    )
+    form.add_button(
+        "§8§l< Back\n§r§7Return to modules",
+        on_click=lambda p: _show_module_menu(plugin, p)
+    )
+    player.send_form(form)
+
+
+def _show_sensitivity_form(plugin, player, module_name):
+    """Show a slider form to adjust module sensitivity."""
+    module = plugin.get_module(module_name)
+    if module is None:
+        return
+
+    form = ModalForm(title=f"§l§eSensitivity: {module_name}")
+    form.add_control(Slider("Sensitivity (1=lenient, 10=strict)", 1, 10, 1, module.sensitivity))
+
+    def on_submit(p, response):
+        if response is None:
+            _show_module_config(plugin, p, module_name)
+            return
+        try:
+            data = json.loads(response) if isinstance(response, str) else response
+            level = int(data[0])
+            module.set_sensitivity(level)
+            p.send_message(
+                f"§2[§7Paradox§2]§a Module '{module_name}' sensitivity set to {module.sensitivity}/10."
+            )
+        except Exception as e:
+            p.send_message(f"§2[§7Paradox§2]§c Error: {e}")
+        _show_module_config(plugin, p, module_name)
+
+    form.on_submit = on_submit
+    player.send_form(form)
+
+
 def _toggle_module(plugin, player, module_name):
     """Toggle a module and refresh."""
     new_state = plugin.toggle_module(module_name)
     status = "§aenabled" if new_state else "§cdisabled"
     player.send_message(f"§2[§7Paradox§2]§7 Module '{module_name}' {status}")
-    _show_module_menu(plugin, player)
+    _show_module_config(plugin, player, module_name)
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -116,6 +174,14 @@ def _show_moderation_menu(plugin, player):
     # Lockdown toggle
     l_label = "§a§lDisable Lockdown\n§r§7Server is locked" if lockdown else "§c§lEnable Lockdown\n§r§7Lock down the server"
     form.add_button(l_label, on_click=lambda p: _gui_lockdown(plugin, p))
+
+    # Lockdown level config
+    ld_level = plugin._lockdown_level
+    ld_desc = "L4 only" if ld_level == 1 else "L4 + L3"
+    form.add_button(
+        f"§6§lLockdown Level\n§r§7Current: {ld_desc}",
+        on_click=lambda p: _show_lockdown_level_form(plugin, p)
+    )
 
     # Player actions
     form.add_button(
@@ -178,6 +244,42 @@ def _gui_lockdown(plugin, player):
     from endstone_paradox.commands.moderation.lockdown_cmd import handle_lockdown
     handle_lockdown(plugin, player, None)
     _show_moderation_menu(plugin, player)
+
+
+def _show_lockdown_level_form(plugin, player):
+    """Show lockdown level selector."""
+    current = plugin._lockdown_level
+
+    form = ActionForm(
+        title="§l§6Lockdown Level",
+        content=f"§7Current level: §e{current}§7\n\n§eLevel 1§7: Only Level 4 (Owner) can stay\n§eLevel 2§7: Level 4 + Level 3 (Moderator) can stay",
+    )
+
+    l1_label = "§a§l✓ Level 1 (Active)§r\n§7L4 only" if current == 1 else "§f§lLevel 1§r\n§7L4 only"
+    l2_label = "§a§l✓ Level 2 (Active)§r\n§7L4 + L3" if current == 2 else "§f§lLevel 2§r\n§7L4 + L3"
+
+    form.add_button(
+        l1_label,
+        on_click=lambda p: _set_lockdown_level(plugin, p, 1)
+    )
+    form.add_button(
+        l2_label,
+        on_click=lambda p: _set_lockdown_level(plugin, p, 2)
+    )
+    form.add_button(
+        "§8§l< Back§r\n§7Return to moderation",
+        on_click=lambda p: _show_moderation_menu(plugin, p)
+    )
+    player.send_form(form)
+
+
+def _set_lockdown_level(plugin, player, level):
+    """Set lockdown level and refresh."""
+    plugin._lockdown_level = level
+    plugin.db.set("config", "lockdown_level", level)
+    desc = "L4 only" if level == 1 else "L4 + L3"
+    player.send_message(f"§2[§7Paradox§2]§a Lockdown level set to §e{level}§a ({desc}).")
+    _show_lockdown_level_form(plugin, player)
 
 
 def _show_player_action_picker(plugin, player, action):

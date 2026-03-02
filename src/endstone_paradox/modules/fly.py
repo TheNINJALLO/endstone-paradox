@@ -10,8 +10,19 @@ class FlyModule(BaseModule):
     name = "fly"
     check_interval = 20  # 1s
 
+    # Base thresholds (at sensitivity 5)
+    BASE_V_THRESHOLD = 0.5
+    BASE_H_THRESHOLD = 0.5
+    BASE_HOVER_THRESHOLD = 5  # seconds
+
     def on_start(self):
         self._player_data = {}  # uuid -> {landing, hover_time, trident_used}
+        self._apply_sensitivity()
+
+    def _apply_sensitivity(self):
+        self.v_threshold = self._scale(self.BASE_V_THRESHOLD)
+        self.h_threshold = self._scale(self.BASE_H_THRESHOLD)
+        self.hover_threshold = self._scale(self.BASE_HOVER_THRESHOLD)
 
     def on_stop(self):
         self._player_data.clear()
@@ -64,19 +75,16 @@ class FlyModule(BaseModule):
 
         vel = player.velocity
         h_speed = math.sqrt(vel.x ** 2 + vel.z ** 2)
-        v_threshold = 0.5
-        h_threshold = 0.5
-        hover_threshold = 5  # seconds
 
         is_suspicious = (
             (player.is_flying and not player.is_on_ground) or
-            (abs(vel.y) >= v_threshold or h_speed >= h_threshold)
+            (abs(vel.y) >= self.v_threshold or h_speed >= self.h_threshold)
         )
 
         if is_suspicious and not player.is_on_ground:
             data["hover_time"] += 1
 
-            if data["hover_time"] >= hover_threshold:
+            if data["hover_time"] >= self.hover_threshold:
                 landing = data.get("landing")
                 if landing:
                     player.teleport(landing)
