@@ -17,6 +17,7 @@ COMMAND_MODULE_MAP = {
     "ac-ratelimit": "ratelimit",
     "ac-namespoof": "namespoof",
     "ac-packetmonitor": "packetmonitor",
+    "ac-containersee": "containersee",
 }
 
 

@@ -1,8 +1,13 @@
-# scaffold.py - Detects speed-bridging via placement rate + axis patterns
+# scaffold.py - Scaffold detection with smarter filtering
+# Only flags blocks placed over air (not normal building), excludes
+# scaffolding/farmland, and returns items on detection.
 
 import time
 from collections import deque
 from endstone_paradox.modules.base import BaseModule
+
+# Blocks that are exempt from scaffold detection
+EXCLUDED_BLOCKS = {"scaffolding"}
 
 
 class ScaffoldModule(BaseModule):
@@ -11,16 +16,15 @@ class ScaffoldModule(BaseModule):
     name = "scaffold"
 
     # Base thresholds (at sensitivity 5)
-    BASE_MAX_PLACEMENTS = 12      # Max blocks in the time window
-    BASE_TIME_WINDOW = 1.5        # Seconds
-    AXIS_THRESHOLD = 3            # All 3 axes must be constant to flag
+    BASE_MAX_PLACEMENTS = 3       # Placements in quick succession to flag
+    BASE_TIME_WINDOW = 1.0        # Seconds (20 ticks)
 
     def on_start(self):
-        self._placement_data = {}  # UUID -> deque of (time, x, y, z)
+        self._placement_data = {}  # UUID -> {positions: [(x,y,z)], times: [float]}
         self._apply_sensitivity()
 
     def _apply_sensitivity(self):
-        self.MAX_PLACEMENTS = max(5, int(self._scale(self.BASE_MAX_PLACEMENTS)))
+        self.MAX_PLACEMENTS = max(3, int(self._scale(self.BASE_MAX_PLACEMENTS)))
         self.TIME_WINDOW = self._scale(self.BASE_TIME_WINDOW)
 
     def on_stop(self):
@@ -37,40 +41,89 @@ class ScaffoldModule(BaseModule):
         if self.plugin.security.is_level4(player):
             return
 
-        uuid_str = str(player.unique_id)
-        now = time.time()
         block = event.block
-
-        placements = self._placement_data.setdefault(uuid_str, deque())
-        placements.append((now, block.x, block.y, block.z))
-
-        # Remove old placements
-        while placements and (now - placements[0][0]) > self.TIME_WINDOW:
-            placements.popleft()
-
-        if len(placements) < self.MAX_PLACEMENTS:
+        if block is None:
             return
 
-        # Check for scaffold pattern: two axes remain constant
-        placement_list = list(placements)
-        xs = set(p[1] for p in placement_list)
-        ys = set(p[2] for p in placement_list)
-        zs = set(p[3] for p in placement_list)
+        # Get block type
+        block_type = str(block.type).lower().replace("minecraft:", "")
 
-        constant_axes = 0
-        if len(xs) <= 2:
-            constant_axes += 1
-        if len(ys) <= 2:
-            constant_axes += 1
-        if len(zs) <= 2:
-            constant_axes += 1
+        # Skip excluded blocks (scaffolding itself, etc.)
+        if block_type in EXCLUDED_BLOCKS:
+            return
 
-        if constant_axes >= self.AXIS_THRESHOLD:
+        # Skip creative/spectator mode
+        from endstone import GameMode
+        if player.game_mode in (GameMode.CREATIVE, GameMode.SPECTATOR):
+            return
+
+        # Skip sneaking players (bridging while sneaking is legitimate)
+        try:
+            if player.is_sneaking:
+                return
+        except Exception:
+            pass
+
+        # Key check: Only flag blocks placed OVER AIR
+        # If the block below is solid, this is normal building
+        try:
+            below = block.below() if hasattr(block, 'below') else None
+            if below is not None:
+                below_type = str(below.type).lower()
+                # Skip farmland (crop planting)
+                if "farmland" in below_type:
+                    return
+                # If block below is solid and not excluded, skip
+                if "air" not in below_type and below_type not in EXCLUDED_BLOCKS:
+                    return
+        except Exception:
+            pass
+
+        uuid_str = str(player.unique_id)
+        now = time.time()
+
+        data = self._placement_data.setdefault(uuid_str, {
+            "positions": [],
+            "times": [],
+        })
+
+        data["positions"].append((block.x, block.y, block.z))
+        data["times"].append(now)
+
+        # Limit buffer size
+        max_buf = self.MAX_PLACEMENTS * 2
+        if len(data["positions"]) > max_buf:
+            data["positions"] = data["positions"][-max_buf:]
+            data["times"] = data["times"][-max_buf:]
+
+        # Not enough data yet
+        if len(data["positions"]) < self.MAX_PLACEMENTS:
+            return
+
+        # Check if recent placements are within the time window
+        recent_times = data["times"][-self.MAX_PLACEMENTS:]
+        if recent_times[-1] - recent_times[0] > self.TIME_WINDOW:
+            return
+
+        # Check for scaffold pattern: at least 2 out of 3 axes constant
+        recent_pos = data["positions"][-self.MAX_PLACEMENTS:]
+        base = recent_pos[0]
+        x_match = all(p[0] == base[0] for p in recent_pos)
+        y_match = all(p[1] == base[1] for p in recent_pos)
+        z_match = all(p[2] == base[2] for p in recent_pos)
+
+        constant_axes = sum([x_match, y_match, z_match])
+
+        if constant_axes >= 2:
             # Cancel the placement
-            event.is_cancelled = True
+            try:
+                event.is_cancelled = True
+            except Exception:
+                pass
 
             self.alert_admins(
                 f"§c{player.name}§e flagged for Scaffolding "
-                f"({len(placements)} blocks in {self.TIME_WINDOW:.1f}s)"
+                f"({self.MAX_PLACEMENTS} blocks in {self.TIME_WINDOW:.1f}s over air)"
             )
-            self._placement_data[uuid_str].clear()
+            # Clear data to prevent repeated flagging
+            self._placement_data[uuid_str] = {"positions": [], "times": []}

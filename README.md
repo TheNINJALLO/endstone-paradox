@@ -91,16 +91,16 @@ This opens the full admin panel where you can manage **everything** — modules,
 
 ## ✨ Features
 
-### 🛡️ 16 Detection Modules
+### 🛡️ 17 Detection & Admin Modules
 
 | Module | What It Detects |
 |--------|-----------------|
-| **Fly** | Flight/hover hacks — ground tracking, velocity analysis, trident exemption |
-| **KillAura** | Combat bots — attack timing, facing angle validation |
-| **Reach** | Extended reach hacks — movement interpolation, distance checks |
+| **Fly** | Flight/hover hacks — surrounding-block air-majority check, velocity analysis, trident exemption |
+| **KillAura** | Combat bots — dynamic threshold adaptation, facing angle validation, attack rate + pattern analysis |
+| **Reach** | Extended reach hacks — Catmull-Rom cubic interpolation for accurate distance checks |
 | **AutoClicker** | Click bots — sliding-window CPS tracking (configurable threshold) |
-| **Scaffold** | Speed bridging — rapid block placement + axis pattern analysis |
-| **X-Ray** | Mining hacks — per-ore mining rate thresholds with alerts |
+| **Scaffold** | Speed bridging — air-below filtering, axis pattern analysis, excludes sneaking/farmland |
+| **X-Ray** | Mining hacks — weighted suspicion scoring, hidden ore detection, vein-jumping, ore ratios, suspicion decay, graduated escalation (alert → priority → freeze) |
 | **GameMode** | Unauthorized gamemode changes — instant blocking |
 | **Namespoof** | Name manipulation — length, character, and duplicate checks |
 | **Self-Infliction** | Self-damage exploits |
@@ -111,6 +111,7 @@ This opens the full admin panel where you can manage **everything** — modules,
 | **Packet Monitor** | Packet spam — per-type frequency monitoring |
 | **PvP Manager** | PvP system — per-player toggles, combat tagging, log detection |
 | **Lag Clear** | Entity cleanup — scheduled clearing with 30-second warnings |
+| **Container See** | Admin tool — see container contents by looking at them (L4 only, off by default) |
 
 Every module can be toggled individually via commands **or** the GUI.
 
@@ -200,6 +201,7 @@ Everything saves automatically and survives server restarts:
 | `/ac-ratelimit` | Toggle packet rate limiting |
 | `/ac-namespoof` | Toggle name spoofing detection |
 | `/ac-packetmonitor` | Toggle packet spam monitoring |
+| `/ac-containersee` | Toggle container vision for admins (off by default) |
 
 > **Tip:** Any detection command accepts `sensitivity N` — e.g., `/ac-killaura sensitivity 3` for lenient or `/ac-xray sensitivity 9` for strict.
 
@@ -238,7 +240,7 @@ Type `/ac-gui` to open the complete admin panel. **Every feature is accessible f
 
 | Section | What You Can Do |
 |---------|-----------------|
-| **Modules** | Toggle all 16 detection modules on/off, adjust sensitivity per-module with a slider (1-10) |
+| **Modules** | Toggle all 17 detection modules on/off, adjust sensitivity per-module with a slider (1-10) |
 | **Moderation** | Vanish, lockdown, lockdown level selector (L4 only / L4+L3), kick, ban, unban, freeze, punish, despawn entities, manage allow/white lists, view spoof logs, change prefix |
 | **Players** | Select any online player → kick, ban, freeze, warn, teleport to/from them, set rank, view inventory — all from one screen |
 | **Utilities** | Homes (set, delete, update, teleport), random TP, PvP toggle (personal + global), chat channels (create, join, leave, send), TPA, ranks |
@@ -286,14 +288,14 @@ endstone-paradox/
     ├── paradox.py              # Main plugin (31 commands, event handlers)
     ├── database.py             # SQLite persistence (WAL mode)
     ├── security.py             # 4-level clearance + SHA-256 auth
-    ├── modules/                # 16 detection modules
-    │   ├── base.py             #   Abstract base class
-    │   ├── fly.py              #   Flight/hover detection
-    │   ├── killaura.py         #   Combat bot detection
-    │   ├── reach.py            #   Reach hack detection
+    ├── modules/                # 17 detection & admin modules
+    │   ├── base.py             #   Abstract base class + sensitivity
+    │   ├── fly.py              #   Flight/hover (surrounding-block check)
+    │   ├── killaura.py         #   Combat bot (dynamic thresholds)
+    │   ├── reach.py            #   Reach hack (Catmull-Rom interpolation)
     │   ├── autoclicker.py      #   CPS tracking
-    │   ├── scaffold.py         #   Speed bridge detection
-    │   ├── xray.py             #   X-ray mining detection
+    │   ├── scaffold.py         #   Speed bridge (air-below filtering)
+    │   ├── xray.py             #   X-ray (weighted suspicion scoring)
     │   ├── gamemode.py         #   Gamemode change blocking
     │   ├── namespoof.py        #   Name validation
     │   ├── self_infliction.py  #   Self-damage detection
@@ -303,7 +305,8 @@ endstone-paradox/
     │   ├── lag_clear.py        #   Entity cleanup
     │   ├── rate_limit.py       #   Packet flood detection
     │   ├── packet_monitor.py   #   Packet spam alerts
-    │   └── pvp_manager.py      #   PvP toggle system
+    │   ├── pvp_manager.py      #   PvP toggle system
+    │   └── containersee.py     #   Container vision (admin tool)
     ├── commands/
     │   ├── moderation/         # 18 admin/moderation commands
     │   ├── settings/           # Module toggle handler

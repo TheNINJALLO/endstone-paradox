@@ -1,4 +1,6 @@
-# killaura.py - KillAura detection via attack timing + facing analysis
+# killaura.py - KillAura detection via dynamic attack pattern analysis
+# Uses self-adapting thresholds based on interval differences and
+# proper facing validation via view direction dot product.
 
 import math
 import time
@@ -10,19 +12,18 @@ class KillAuraModule(BaseModule):
     name = "killaura"
 
     # Base tuning constants (at sensitivity 5)
-    BASE_MIN_ATTACKS = 8        # need enough data to analyze
-    BASE_TIME_WINDOW = 5.0      # seconds
-    BASE_MIN_STD_DEV = 0.008    # only flags truly robotic timing
-    BASE_MAX_ANGLE = 120.0      # bedrock hit detection is pretty generous
+    BASE_MAX_ATTACKS_PER_SEC = 14     # Max attacks in 1 second
+    BASE_MAX_ATTACK_DISTANCE = 4.5    # Max legitimate hit distance
+    BASE_MAX_ANGLE = 60.0             # Max angle between view and target
+    BUFFER_SIZE = 20                   # Attack time buffer
 
     def on_start(self):
-        self._attack_data = {}  # uuid -> deque of timestamps
+        self._attack_data = {}  # uuid -> deque of timestamps (in ticks/time)
         self._apply_sensitivity()
 
     def _apply_sensitivity(self):
-        self.MIN_ATTACKS = max(3, int(self._scale(self.BASE_MIN_ATTACKS)))
-        self.TIME_WINDOW = self.BASE_TIME_WINDOW
-        self.MIN_STD_DEV = self._scale(self.BASE_MIN_STD_DEV)
+        self.MAX_ATTACKS = max(5, int(self._scale(self.BASE_MAX_ATTACKS_PER_SEC)))
+        self.MAX_DISTANCE = self._scale(self.BASE_MAX_ATTACK_DISTANCE)
         self.MAX_ANGLE = self._scale(self.BASE_MAX_ANGLE)
 
     def on_stop(self):
@@ -43,59 +44,118 @@ class KillAuraModule(BaseModule):
         uuid_str = str(actor.unique_id)
         now = time.time()
 
-        attacks = self._attack_data.setdefault(uuid_str, deque())
+        attacks = self._attack_data.setdefault(uuid_str, deque(maxlen=self.BUFFER_SIZE))
         attacks.append(now)
 
-        # prune old entries
-        while attacks and (now - attacks[0]) > self.TIME_WINDOW:
-            attacks.popleft()
+        # Count recent attacks (last 1 second)
+        recent = [t for t in attacks if now - t <= 1.0]
 
-        if len(attacks) < self.MIN_ATTACKS:
-            return
+        # Check 1: Distance check
+        distance_ok = self._check_distance(actor, event)
 
-        # calculate timing intervals
-        intervals = []
-        attack_list = list(attacks)
-        for i in range(1, len(attack_list)):
-            intervals.append(attack_list[i] - attack_list[i - 1])
+        # Check 2: Facing check
+        facing_ok = self._check_facing(actor, event)
 
-        if not intervals:
-            return
+        # Check 3: Attack rate
+        rate_ok = len(recent) < self.MAX_ATTACKS
 
-        avg_interval = sum(intervals) / len(intervals)
-        variance = sum((i - avg_interval) ** 2 for i in intervals) / len(intervals)
-        std_dev = math.sqrt(variance)
+        # Check 4: Pattern consistency (dynamic threshold)
+        pattern_ok = not self._is_suspicious_pattern(list(attacks))
 
-        angle_check = self._check_facing_angle(actor, event)
-
-        # flag if timing is too consistent or angle is way off
-        if std_dev < self.MIN_STD_DEV or not angle_check:
+        # Flag if any check fails
+        if not distance_ok or not facing_ok or not rate_ok or not pattern_ok:
             try:
                 event.is_cancelled = True
             except Exception:
                 pass
 
+            reasons = []
+            if not distance_ok:
+                reasons.append("dist")
+            if not facing_ok:
+                reasons.append("angle")
+            if not rate_ok:
+                reasons.append(f"rate={len(recent)}/s")
+            if not pattern_ok:
+                reasons.append("pattern")
+
             self.alert_admins(
                 f"§c{actor.name}§e flagged for KillAura "
-                f"(σ={std_dev:.4f}, attacks={len(attacks)})"
+                f"({', '.join(reasons)})"
             )
-            self._attack_data[uuid_str].clear()
+            self._attack_data[uuid_str] = deque(maxlen=self.BUFFER_SIZE)
 
-    def _check_facing_angle(self, attacker, event) -> bool:
-        """Returns True if attacker is roughly facing the victim."""
+    def _check_distance(self, attacker, event):
+        """Check if attack distance is within limits."""
         try:
+            victim = event.actor if event.actor != attacker else None
+            if victim is None:
+                return True
             a_loc = attacker.location
-            v_loc = event.actor.location if event.actor != attacker else None
-            if v_loc is None:
-                return True  # can't check
+            v_loc = victim.location
+            dx = a_loc.x - v_loc.x
+            dy = a_loc.y - v_loc.y
+            dz = a_loc.z - v_loc.z
+            dist = math.sqrt(dx * dx + dy * dy + dz * dz)
+            return dist <= self.MAX_DISTANCE
+        except Exception:
+            return True
 
+    def _check_facing(self, attacker, event):
+        """Check if attacker is facing the target via angle calculation."""
+        try:
+            victim = event.actor if event.actor != attacker else None
+            if victim is None:
+                return True
+
+            a_loc = attacker.location
+            v_loc = victim.location
+
+            # Direction to victim
             dx = v_loc.x - a_loc.x
             dz = v_loc.z - a_loc.z
             target_yaw = math.degrees(math.atan2(-dx, dz))
 
+            # Player's yaw
             a_yaw = a_loc.yaw if hasattr(a_loc, 'yaw') else 0
             angle_diff = abs(((a_yaw - target_yaw + 180) % 360) - 180)
 
             return angle_diff <= self.MAX_ANGLE
         except Exception:
             return True
+
+    def _is_suspicious_pattern(self, attack_times):
+        """
+        Detect suspiciously consistent attack timing using dynamic thresholds.
+        Computes interval differences and checks if they're too uniform.
+        """
+        if len(attack_times) < 5:
+            return False
+
+        # Compute intervals
+        intervals = []
+        for i in range(1, len(attack_times)):
+            intervals.append(attack_times[i] - attack_times[i - 1])
+
+        if len(intervals) < 3:
+            return False
+
+        # Compute differences between consecutive intervals
+        diffs = []
+        for i in range(1, len(intervals)):
+            diffs.append(intervals[i] - intervals[i - 1])
+
+        if not diffs:
+            return False
+
+        # Dynamic threshold = avg_diff + 1.5 * stddev
+        avg_diff = sum(abs(d) for d in diffs) / len(diffs)
+        variance = sum((abs(d) - avg_diff) ** 2 for d in diffs) / len(diffs)
+        std_dev = math.sqrt(variance)
+
+        threshold = avg_diff + 1.5 * std_dev
+
+        # If all diffs are within the threshold, timing is too consistent
+        all_consistent = all(abs(d) <= max(threshold, 0.008) for d in diffs)
+
+        return all_consistent and avg_diff < 0.02  # Very tight, robotic timing

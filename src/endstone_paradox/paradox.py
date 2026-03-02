@@ -60,6 +60,7 @@ class ParadoxPlugin(Plugin):
         "ac-ratelimit": {"description": "Toggle packet rate limiting on or off", "usages": ["/ac-ratelimit"], "permissions": ["paradox.settings"]},
         "ac-namespoof": {"description": "Toggle name spoofing detection on or off", "usages": ["/ac-namespoof"], "permissions": ["paradox.settings"]},
         "ac-packetmonitor": {"description": "Toggle packet spam monitoring on or off", "usages": ["/ac-packetmonitor"], "permissions": ["paradox.settings"]},
+        "ac-containersee": {"description": "Toggle container vision for admins (see contents by looking)", "usages": ["/ac-containersee"], "permissions": ["paradox.settings"]},
         # --- Utility ---
         "ac-home": {"description": "Manage homes: set/delete/list or teleport by name", "usages": ["/ac-home [args: message]"], "permissions": ["paradox.home"]},
         "ac-tpr": {"description": "Teleport to a random location, optionally set radius", "usages": ["/ac-tpr [radius: int]"], "permissions": ["paradox.tpr"]},
@@ -134,7 +135,7 @@ class ParadoxPlugin(Plugin):
         self.logger.info("  §f§l ██      ██   ██ ██   ██ ██   ██ ██   ██ ██    ██  ██ ██")
         self.logger.info("  §f§l ██      ██   ██ ██   ██ ██   ██ ██████   ██████  ██   ██")
         self.logger.info("")
-        self.logger.info("  §7AntiCheat §ev1.2.0")
+        self.logger.info("  §7AntiCheat §ev1.3.0")
         self.logger.info("  §7Designed by §fVisual1mpact")
         self.logger.info("  §7Ported to Endstone by §a§lTheN1NJ4LL0")
         self.logger.info("")
@@ -197,6 +198,7 @@ class ParadoxPlugin(Plugin):
         from endstone_paradox.modules.rate_limit import RateLimitModule
         from endstone_paradox.modules.packet_monitor import PacketMonitorModule
         from endstone_paradox.modules.pvp_manager import PvPManagerModule
+        from endstone_paradox.modules.containersee import ContainerSeeModule
 
         module_classes = {
             "fly": FlyModule,
@@ -215,10 +217,11 @@ class ParadoxPlugin(Plugin):
             "ratelimit": RateLimitModule,
             "packetmonitor": PacketMonitorModule,
             "pvp": PvPManagerModule,
+            "containersee": ContainerSeeModule,
         }
 
         # these are off by default since they need tuning per-server
-        default_off = {"ratelimit", "packetmonitor"}
+        default_off = {"ratelimit", "packetmonitor", "containersee"}
 
         for name, cls in module_classes.items():
             try:
