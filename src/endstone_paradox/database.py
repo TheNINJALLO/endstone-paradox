@@ -184,6 +184,16 @@ class ParadoxDatabase:
                 self._conn.close()
                 self._conn = None
 
+    def reconnect(self):
+        """Close and re-open the database connection (for plugin reload)."""
+        self.close()
+        self._conn = self._create_connection()
+        self._init_schema()
+
+    @property
+    def db_path(self) -> Path:
+        return self._db_path
+
     def __del__(self):
         try:
             self.close()

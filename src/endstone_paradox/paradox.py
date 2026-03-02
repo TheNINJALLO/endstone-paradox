@@ -20,6 +20,7 @@ from endstone.event import (
 
 from endstone_paradox.database import ParadoxDatabase
 from endstone_paradox.security import SecurityManager, SecurityClearance
+from endstone_paradox.config import ParadoxConfig
 
 
 class ParadoxPlugin(Plugin):
@@ -108,6 +109,8 @@ class ParadoxPlugin(Plugin):
         super().__init__()
         self.db: ParadoxDatabase = None
         self.security: SecurityManager = None
+        self.paradox_config: ParadoxConfig = None
+        self._web_server = None
 
         self._modules = {}        # loaded module instances
         self._module_tasks = {}
@@ -143,6 +146,7 @@ class ParadoxPlugin(Plugin):
         self.logger.info("")
 
         data_folder = Path(self.data_folder)
+        self.paradox_config = ParadoxConfig(data_folder, self.logger)
         self.db = ParadoxDatabase(data_folder, self.logger)
         self.security = SecurityManager(self.db)
 
@@ -159,12 +163,31 @@ class ParadoxPlugin(Plugin):
         self.register_events(self)
         self._init_modules()
 
+        # Start web UI
+        if self.paradox_config.get("web_ui", "enabled", default=True):
+            try:
+                from endstone_paradox.web.server import ParadoxWebServer
+                self._web_server = ParadoxWebServer(
+                    self.db.db_path, self.paradox_config, self.logger
+                )
+                self._web_server.start()
+            except Exception as e:
+                self.logger.warning(f"§2[§7Paradox§2]§e Web UI failed to start: {e}")
+
         self.logger.info("§2[§7Paradox§2]§a Loaded successfully!")
         self.logger.info(f"§2[§7Paradox§2]§7 Database: {self.db._db_path}")
         self.logger.info(f"§2[§7Paradox§2]§7 Modules loaded: {len(self._modules)}")
 
     def on_disable(self):
         self.logger.info("§2[§7Paradox§2]§r Shutting down Paradox AntiCheat...")
+
+        # Stop web server
+        if self._web_server:
+            try:
+                self._web_server.stop()
+            except Exception:
+                pass
+            self._web_server = None
 
         for name, module in self._modules.items():
             try:
@@ -403,6 +426,13 @@ class ParadoxPlugin(Plugin):
     def on_player_join(self, event: PlayerJoinEvent):
         player = event.player
         uuid_str = str(player.unique_id)
+
+        # global ban list check (from original Paradox AntiCheat)
+        from endstone_paradox.globalban import is_globally_banned
+        if is_globally_banned(player.name):
+            player.kick("§cYou are globally banned from Paradox AntiCheat!")
+            self.logger.info(f"Globally banned player {player.name} attempted to join - kicked.")
+            return
 
         # ban check
         ban_data = self.db.get("bans", uuid_str)
