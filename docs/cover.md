@@ -11,5 +11,5 @@
 - 🎮 Full In-Game GUI
 - ⚡ Packet-Level Analysis
 
-[Get Started](gettingstarted.md)
+[Get Started](#/gettingstarted)
 [View on GitHub](https://github.com/TheNINJALLO/endstone-paradox/)
