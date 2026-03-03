@@ -15,6 +15,9 @@
       <img src="https://img.shields.io/github/v/release/TheNINJALLO/endstone-paradox?style=for-the-badge&color=blue&label=Download" alt="Latest Release">
     </a>
     <img src="https://img.shields.io/github/downloads/TheNINJALLO/endstone-paradox/total?style=for-the-badge&color=brightgreen&label=Downloads" alt="Total Downloads">
+    <a href="https://theninjallo.github.io/endstone-paradox/">
+      <img src="https://img.shields.io/badge/Docs-Documentation-22c55e?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Documentation">
+    </a>
   </p>
 </p>
 
