@@ -769,7 +769,7 @@ input[type="range"]::-webkit-slider-thumb {
 SIDEBAR_HTML = """
 <nav class="sidebar">
     <div class="sidebar-brand">
-        <h1><img src="https://raw.githubusercontent.com/TheNINJALLO/endstone-paradox/main/Icon.jpg" alt="Paradox" style="width:28px;height:28px;border-radius:6px;vertical-align:middle;margin-right:8px;"> Paradox</h1>
+        <h1><img src="https://raw.githubusercontent.com/TheNINJALLO/endstone-paradox/main/Icon.png" alt="Paradox" style="width:28px;height:28px;border-radius:6px;vertical-align:middle;margin-right:8px;"> Paradox</h1>
         <span>AntiCheat Web Panel</span>
     </div>
     <div class="nav-section">Overview</div>

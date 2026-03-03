@@ -1,4 +1,4 @@
-![Paradox AntiCheat](Icon.jpg ':size=200')
+![Paradox AntiCheat](Icon.png ':size=200')
 
 # Paradox AntiCheat
 

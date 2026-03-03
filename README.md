@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Icon.jpg" alt="Paradox AntiCheat" width="200">
+  <img src="Icon.png" alt="Paradox AntiCheat" width="200">
   <h1 align="center">🛡️ Paradox AntiCheat</h1>
   <p align="center">
     A comprehensive anti-cheat and server moderation plugin for <strong>Endstone</strong> (Minecraft Bedrock Edition)
