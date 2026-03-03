@@ -558,7 +558,7 @@ class ParadoxPlugin(Plugin):
 
     @event_handler
     def on_packet_receive(self, event: PacketReceiveEvent):
-        for module_name in ("ratelimit", "packetmonitor", "antidupe"):
+        for module_name in ("ratelimit", "packetmonitor", "antidupe", "autoclicker"):
             module = self._modules.get(module_name)
             if module and module.running:
                 try:

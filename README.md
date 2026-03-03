@@ -57,7 +57,7 @@ Drop the `.whl` file into your Endstone server's `plugins/` folder:
 your-server/
 ├── endstone.toml
 ├── plugins/
-│   └── endstone_paradox-1.5.0-py3-none-any.whl   ← drop it here
+│   └── endstone_paradox-1.5.2-py3-none-any.whl   ← drop it here
 └── ...
 ```
 
@@ -66,7 +66,7 @@ your-server/
 Start (or restart) your Endstone server. You'll see Paradox load in the console:
 
 ```
-[ParadoxAC] Paradox AntiCheat v1.5.0 loaded!
+[ParadoxAC] Paradox AntiCheat v1.5.2 loaded!
 [ParadoxAC] Database initialized at plugins/ParadoxAC/paradox.db
 [ParadoxAC] 20 detection modules registered.
 ```
@@ -102,7 +102,7 @@ This opens the full admin panel where you can manage **everything** — modules,
 | **Fly** | Flight/hover hacks — surrounding-block air-majority check, velocity analysis, trident exemption |
 | **KillAura** | Combat bots — dynamic threshold adaptation, facing angle validation, attack rate + pattern analysis |
 | **Reach** | Extended reach hacks — Catmull-Rom cubic interpolation for accurate distance checks |
-| **AutoClicker** | Click bots — sliding-window CPS tracking (configurable threshold) |
+| **AutoClicker** | Click bots — per-platform CPS (PC/Mobile/Console), air-click tracking via packets, click consistency (CV) analysis |
 | **Scaffold** | Speed bridging — air-below filtering, axis pattern analysis, excludes sneaking/farmland |
 | **X-Ray** | Mining hacks — weighted suspicion scoring, hidden ore detection, vein-jumping, ore ratios, suspicion decay, graduated escalation (alert → priority → freeze) |
 | **GameMode** | Unauthorized gamemode changes — instant blocking |
