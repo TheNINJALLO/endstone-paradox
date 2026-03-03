@@ -1,3 +1,5 @@
+![Paradox AntiCheat](Icon.jpg ':size=200')
+
 # Paradox AntiCheat
 
 > The most advanced anti-cheat plugin for Minecraft Bedrock Edition via Endstone

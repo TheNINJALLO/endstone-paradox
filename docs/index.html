@@ -1,73 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Paradox AntiCheat for Endstone — Documentation</title>
-  <meta name="title" content="Paradox AntiCheat for Endstone — Documentation" />
-  <meta name="description" content="Comprehensive documentation for Paradox AntiCheat, the most advanced anti-cheat plugin for Minecraft Bedrock Edition via Endstone. 20 detection modules, web admin panel, 4-level security, and more." />
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no, viewport-fit=cover">
+    <meta charset="UTF-8">
+    <title>Paradox AntiCheat for Endstone — Documentation</title>
+    <meta name="title" content="Paradox AntiCheat for Endstone — Documentation" />
+    <meta name="description"
+        content="Comprehensive documentation for Paradox AntiCheat, the most advanced anti-cheat plugin for Minecraft Bedrock Edition via Endstone. 20 detection modules, web admin panel, 4-level security, and more." />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no, viewport-fit=cover">
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://TheNINJALLO.github.io/endstone-paradox/" />
-  <meta property="og:title" content="Paradox AntiCheat for Endstone — Documentation" />
-  <meta property="og:description" content="20 detection modules, web admin panel, 4-level security clearance, and comprehensive anti-cheat for Minecraft Bedrock via Endstone." />
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://TheNINJALLO.github.io/endstone-paradox/" />
+    <meta property="og:title" content="Paradox AntiCheat for Endstone — Documentation" />
+    <meta property="og:description"
+        content="20 detection modules, web admin panel, 4-level security clearance, and comprehensive anti-cheat for Minecraft Bedrock via Endstone." />
 
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:url" content="https://TheNINJALLO.github.io/endstone-paradox/" />
-  <meta property="twitter:title" content="Paradox AntiCheat for Endstone" />
-  <meta property="twitter:description" content="20 detection modules, web admin panel, 4-level security clearance, and comprehensive anti-cheat for Minecraft Bedrock via Endstone." />
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://TheNINJALLO.github.io/endstone-paradox/" />
+    <meta property="twitter:title" content="Paradox AntiCheat for Endstone" />
+    <meta property="twitter:description"
+        content="20 detection modules, web admin panel, 4-level security clearance, and comprehensive anti-cheat for Minecraft Bedrock via Endstone." />
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0.9.0/dist/css/theme-simple-dark.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.css">
-  <style>
-    :root {
-      --sidebar-nav-pagelink-background-image: none;
-      --sidebar-nav-link-before-content: '';
-      --sidebar-width: 20rem;
-      --content-max-width: 80rem;
-      --cover-max-width: 80em;
-      --theme-color: #22c55e;
-      --cover-button-primary-background: rgba(34, 197, 94, 0.5);
-    }
-    .sidebar-nav ul > li.folder {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='11.2' viewBox='0 0 7 11.2'%3E%3Cpath d='M1.5 1.5l4 4.1 -4 4.1' stroke-width='1.5' stroke='rgb%28179, 179, 179%29' fill='none' stroke-linecap='square' stroke-linejoin='miter' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: left calc(1em - 8px);
-      padding-left: 16px;
-    }
-    .sidebar-nav ul > li.folder.open {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11.2' height='7' viewBox='0 0 11.2 7'%3E%3Cpath d='M1.5 1.5l4.1 4 4.1-4' stroke-width='1.5' stroke='rgb%2834, 197, 94%29' fill='none' stroke-linecap='square' stroke-linejoin='miter' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
-      background-position: left calc(1em - 6px);
-    }
-    .sidebar-nav li.folder > ul { margin-left: 16px; }
-    .sidebar-nav li.folder li.file > a { padding-left: 16px; }
-  </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0.9.0/dist/css/theme-simple-dark.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.css">
+    <style>
+        :root {
+            --sidebar-nav-pagelink-background-image: none;
+            --sidebar-nav-link-before-content: '';
+            --sidebar-width: 20rem;
+            --content-max-width: 80rem;
+            --cover-max-width: 80em;
+            --theme-color: #22c55e;
+            --cover-button-primary-background: rgba(34, 197, 94, 0.5);
+        }
+
+        .sidebar-nav ul>li.folder {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='11.2' viewBox='0 0 7 11.2'%3E%3Cpath d='M1.5 1.5l4 4.1 -4 4.1' stroke-width='1.5' stroke='rgb%28179, 179, 179%29' fill='none' stroke-linecap='square' stroke-linejoin='miter' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left calc(1em - 8px);
+            padding-left: 16px;
+        }
+
+        .sidebar-nav ul>li.folder.open {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11.2' height='7' viewBox='0 0 11.2 7'%3E%3Cpath d='M1.5 1.5l4.1 4 4.1-4' stroke-width='1.5' stroke='rgb%2834, 197, 94%29' fill='none' stroke-linecap='square' stroke-linejoin='miter' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+            background-position: left calc(1em - 6px);
+        }
+
+        .sidebar-nav li.folder>ul {
+            margin-left: 16px;
+        }
+
+        .sidebar-nav li.folder li.file>a {
+            padding-left: 16px;
+        }
+    </style>
 </head>
+
 <body>
-  <div id="app"></div>
-  <script>
-    window.$docsify = {
-      name: 'Paradox AntiCheat',
-      repo: 'https://github.com/TheNINJALLO/endstone-paradox/',
-      loadSidebar: true,
-      auto2top: true,
-      coverpage: "cover.md",
-      onlyCover: true,
-      subMaxLevel: 3,
-      search: {
-        paths: 'auto',
-        noData: 'No Results!',
-        placeholder: "Search documentation...",
-        depth: 6,
-        hideOtherSidebarContent: false
-      },
-    }
-  </script>
-  <script src="//cdn.jsdelivr.net/npm/docsify@4.13.1"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify@4.13.1/lib/plugins/search.min.js"></script>
+    <div id="app"></div>
+    <script>
+        window.$docsify = {
+            name: 'Paradox AntiCheat',
+            repo: 'https://github.com/TheNINJALLO/endstone-paradox/',
+            logo: 'Icon.jpg',
+            loadSidebar: true,
+            auto2top: true,
+            coverpage: "cover.md",
+            onlyCover: true,
+            subMaxLevel: 3,
+            search: {
+                paths: 'auto',
+                noData: 'No Results!',
+                placeholder: "Search documentation...",
+                depth: 6,
+                hideOtherSidebarContent: false
+            },
+        }
+    </script>
+    <script src="//cdn.jsdelivr.net/npm/docsify@4.13.1"></script>
+    <script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/docsify@4.13.1/lib/plugins/search.min.js"></script>
 </body>
+
 </html>

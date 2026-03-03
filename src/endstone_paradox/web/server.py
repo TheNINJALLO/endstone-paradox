@@ -769,7 +769,7 @@ input[type="range"]::-webkit-slider-thumb {
 SIDEBAR_HTML = """
 <nav class="sidebar">
     <div class="sidebar-brand">
-        <h1><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="url(#g)" stroke-width="2" style="vertical-align:middle;margin-right:6px;"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#059669"/></linearGradient></defs><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Paradox</h1>
+        <h1><img src="https://raw.githubusercontent.com/TheNINJALLO/endstone-paradox/main/Icon.jpg" alt="Paradox" style="width:28px;height:28px;border-radius:6px;vertical-align:middle;margin-right:8px;"> Paradox</h1>
         <span>AntiCheat Web Panel</span>
     </div>
     <div class="nav-section">Overview</div>
