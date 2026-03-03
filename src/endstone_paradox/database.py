@@ -17,9 +17,10 @@ class ParadoxDatabase:
         "whitelist", "allowlist", "disabled_commands", "homes",
         "ranks", "player_data", "spoof_log", "tpa_requests",
         "pvp_data", "frozen_players", "vanished_players",
+        "violations",
     ]
 
-    DB_VERSION = 1
+    DB_VERSION = 2
 
     def __init__(self, data_folder: Path, logger=None):
         self._data_folder = data_folder

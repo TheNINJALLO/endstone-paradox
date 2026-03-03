@@ -69,10 +69,10 @@ class VisionModule(BaseModule):
 
                 # Flag if too many snaps
                 if len(data["snaps"]) >= self.SNAP_COUNT_LIMIT:
-                    self.alert_admins(
-                        f"§c{player.name}§e flagged for suspicious aim "
-                        f"({len(data['snaps'])} rapid snaps in {self.WINDOW_SIZE:.1f}s)"
-                    )
+                    self.emit(player, 3, {
+                        "snaps": len(data['snaps']),
+                        "window": f"{self.WINDOW_SIZE:.1f}s",
+                    })
                     data["snaps"].clear()
             except Exception:
                 pass

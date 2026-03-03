@@ -9,13 +9,15 @@ endstone-paradox/
 ├── docs/                       # This documentation site
 └── src/endstone_paradox/
     ├── __init__.py
-    ├── paradox.py              # Main plugin (31 commands, event handlers)
+    ├── paradox.py              # Main plugin (35 commands, event handlers)
     ├── database.py             # SQLite persistence (WAL mode)
     ├── security.py             # 4-level clearance + SHA-256 auth
     ├── config.py               # TOML config loader
     ├── globalban.py            # 509 known cheaters from original Paradox
+    ├── core/                   # Core engine components
+    │   └── violation_engine.py #   Centralized violation processing
     ├── modules/                # 20 detection & admin modules
-    │   ├── base.py             #   Abstract base class + sensitivity
+    │   ├── base.py             #   Abstract base class + sensitivity + emit()
     │   ├── fly.py              #   Flight/hover detection
     │   ├── killaura.py         #   Combat bot detection
     │   ├── reach.py            #   Reach hack (Catmull-Rom)
@@ -39,7 +41,8 @@ endstone-paradox/
     ├── commands/
     │   ├── moderation/         # 18 admin/moderation commands
     │   ├── settings/           # Module toggle handler
-    │   └── utility/            # 9 utility commands
+    │   ├── utility/            # 9 utility commands
+    │   └── violation/          # 4 violation engine commands
     ├── gui/
     │   └── form_generator.py   # Full GUI (8 sections)
     └── web/
@@ -53,17 +56,28 @@ All 20 modules extend `BaseModule`, which provides:
 - **Lifecycle management**: `start()`, `stop()`, `on_start()`, `on_stop()`
 - **Periodic checks**: Scheduler-based `check()` method at configurable intervals
 - **Sensitivity scaling**: `_scale()` method for threshold adjustment
-- **Event hooks**: `on_player_join()`, `on_player_leave()`, `on_damage()`, `on_block_break()`, `on_block_place()`, `on_packet()`
-- **Admin alerts**: `alert_admins()` broadcasts to L4 players
+- **Event hooks**: `on_player_join()`, `on_player_leave()`, `on_damage()`, `on_move()`, `on_block_break()`, `on_block_place()`, `on_packet()`
+- **Violation emission**: `emit(player, severity, evidence, action_hint)` routes to the violation engine
+- **Admin alerts**: `alert_admins()` broadcasts to L4 players (fallback)
+
+### Violation Engine
+The `ViolationEngine` (in `core/violation_engine.py`) centralizes all enforcement:
+- Modules call `self.emit()` instead of punishing directly
+- Rolling 5-minute decay buffers per player with severity-weighted scoring
+- Cross-module correlation — flags from multiple modules escalate faster
+- Enforcement ladder: warn → cancel → setback → kick → ban
+- 3 modes: `logonly`, `soft` (default), `hard`
+- Rate-limited staff alerts (10s per player per module)
+- Write-behind evidence persistence to SQLite (30s flush)
 
 ### Event Routing
 The main `paradox.py` registers for Endstone events and routes them to the appropriate modules:
 - `on_player_join` → module `on_player_join` (invsync)
-- `on_player_quit` → module `on_player_leave` (all modules)
-- `on_actor_damage` → killaura, reach, autoclicker, pvp, selfinfliction
+- `on_player_quit` → module `on_player_leave` (all modules) + violation engine cleanup
+- `on_actor_damage` → killaura, reach, autoclicker, pvp, selfinfliction, fly (knockback tracking)
 - `on_block_break` → xray
 - `on_block_place` → scaffold, antidupe
-- `on_packet_receive` → ratelimit, packetmonitor, antidupe
+- `on_packet_receive` → ratelimit, packetmonitor, antidupe, autoclicker
 
 ### Database Design
-Uses SQLite in **WAL mode** for concurrent read/write. Data is stored as JSON-serialized values in key-value tables, providing flexibility without schema migrations.
+Uses SQLite in **WAL mode** for concurrent read/write. Data is stored as JSON-serialized values in key-value tables, providing flexibility without schema migrations. The `violations` table stores enforcement evidence with write-behind buffering for performance.

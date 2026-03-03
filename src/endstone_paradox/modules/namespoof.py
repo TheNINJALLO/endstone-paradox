@@ -43,19 +43,20 @@ class NameSpoofModule(BaseModule):
         # Length check
         if len(name) < self.MIN_NAME_LENGTH or len(name) > self.MAX_NAME_LENGTH:
             self._log_spoof(player, f"Invalid name length: {len(name)}")
+            self.emit(player, 5, {
+                "reason": "name_length",
+                "length": len(name),
+            }, action_hint="kick")
             player.kick("§cInvalid name length.")
-            self.alert_admins(
-                f"§c{name}§e kicked for invalid name length ({len(name)} chars)"
-            )
             return False
 
         # Character check
         if not self.ALLOWED_PATTERN.match(name):
             self._log_spoof(player, f"Invalid characters in name: {name}")
+            self.emit(player, 5, {
+                "reason": "invalid_chars",
+            }, action_hint="kick")
             player.kick("§cInvalid characters in name.")
-            self.alert_admins(
-                f"§c{name}§e kicked for invalid characters in name"
-            )
             return False
 
         # Duplicate check
@@ -63,10 +64,10 @@ class NameSpoofModule(BaseModule):
         existing_uuid = self._known_names.get(name_lower)
         if existing_uuid and existing_uuid != uuid_str:
             self._log_spoof(player, f"Duplicate name: {name}")
+            self.emit(player, 5, {
+                "reason": "duplicate_name",
+            }, action_hint="kick")
             player.kick("§cDuplicate name detected.")
-            self.alert_admins(
-                f"§c{name}§e kicked for duplicate name (spoofing?)"
-            )
             return False
 
         # Register the name

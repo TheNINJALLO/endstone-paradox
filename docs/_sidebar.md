@@ -26,6 +26,8 @@
   - [Moderation Commands](commands/moderation.md)
   - [Utility Commands](commands/utility.md)
   - [Module Toggle Commands](commands/toggles.md)
+  - [Violation Engine Commands](commands/violation.md)
+- [Violation Engine](violation-engine.md)
 - [Security & Clearance](security.md)
 - [In-Game GUI](gui.md)
 - [Web Admin Panel](webui.md)

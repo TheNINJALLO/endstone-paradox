@@ -276,10 +276,11 @@ class XrayModule(BaseModule):
             return
         notifs[level] = now
 
-        self.alert_admins(
-            f"{level} §c{player.name}§e X-Ray suspicion: "
-            f"§f{score}§e — {reason}"
-        )
+        self.emit(player, 2 if level == "§e[Alert]" else 3, {
+            "score": score,
+            "reason": reason,
+            "level": level,
+        })
 
     def _escalate_freeze(self, uuid_str, player, profile, reason):
         """Freeze the player via slowness + mining fatigue."""
@@ -302,9 +303,10 @@ class XrayModule(BaseModule):
         except Exception:
             pass
 
-        self.alert_admins(
-            f"§4[FREEZE] §c{player.name}§e frozen for X-Ray — "
-            f"suspicion §f{profile['suspicion']}§e — {reason}"
-        )
+        self.emit(player, 5, {
+            "score": profile['suspicion'],
+            "reason": reason,
+            "action": "freeze",
+        })
         # Reset score after freeze so it can rebuild
         profile["suspicion"] = max(0, profile["suspicion"] - self.FREEZE_SCORE // 2)

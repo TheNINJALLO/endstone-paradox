@@ -22,3 +22,15 @@ All moderation commands require appropriate [clearance level](security.md).
 | `/ac-spooflog` | View name spoof detection logs | L3 |
 | `/ac-command <cmd>` | Execute a server command as console | L4 |
 | `/ac-prefix <prefix>` | Change the command prefix | L4 |
+
+## Violation Engine Commands
+
+| Command | Description | Min. Clearance |
+|---------|-------------|----------------|
+| `/ac-case <player> [count]` | View last N violation entries for a player | L3 |
+| `/ac-watch <player> [minutes]` | Stream a player's violations in real-time | L3 |
+| `/ac-watch stop` | Stop watching | L3 |
+| `/ac-mode <logonly\|soft\|hard>` | Set enforcement mode | L4 |
+| `/ac-exempt <player> <module\|all> [min]` | Temporarily exempt a player from detection | L4 |
+
+See [Violation Engine](violation-engine.md) for full documentation.

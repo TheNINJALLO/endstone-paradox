@@ -25,6 +25,6 @@ class GameModeModule(BaseModule):
         new_mode = event.new_game_mode
         if new_mode not in self.ALLOWED_MODES:
             event.is_cancelled = True
-            self.alert_admins(
-                f"§c{player.name}§e attempted unauthorized gamemode change to {new_mode.name}"
-            )
+            self.emit(player, 4, {
+                "mode": new_mode.name,
+            }, action_hint="cancel")

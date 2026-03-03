@@ -121,9 +121,9 @@ class ScaffoldModule(BaseModule):
             except Exception:
                 pass
 
-            self.alert_admins(
-                f"§c{player.name}§e flagged for Scaffolding "
-                f"({self.MAX_PLACEMENTS} blocks in {self.TIME_WINDOW:.1f}s over air)"
-            )
+            self.emit(player, 3, {
+                "blocks": self.MAX_PLACEMENTS,
+                "window": f"{self.TIME_WINDOW:.1f}s",
+            }, action_hint="cancel")
             # Clear data to prevent repeated flagging
             self._placement_data[uuid_str] = {"positions": [], "times": []}

@@ -99,9 +99,9 @@ This opens the full admin panel where you can manage **everything** — modules,
 
 | Module | What It Detects |
 |--------|-----------------|
-| **Fly** | Flight/hover hacks — surrounding-block air-majority check, velocity analysis, trident exemption |
-| **KillAura** | Combat bots — dynamic threshold adaptation, facing angle validation, attack rate + pattern analysis |
-| **Reach** | Extended reach hacks — Catmull-Rom cubic interpolation for accurate distance checks |
+| **Fly** | Flight/hover hacks — surrounding-block air-majority check, velocity analysis, trident exemption, knockback/slime/honey exemptions |
+| **KillAura** | Combat bots — dynamic threshold adaptation, facing angle validation, attack rate + pattern analysis, latency tolerance |
+| **Reach** | Extended reach hacks — Catmull-Rom cubic interpolation for accurate distance checks, latency tolerance |
 | **AutoClicker** | Click bots — per-platform CPS (PC/Mobile/Console), air-click tracking via packets, click consistency (CV) analysis |
 | **Scaffold** | Speed bridging — air-below filtering, axis pattern analysis, excludes sneaking/farmland |
 | **X-Ray** | Mining hacks — weighted suspicion scoring, hidden ore detection, vein-jumping, ore ratios, suspicion decay, graduated escalation (alert → priority → freeze) |
@@ -134,6 +134,23 @@ All detection modules support a **sensitivity scale from 1 to 10**:
 
 Adjust per module via command (`/ac-fly sensitivity 8`) or the GUI → **Modules** → select a module → **Adjust Sensitivity**.
 
+### ⚖️ Violation Engine
+
+All detection modules feed into a **centralized violation engine** instead of punishing directly:
+
+| Feature | Description |
+|---------|-------------|
+| **Rolling buffers** | Per-player 5-minute decay window with severity scoring |
+| **Enforcement ladder** | warn → cancel → setback → kick → ban (auto-escalation) |
+| **3 modes** | `logonly` (monitor only), `soft` (default — cancel + setback), `hard` (faster escalation) |
+| **Rate-limited alerts** | Staff get max 1 alert per player per module every 10 seconds |
+| **Evidence logging** | All violations persisted to SQLite with timestamps, severity, and module |
+| **Cross-module correlation** | Multi-module flags increase escalation speed |
+| **Temporary exemptions** | Exempt specific players from specific modules for testing |
+| **Live watching** | Admins can stream a player's violations in real-time |
+
+Configure with `/ac-mode`, view evidence with `/ac-case`, watch live with `/ac-watch`.
+
 ### 🔐 4-Level Security System
 
 | Level | Name | Access |
@@ -158,6 +175,7 @@ Everything saves automatically and survives server restarts:
 - Player homes, ranks, channels
 - Frozen/vanished player lists
 - Namespoof detection logs
+- Violation evidence and enforcement history
 - All configuration settings
 
 ---
@@ -188,6 +206,16 @@ Everything saves automatically and survives server restarts:
 | `/ac-spooflog` | View name spoofing logs |
 | `/ac-command [enable\|disable] [cmd]` | Enable or disable a command |
 | `/ac-prefix [prefix]` | Change the chat prefix |
+
+### Violation Engine
+
+| Command | Description |
+|---------|-------------|
+| `/ac-case <player> [count]` | View last N violation entries for a player |
+| `/ac-watch <player> [minutes]` | Stream a player's violations in real-time |
+| `/ac-watch stop` | Stop watching |
+| `/ac-mode <logonly\|soft\|hard>` | Set enforcement mode (L4 only) |
+| `/ac-exempt <player> <module\|all> [min]` | Temporarily exempt a player from detection |
 
 ### Detection Toggles
 

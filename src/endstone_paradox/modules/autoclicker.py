@@ -132,7 +132,8 @@ class AutoClickerModule(BaseModule):
 
     def on_damage(self, event):
         """Track attack frequency against entities for CPS calculation."""
-        actor = event.actor
+        # ATTACKER is event.damager, not event.actor
+        actor = getattr(event, 'damager', None)
         if actor is None or not hasattr(actor, 'unique_id'):
             return
         if not hasattr(actor, 'game_mode'):
@@ -159,12 +160,17 @@ class AutoClickerModule(BaseModule):
         # CPS check
         if cps > max_cps:
             flagged = True
-            event.cancelled = True
+            try:
+                event.cancelled = True
+            except Exception:
+                pass
             self._flags[uuid_str] += 1
-            self.alert_admins(
-                f"§c{actor.name}§e flagged for AutoClicker "
-                f"(CPS={cps}/{max_cps}, platform={platform})"
-            )
+            self.emit(actor, 3, {
+                "type": "cps",
+                "cps": cps,
+                "max": max_cps,
+                "platform": platform,
+            }, action_hint="cancel")
 
         # Consistency check (only when enough samples)
         if not flagged and len(clicks) >= self.MIN_CLICKS_FOR_CV:
@@ -179,11 +185,13 @@ class AutoClickerModule(BaseModule):
                         flagged = True
                         self._flags[uuid_str] += 1
                         effective_cps = round(1.0 / mean_interval, 1) if mean_interval > 0 else 0
-                        self.alert_admins(
-                            f"§c{actor.name}§e flagged for AutoClicker "
-                            f"(inhuman consistency CV={cv:.3f}<{min_cv:.3f}, "
-                            f"~{effective_cps} CPS, platform={platform})"
-                        )
+                        self.emit(actor, 4, {
+                            "type": "consistency",
+                            "cv": f"{cv:.3f}",
+                            "min_cv": f"{min_cv:.3f}",
+                            "cps": effective_cps,
+                            "platform": platform,
+                        }, action_hint="cancel")
 
         if flagged:
             self._hit_data[uuid_str].clear()

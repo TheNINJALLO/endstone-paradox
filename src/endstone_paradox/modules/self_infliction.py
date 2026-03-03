@@ -45,10 +45,9 @@ class SelfInflictionModule(BaseModule):
                 event.is_cancelled = True
 
                 if count >= 5:
-                    self.alert_admins(
-                        f"§c{actor.name}§e flagged for self-infliction "
-                        f"(count={count})"
-                    )
+                    self.emit(actor, 2, {
+                        "count": count,
+                    }, action_hint="cancel")
                     self._flags[uuid_str] = 0
         except Exception:
             pass

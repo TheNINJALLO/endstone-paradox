@@ -66,10 +66,10 @@ class AFKModule(BaseModule):
                 last = self._last_activity.get(uuid_str, now)
                 idle_time = now - last
                 if idle_time >= self._timeout:
+                    self.emit(player, 1, {
+                        "idle": f"{int(idle_time / 60)}min",
+                    }, action_hint="kick")
                     player.kick(f"§eKicked for being AFK ({int(idle_time / 60)} minutes)")
-                    self.alert_admins(
-                        f"§7{player.name}§e kicked for AFK ({int(idle_time / 60)}min)"
-                    )
                     self._last_activity.pop(uuid_str, None)
                     self._last_positions.pop(uuid_str, None)
                 elif idle_time >= self._timeout - 60:

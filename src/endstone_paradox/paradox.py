@@ -21,6 +21,7 @@ from endstone.event import (
 from endstone_paradox.database import ParadoxDatabase
 from endstone_paradox.security import SecurityManager, SecurityClearance
 from endstone_paradox.config import ParadoxConfig
+from endstone_paradox.core.violation_engine import ViolationEngine, EnforcementMode
 
 
 class ParadoxPlugin(Plugin):
@@ -72,6 +73,11 @@ class ParadoxPlugin(Plugin):
         "ac-debug-db": {"description": "Inspect or modify the Paradox database directly", "usages": ["/ac-debug-db [args: message]"], "permissions": ["paradox.debugdb"]},
         "ac-gui": {"description": "Open the Paradox admin GUI menu", "usages": ["/ac-gui"], "permissions": ["paradox.gui"]},
         "ac-about": {"description": "View Paradox AntiCheat version and info", "usages": ["/ac-about"], "permissions": ["paradox.about"]},
+        # --- Violation Engine ---
+        "ac-case": {"description": "View violation evidence for a player", "usages": ["/ac-case <player: player> [count: int]"], "permissions": ["paradox.case"]},
+        "ac-watch": {"description": "Stream violations for a player in real-time", "usages": ["/ac-watch <player: player> [minutes: int]"], "permissions": ["paradox.watch"]},
+        "ac-mode": {"description": "Set enforcement mode: logonly, soft, or hard", "usages": ["/ac-mode <mode: message>"], "permissions": ["paradox.mode"]},
+        "ac-exempt": {"description": "Temporarily exempt a player from a module", "usages": ["/ac-exempt <player: player> [args: message]"], "permissions": ["paradox.exempt"]},
     }
 
     permissions = {
@@ -103,6 +109,10 @@ class ParadoxPlugin(Plugin):
         "paradox.debugdb": {"description": "Use /ac-debug-db command", "default": "op"},
         "paradox.gui": {"description": "Use /ac-gui command", "default": "op"},
         "paradox.about": {"description": "Use /ac-about command", "default": True},
+        "paradox.case": {"description": "Use /ac-case command", "default": "op"},
+        "paradox.watch": {"description": "Use /ac-watch command", "default": "op"},
+        "paradox.mode": {"description": "Use /ac-mode command", "default": "op"},
+        "paradox.exempt": {"description": "Use /ac-exempt command", "default": "op"},
     }
 
     def __init__(self):
@@ -122,6 +132,9 @@ class ParadoxPlugin(Plugin):
         self._lockdown_level = 1       # 1 = L4 only, 2 = L4+L3
 
         self._command_handlers = {}
+
+        # Violation engine (initialized in on_enable)
+        self.violation_engine: ViolationEngine = None
 
     # -------------------------------------------------------------------
     # Lifecycle
@@ -163,6 +176,16 @@ class ParadoxPlugin(Plugin):
         self.register_events(self)
         self._init_modules()
 
+        # Init violation engine
+        self.violation_engine = ViolationEngine(self)
+
+        # Periodic flush task (every 30s = 600 ticks)
+        def _flush_violations():
+            if self.violation_engine:
+                self.violation_engine.maybe_flush()
+            self.server.scheduler.run_task(self, _flush_violations, delay=600)
+        self.server.scheduler.run_task(self, _flush_violations, delay=600)
+
         # Start web UI
         if self.paradox_config.get("web_ui", "enabled", default=True):
             try:
@@ -196,6 +219,9 @@ class ParadoxPlugin(Plugin):
                 self.logger.error(f"Error stopping module {name}: {e}")
 
         if self.db:
+            # Final flush of violation evidence
+            if self.violation_engine:
+                self.violation_engine.flush()
             self.db.close()
 
         self.logger.info("§2[§7Paradox§2]§c Paradox AntiCheat disabled.")
@@ -323,6 +349,11 @@ class ParadoxPlugin(Plugin):
         from endstone_paradox.commands.utility.gui_cmd import handle_gui
         from endstone_paradox.commands.utility.about_cmd import handle_about
 
+        from endstone_paradox.commands.violation.case_cmd import handle_case
+        from endstone_paradox.commands.violation.watch_cmd import handle_watch
+        from endstone_paradox.commands.violation.mode_cmd import handle_mode
+        from endstone_paradox.commands.violation.exempt_cmd import handle_exempt
+
         # moderation
         self._command_handlers["ac-op"] = handle_op
         self._command_handlers["ac-deop"] = handle_deop
@@ -348,7 +379,7 @@ class ParadoxPlugin(Plugin):
             "ac-fly", "ac-killaura", "ac-reach", "ac-autoclicker",
             "ac-scaffold", "ac-xray", "ac-gamemode", "ac-afk",
             "ac-vision", "ac-worldborder", "ac-lagclear", "ac-ratelimit",
-            "ac-namespoof", "ac-packetmonitor",
+            "ac-namespoof", "ac-packetmonitor", "ac-containersee",
         ]:
             self._command_handlers[cmd] = handle_toggle
 
@@ -362,6 +393,12 @@ class ParadoxPlugin(Plugin):
         self._command_handlers["ac-debug-db"] = handle_debug_db
         self._command_handlers["ac-gui"] = handle_gui
         self._command_handlers["ac-about"] = handle_about
+
+        # violation engine
+        self._command_handlers["ac-case"] = handle_case
+        self._command_handlers["ac-watch"] = handle_watch
+        self._command_handlers["ac-mode"] = handle_mode
+        self._command_handlers["ac-exempt"] = handle_exempt
 
     def on_command(self, sender, command, args) -> bool:
         from endstone import Player
@@ -411,7 +448,7 @@ class ParadoxPlugin(Plugin):
         # L3 - moderator tools
         level3_commands = {
             "ac-kick", "ac-freeze", "ac-vanish", "ac-despawn",
-            "ac-invsee", "ac-spooflog", "ac-rank",
+            "ac-invsee", "ac-spooflog", "ac-rank", "ac-case", "ac-watch",
         }
         # everything else -> L4
 
@@ -489,14 +526,14 @@ class ParadoxPlugin(Plugin):
     @event_handler
     def on_player_quit(self, event: PlayerQuitEvent):
         player = event.player
-        uuid_str = str(player.unique_id)
-        self._player_jump_flags.pop(uuid_str, None)
-
         for module in self._modules.values():
             try:
                 module.on_player_leave(player)
             except Exception:
                 pass
+        if self.violation_engine:
+            self.violation_engine.on_player_leave(player)
+        self._player_jump_flags.pop(str(player.unique_id), None)
 
     @event_handler
     def on_player_jump(self, event: PlayerJumpEvent):

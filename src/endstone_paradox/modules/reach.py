@@ -1,6 +1,7 @@
 # reach.py - Reach detection via Catmull-Rom cubic interpolation
 # Tracks position history and uses cubic interpolation to estimate
 # player positions at the moment of attack for accurate distance checks.
+# Fixed: uses event.damager as attacker, event.actor as victim.
 
 import math
 import time
@@ -16,13 +17,18 @@ class ReachModule(BaseModule):
 
     BASE_MAX_ATTACK_DISTANCE = 4.5   # Blocks — vanilla ~3, generous for latency
     HISTORY_SIZE = 10                 # Position samples to keep
+    LATENCY_TOLERANCE = 0.5          # Extra distance for lag
 
     def on_start(self):
         self._move_history = {}  # UUID -> deque of (time, x, y, z, vx, vy, vz)
         self._apply_sensitivity()
 
+        custom = self.db.get("config", "latency_tolerance")
+        if custom is not None:
+            self.LATENCY_TOLERANCE = float(custom)
+
     def _apply_sensitivity(self):
-        self.MAX_ATTACK_DISTANCE = self._scale(self.BASE_MAX_ATTACK_DISTANCE)
+        self.MAX_ATTACK_DISTANCE = self._scale(self.BASE_MAX_ATTACK_DISTANCE) + self.LATENCY_TOLERANCE
 
     def on_stop(self):
         self._move_history.clear()
@@ -38,6 +44,8 @@ class ReachModule(BaseModule):
                 uuid_str = str(player.unique_id)
                 loc = player.location
                 vel = player.velocity
+                if loc is None or vel is None:
+                    continue
                 history = self._move_history.setdefault(
                     uuid_str, deque(maxlen=self.HISTORY_SIZE)
                 )
@@ -47,30 +55,38 @@ class ReachModule(BaseModule):
 
     def on_damage(self, event):
         """Check attack distance on damage events."""
-        actor = event.actor
-        if actor is None or not hasattr(actor, 'unique_id'):
+        # VICTIM = event.actor, ATTACKER = event.damager
+        victim = event.actor
+        if victim is None:
             return
-        if not hasattr(actor, 'game_mode'):
+
+        attacker = getattr(event, 'damager', None)
+        if attacker is None:
             return
-        if self.plugin.security.is_level4(actor):
+
+        # Attacker must be a player
+        if not hasattr(attacker, 'game_mode') or not hasattr(attacker, 'unique_id'):
+            return
+
+        if self.plugin.security.is_level4(attacker):
             return
 
         try:
-            victim = event.actor
-            if victim is None or victim == actor:
+            if not hasattr(victim, 'location') or victim.location is None:
                 return
 
-            v_loc = victim.location
-            a_uuid = str(actor.unique_id)
+            a_uuid = str(attacker.unique_id)
             v_uuid = str(victim.unique_id) if hasattr(victim, 'unique_id') else None
+            v_loc = victim.location
 
             now = time.time()
 
-            # Get interpolated positions for both attacker and victim
+            # Get interpolated position for the ATTACKER
             a_pos = self._estimate_position_cubic(a_uuid, now - 0.05)
             if a_pos is None:
                 return
 
+            # Get interpolated position for the victim (if tracked)
             if v_uuid:
                 v_pos = self._estimate_position_cubic(v_uuid, now - 0.05)
                 if v_pos:
@@ -87,11 +103,14 @@ class ReachModule(BaseModule):
             distance = math.sqrt(dx * dx + dy * dy + dz * dz)
 
             if distance > self.MAX_ATTACK_DISTANCE:
-                event.is_cancelled = True
-                self.alert_admins(
-                    f"§c{actor.name}§e flagged for Reach "
-                    f"(dist={distance:.2f}, max={self.MAX_ATTACK_DISTANCE:.1f})"
-                )
+                try:
+                    event.cancelled = True
+                except Exception:
+                    pass
+                self.emit(attacker, 3, {
+                    "dist": f"{distance:.2f}",
+                    "max": f"{self.MAX_ATTACK_DISTANCE:.1f}",
+                }, action_hint="cancel")
         except Exception:
             pass
 
@@ -111,7 +130,6 @@ class ReachModule(BaseModule):
 
         # If we have 4+ samples, use Catmull-Rom
         if len(h) >= 4:
-            # Find the two samples bracketing the target time
             for i in range(1, len(h) - 2):
                 t1 = h[i][0]
                 t2 = h[i + 1][0]
@@ -141,7 +159,6 @@ class ReachModule(BaseModule):
                     z0 + alpha * (z1 - z0),
                 )
 
-        # Use latest position
         last = h[-1]
         return (last[1], last[2], last[3])
 

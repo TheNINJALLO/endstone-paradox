@@ -18,6 +18,7 @@ class FlyModule(BaseModule):
 
     def on_start(self):
         self._player_data = {}  # uuid -> {landing, hover_time, trident_used}
+        self._recent_damage = {}  # uuid -> last_damage_time (knockback exemption)
         self._apply_sensitivity()
 
     def _apply_sensitivity(self):
@@ -27,9 +28,21 @@ class FlyModule(BaseModule):
 
     def on_stop(self):
         self._player_data.clear()
+        self._recent_damage.clear()
 
     def on_player_leave(self, player):
-        self._player_data.pop(str(player.unique_id), None)
+        uuid_str = str(player.unique_id)
+        self._player_data.pop(uuid_str, None)
+        self._recent_damage.pop(uuid_str, None)
+
+    def on_damage(self, event):
+        """Track when player takes damage for knockback exemption."""
+        victim = event.actor
+        if victim is None or not hasattr(victim, 'unique_id'):
+            return
+        if hasattr(victim, 'game_mode'):
+            import time as _t
+            self._recent_damage[str(victim.unique_id)] = _t.time()
 
     def check(self):
         for player in self.plugin.server.online_players:
@@ -50,6 +63,16 @@ class FlyModule(BaseModule):
         if player.is_gliding or player.is_in_water:
             return
         if self.plugin.is_player_climbing(player):
+            return
+
+        # Knockback exemption — 2s after taking damage
+        import time as _t
+        last_dmg = self._recent_damage.get(uuid_str, 0)
+        if _t.time() - last_dmg < 2.0:
+            return
+
+        # Slime/honey block exemption
+        if self._on_bouncy_block(player):
             return
 
         data = self._player_data.setdefault(uuid_str, {
@@ -94,11 +117,10 @@ class FlyModule(BaseModule):
 
             if data["hover_time"] >= self.hover_threshold:
                 landing = data.get("landing")
-                if landing:
-                    player.teleport(landing)
-                    self.alert_admins(
-                        f"§c{player.name}§e was detected flying and teleported back."
-                    )
+                self.emit(player, 3, {
+                    "hover": data["hover_time"],
+                    "threshold": self.hover_threshold,
+                }, action_hint="setback")
                 data["hover_time"] = 0
         else:
             data["hover_time"] = max(0, data["hover_time"] - 1)
@@ -161,3 +183,19 @@ class FlyModule(BaseModule):
         data = self._player_data.get(uuid_str)
         if data:
             data["trident_used"] = True
+
+    def _on_bouncy_block(self, player):
+        """Check if player is on or near slime/honey blocks."""
+        try:
+            loc = player.location
+            if loc is None:
+                return False
+            dim = player.dimension
+            block = dim.get_block_at(int(loc.x), int(loc.y) - 1, int(loc.z))
+            if block is not None:
+                block_id = str(block.type).lower()
+                if "slime" in block_id or "honey" in block_id:
+                    return True
+        except Exception:
+            pass
+        return False

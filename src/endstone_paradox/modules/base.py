@@ -114,6 +114,7 @@ class BaseModule(ABC):
     def on_player_join(self, player): pass
     def on_player_leave(self, player): pass
     def on_damage(self, event): pass
+    def on_move(self, event): pass
     def on_block_break(self, event): pass
     def on_block_place(self, event): pass
     def on_packet(self, event): pass
@@ -121,3 +122,15 @@ class BaseModule(ABC):
 
     def alert_admins(self, message: str):
         self.plugin.send_to_level4(f"§2[§7Paradox§2]§e {message}")
+
+    def emit(self, player, severity: int, evidence: dict,
+             action_hint: str = None):
+        """Emit a violation to the centralised engine."""
+        engine = getattr(self.plugin, 'violation_engine', None)
+        if engine:
+            engine.emit_violation(player, self.name, severity, evidence, action_hint)
+        else:
+            # Fallback if engine not yet initialised
+            ev_str = ', '.join(f'{k}={v}' for k, v in evidence.items())
+            name = getattr(player, 'name', '?')
+            self.alert_admins(f"§c{name}§e {self.name} ({ev_str})")
