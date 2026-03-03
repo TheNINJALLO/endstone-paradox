@@ -91,7 +91,7 @@ This opens the full admin panel where you can manage **everything** — modules,
 
 ## ✨ Features
 
-### 🛡️ 17 Detection & Admin Modules
+### 🛡️ 20 Detection & Admin Modules
 
 | Module | What It Detects |
 |--------|-----------------|
@@ -112,8 +112,11 @@ This opens the full admin panel where you can manage **everything** — modules,
 | **PvP Manager** | PvP system — per-player toggles, combat tagging, log detection |
 | **Lag Clear** | Entity cleanup — scheduled clearing with 30-second warnings |
 | **Container See** | Admin tool — see container contents and player inventories by looking at them (L4 only, off by default) |
+| **Anti-Dupe** | 4-layer duplication prevention — bundle blocking, hopper cluster monitoring (allows clocks), piston entity tracking, packet analysis (off by default) |
+| **Crash-Drop** | Anti-crash-drop — tracks disconnect locations, removes duped item entities, detects rapid disconnect cycling (off by default) |
+| **Inv-Sync** | Inventory synchronization — DB-persisted snapshots, detects excess items on rejoin from dupe exploits (off by default) |
 
-Every module can be toggled individually via commands **or** the GUI.
+Every module can be toggled individually via commands **or** the GUI. The 3 anti-dupe modules are **off by default** and should be tuned per-server.
 
 #### 🎚️ Module Sensitivity
 
@@ -368,7 +371,7 @@ endstone-paradox/
     ├── paradox.py              # Main plugin (31 commands, event handlers)
     ├── database.py             # SQLite persistence (WAL mode)
     ├── security.py             # 4-level clearance + SHA-256 auth
-    ├── modules/                # 17 detection & admin modules
+    ├── modules/                # 20 detection & admin modules
     │   ├── base.py             #   Abstract base class + sensitivity
     │   ├── fly.py              #   Flight/hover (surrounding-block check)
     │   ├── killaura.py         #   Combat bot (dynamic thresholds)
@@ -386,7 +389,10 @@ endstone-paradox/
     │   ├── rate_limit.py       #   Packet flood detection
     │   ├── packet_monitor.py   #   Packet spam alerts
     │   ├── pvp_manager.py      #   PvP toggle system
-    │   └── containersee.py     #   Container vision (admin tool)
+    │   ├── containersee.py     #   Container vision (admin tool)
+    │   ├── antidupe.py         #   4-layer dupe prevention (bundles, hoppers, pistons, packets)
+    │   ├── crashdrop.py        #   Anti-crash-drop (disconnect item removal)
+    │   └── invsync.py          #   Inventory sync (DB snapshots, rejoin diff)
     ├── commands/
     │   ├── moderation/         # 18 admin/moderation commands
     │   ├── settings/           # Module toggle handler

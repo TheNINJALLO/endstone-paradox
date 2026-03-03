@@ -25,6 +25,7 @@ ALL_MODULES = {
     "afk": True, "worldborder": True, "lagclear": True, "vision": True,
     "selfinfliction": True, "pvp": True, "ratelimit": False,
     "packetmonitor": False, "containersee": False,
+    "antidupe": False, "crashdrop": False, "invsync": False,
 }
 
 
@@ -427,6 +428,24 @@ def _register_routes(app):
             _db_set("players", uuid_str, data)
         return redirect(url_for("permissions"))
 
+    # ── Anti-Dupe Monitoring ──
+
+    @app.route("/antidupe")
+    @login_required
+    def antidupe():
+        antidupe_events = _db_get("antidupe_log", "events", [])
+        crashdrop_events = _db_get("crashdrop_log", "events", [])
+        invsync_events = _db_get("invsync_log", "events", [])
+        if not isinstance(antidupe_events, list): antidupe_events = []
+        if not isinstance(crashdrop_events, list): crashdrop_events = []
+        if not isinstance(invsync_events, list): invsync_events = []
+        return render_template_string(
+            ANTIDUPE_HTML,
+            antidupe_events=antidupe_events,
+            crashdrop_events=crashdrop_events,
+            invsync_events=invsync_events,
+        )
+
 
 # ══════════════════════════════════════════════════════════
 #  HTML TEMPLATES
@@ -760,6 +779,7 @@ SIDEBAR_HTML = """
     <a class="nav-item" href="/bans"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> Bans</a>
     <a class="nav-item" href="/players"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg> Players</a>
     <a class="nav-item" href="/permissions"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg> Permissions</a>
+    <a class="nav-item" href="/antidupe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="9" y1="12" x2="15" y2="12"/></svg> Anti-Dupe</a>
     <a class="nav-item" href="/logs"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Logs</a>
     <div class="nav-section">Settings</div>
     <a class="nav-item" href="/config"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Config</a>
@@ -1383,3 +1403,138 @@ PERMISSIONS_HTML = """<!DOCTYPE html>
 </div>
 </body></html>"""
 
+# -- Anti-Dupe Page --
+
+ANTIDUPE_HTML = """<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Paradox - Anti-Dupe Monitor</title>
+""" + BASE_CSS + """
+<style>
+.event-card {
+    background: rgba(15,21,32,0.6);
+    border: 1px solid rgba(34,197,94,0.1);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+.event-card:hover { border-color: rgba(34,197,94,0.3); }
+.event-type {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.event-type.dupe { background: rgba(239,68,68,0.2); color: #ef4444; }
+.event-type.info { background: rgba(59,130,246,0.2); color: #3b82f6; }
+.event-type.warning { background: rgba(245,158,11,0.2); color: #f59e0b; }
+.event-type.success { background: rgba(34,197,94,0.2); color: #22c55e; }
+.event-time { color: #6b7280; font-size: 12px; font-family: monospace; }
+.event-details { margin-top: 8px; font-size: 13px; color: #9ca3af; line-height: 1.6; }
+.event-details strong { color: #e5e7eb; }
+.section-title {
+    font-size: 18px; font-weight: 700; color: #e5e7eb;
+    margin: 24px 0 12px 0; display: flex; align-items: center; gap: 8px;
+}
+.section-title .count {
+    background: rgba(34,197,94,0.15); color: #22c55e;
+    padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600;
+}
+.no-events { text-align: center; color: #4b5563; padding: 32px; font-size: 14px; }
+.filter-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+.filter-bar input {
+    flex: 1; padding: 8px 12px;
+    background: rgba(15,21,32,0.8); border: 1px solid rgba(55,65,81,0.5);
+    border-radius: 8px; color: #e5e7eb; font-size: 13px;
+}
+</style>
+</head><body>
+<div class="layout">
+""" + SIDEBAR_HTML + """
+<div class="main">
+    <h1>Anti-Dupe Monitor</h1>
+    <p style="color:#6b7280;margin-bottom:16px;">Tracks suspected duplication exploits across 4 detection layers: bundle blocking, hopper cluster monitoring, piston entity tracking, and packet analysis.</p>
+
+    <div class="filter-bar">
+        <input type="text" id="searchFilter" placeholder="Search events by player, type, location..." onkeyup="filterEvents()">
+    </div>
+
+    <div class="section-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+        Dupe Detection Events
+        <span class="count">{{ antidupe_events|length }}</span>
+    </div>
+    {% for event in antidupe_events|reverse %}
+    <div class="event-card event-item">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="event-type {% if 'dupe' in event.type %}dupe{% elif 'rapid' in event.type %}warning{% else %}info{% endif %}">{{ event.type }}</span>
+            <span class="event-time">{{ event.time|int }}</span>
+        </div>
+        <div class="event-details">
+            {% for k, v in event.details.items() %}
+            <div><strong>{{ k }}:</strong> {{ v }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+    {% if not antidupe_events %}
+    <div class="no-events">No dupe detection events recorded yet. Enable the antidupe module to start monitoring.</div>
+    {% endif %}
+
+    <div class="section-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Crash-Drop Events
+        <span class="count">{{ crashdrop_events|length }}</span>
+    </div>
+    {% for event in crashdrop_events|reverse %}
+    <div class="event-card event-item">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="event-type {% if 'removed' in event.type %}success{% elif 'rapid' in event.type %}dupe{% else %}info{% endif %}">{{ event.type }}</span>
+            <span class="event-time">{{ event.time|int }}</span>
+        </div>
+        <div class="event-details">
+            {% for k, v in event.details.items() %}
+            <div><strong>{{ k }}:</strong> {{ v }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+    {% if not crashdrop_events %}
+    <div class="no-events">No crash-drop events recorded yet. Enable the crashdrop module to start monitoring.</div>
+    {% endif %}
+
+    <div class="section-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+        Inventory Sync Events
+        <span class="count">{{ invsync_events|length }}</span>
+    </div>
+    {% for event in invsync_events|reverse %}
+    <div class="event-card event-item">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="event-type warning">{{ event.type }}</span>
+            <span class="event-time">{{ event.time|int }}</span>
+        </div>
+        <div class="event-details">
+            {% for k, v in event.details.items() %}
+            <div><strong>{{ k }}:</strong> {{ v }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+    {% if not invsync_events %}
+    <div class="no-events">No inventory sync events recorded yet. Enable the invsync module to start monitoring.</div>
+    {% endif %}
+</div>
+</div>
+<script>
+function filterEvents() {
+    const q = document.getElementById('searchFilter').value.toLowerCase();
+    document.querySelectorAll('.event-item').forEach(el => {
+        el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+}
+</script>
+</body></html>"""

@@ -111,6 +111,7 @@ class BaseModule(ABC):
     # -- override points --
     def on_start(self): pass
     def on_stop(self): pass
+    def on_player_join(self, player): pass
     def on_player_leave(self, player): pass
     def on_damage(self, event): pass
     def on_block_break(self, event): pass

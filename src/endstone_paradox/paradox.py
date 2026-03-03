@@ -222,6 +222,9 @@ class ParadoxPlugin(Plugin):
         from endstone_paradox.modules.packet_monitor import PacketMonitorModule
         from endstone_paradox.modules.pvp_manager import PvPManagerModule
         from endstone_paradox.modules.containersee import ContainerSeeModule
+        from endstone_paradox.modules.antidupe import AntiDupeModule
+        from endstone_paradox.modules.crashdrop import CrashDropModule
+        from endstone_paradox.modules.invsync import InvSyncModule
 
         module_classes = {
             "fly": FlyModule,
@@ -241,10 +244,13 @@ class ParadoxPlugin(Plugin):
             "packetmonitor": PacketMonitorModule,
             "pvp": PvPManagerModule,
             "containersee": ContainerSeeModule,
+            "antidupe": AntiDupeModule,
+            "crashdrop": CrashDropModule,
+            "invsync": InvSyncModule,
         }
 
         # these are off by default since they need tuning per-server
-        default_off = {"ratelimit", "packetmonitor", "containersee"}
+        default_off = {"ratelimit", "packetmonitor", "containersee", "antidupe", "crashdrop", "invsync"}
 
         for name, cls in module_classes.items():
             try:
@@ -463,6 +469,13 @@ class ParadoxPlugin(Plugin):
         player_data["last_join"] = __import__("time").time()
         self.db.set("players", uuid_str, player_data)
 
+        # notify modules about the join (e.g. invsync)
+        for module in self._modules.values():
+            try:
+                module.on_player_join(player)
+            except Exception:
+                pass
+
         # ping L4 admins about the join
         if self.security.get_level4_players():
             for online_player in self.server.online_players:
@@ -526,12 +539,13 @@ class ParadoxPlugin(Plugin):
 
     @event_handler
     def on_block_place(self, event: BlockPlaceEvent):
-        module = self._modules.get("scaffold")
-        if module and module.running:
-            try:
-                module.on_block_place(event)
-            except Exception as e:
-                self.logger.error(f"Scaffold module block place error: {e}")
+        for module_name in ("scaffold", "antidupe"):
+            module = self._modules.get(module_name)
+            if module and module.running:
+                try:
+                    module.on_block_place(event)
+                except Exception as e:
+                    self.logger.error(f"{module_name} module block place error: {e}")
 
     @event_handler
     def on_gamemode_change(self, event: PlayerGameModeChangeEvent):
@@ -544,7 +558,7 @@ class ParadoxPlugin(Plugin):
 
     @event_handler
     def on_packet_receive(self, event: PacketReceiveEvent):
-        for module_name in ("ratelimit", "packetmonitor"):
+        for module_name in ("ratelimit", "packetmonitor", "antidupe"):
             module = self._modules.get(module_name)
             if module and module.running:
                 try:
