@@ -44,6 +44,13 @@ def handle_ban(plugin, sender, args) -> bool:
         target.kick(f"§cBanned: {reason}")
         sender.send_message(f"§2[§7Paradox§2]§a Banned {target.name}: {reason}")
         plugin.send_to_level4(f"§2[§7Paradox§2]§c {sender.name} banned {target.name}: {reason}")
+
+        # Push to Global Ban API (all servers)
+        if plugin._global_api:
+            plugin._global_api.push_ban(
+                player_name=target.name, reason=reason,
+                player_xuid=uuid_str, category="ban"
+            )
     else:
         # Offline ban by name
         plugin.db.set("bans", target_name.lower(), {
@@ -53,5 +60,11 @@ def handle_ban(plugin, sender, args) -> bool:
             "time": time.time(),
         })
         sender.send_message(f"§2[§7Paradox§2]§a Banned (offline) {target_name}: {reason}")
+
+        # Push to Global Ban API (all servers)
+        if plugin._global_api:
+            plugin._global_api.push_ban(
+                player_name=target_name, reason=reason, category="ban"
+            )
 
     return True

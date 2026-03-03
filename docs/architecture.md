@@ -73,7 +73,7 @@ The `ViolationEngine` (in `core/violation_engine.py`) centralizes all enforcemen
 
 ### Event Routing
 The main `paradox.py` registers for Endstone events and routes them to the appropriate modules:
-- `on_player_join` → namespoof check, skinguard check, module `on_player_join` (invsync)
+- `on_player_join` → global API ban check, namespoof check, skinguard check, module `on_player_join` (invsync)
 - `on_player_quit` → module `on_player_leave` (all modules) + violation engine cleanup
 - `on_actor_damage` → killaura, reach, autoclicker, pvp, selfinfliction, fly (knockback tracking)
 - `on_block_break` → xray

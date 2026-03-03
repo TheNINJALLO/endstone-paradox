@@ -152,6 +152,18 @@ class ViolationEngine:
         if self._mode != EnforcementMode.LOGONLY:
             self._enforce(player, action, module, evidence)
 
+        # Push violation report to Global Ban API (for cross-server intelligence)
+        if hasattr(self.plugin, '_global_api') and self.plugin._global_api:
+            try:
+                xuid = uuid_str if uuid_str else ""
+                self.plugin._global_api.push_report(
+                    player_name=player.name if hasattr(player, 'name') else "?",
+                    module=module, severity=severity,
+                    evidence=evidence, player_xuid=xuid
+                )
+            except Exception:
+                pass
+
     def add_exemption(self, uuid_str: str, module: str, duration_s: float):
         """Temporarily exempt a player from a module (or 'all')."""
         self._exemptions[(uuid_str, module)] = time.time() + duration_s
@@ -288,12 +300,25 @@ class ViolationEngine:
                 player.kick(f"§c[Paradox] Kicked for {module} violations")
             elif action == ACTION_BAN:
                 uuid_str = str(player.unique_id)
+                reason = f"Auto-ban: {module} violations"
                 self.db.set("bans", uuid_str, {
                     "name": player.name,
-                    "reason": f"Auto-ban: {module} violations",
+                    "reason": reason,
                     "time": time.time(),
                 })
                 player.kick(f"§c[Paradox] Banned for {module} violations")
+
+                # Push auto-ban to Global Ban API
+                if hasattr(self.plugin, '_global_api') and self.plugin._global_api:
+                    try:
+                        self.plugin._global_api.push_ban(
+                            player_name=player.name,
+                            reason=reason,
+                            player_xuid=uuid_str,
+                            category="ban"
+                        )
+                    except Exception:
+                        pass
         except Exception as e:
             self.logger.error(f"[ViolationEngine] enforce error: {e}")
 

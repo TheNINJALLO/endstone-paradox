@@ -137,6 +137,9 @@ class ParadoxPlugin(Plugin):
         # Violation engine (initialized in on_enable)
         self.violation_engine: ViolationEngine = None
 
+        # Global API client (initialized in on_enable)
+        self._global_api = None
+
     # -------------------------------------------------------------------
     # Lifecycle
     # -------------------------------------------------------------------
@@ -198,6 +201,15 @@ class ParadoxPlugin(Plugin):
             except Exception as e:
                 self.logger.warning(f"§2[§7Paradox§2]§e Web UI failed to start: {e}")
 
+        # Start Global Ban API client
+        if self.paradox_config.get("global_database", "enabled", default=False):
+            try:
+                from endstone_paradox.global_api import GlobalAPIClient
+                self._global_api = GlobalAPIClient(self)
+                self._global_api.start()
+            except Exception as e:
+                self.logger.warning(f"§2[§7Paradox§2]§e Global API client failed to start: {e}")
+
         self.logger.info("§2[§7Paradox§2]§a Loaded successfully!")
         self.logger.info(f"§2[§7Paradox§2]§7 Database: {self.db._db_path}")
         self.logger.info(f"§2[§7Paradox§2]§7 Modules loaded: {len(self._modules)}")
@@ -224,6 +236,14 @@ class ParadoxPlugin(Plugin):
             if self.violation_engine:
                 self.violation_engine.flush()
             self.db.close()
+
+        # Stop global API client
+        if self._global_api:
+            try:
+                self._global_api.stop()
+            except Exception:
+                pass
+            self._global_api = None
 
         self.logger.info("§2[§7Paradox§2]§c Paradox AntiCheat disabled.")
 
@@ -473,7 +493,12 @@ class ParadoxPlugin(Plugin):
         player = event.player
         uuid_str = str(player.unique_id)
 
-        # global ban list check (from original Paradox AntiCheat)
+        # global API ban check (synced entries from Global Ban API)
+        if self._global_api:
+            if not self._global_api.check_player_on_join(player):
+                return
+
+        # global ban list check (hardcoded from original Paradox AntiCheat)
         from endstone_paradox.globalban import is_globally_banned
         if is_globally_banned(player.name):
             player.kick("§cYou are globally banned from Paradox AntiCheat!")

@@ -384,13 +384,23 @@ Paradox includes a built-in web admin panel accessible from any browser.
 
 ### Global Ban List
 
-Paradox ships with a **hardcoded list of 509 known cheaters** from the [original Paradox AntiCheat](https://github.com/Visual1mpact/Paradox_AntiCheat). Players matching these names are automatically kicked on join. The full list is viewable and searchable in the Web UI's Bans page.
+Paradox ships with a **hardcoded list of 509 known cheaters** from the [original Paradox AntiCheat](https://github.com/Visual1mpact/Paradox_AntiCheat). Players matching these names are automatically kicked on join.
 
-### Global Ban Database
+### 🌍 Global Ban Database (Cross-Server)
 
-A separate standalone API service (**Paradox Global Ban API**) centralizes bans, high-risk flags, and violation reports across all servers running Paradox. Deploy it as a companion service and configure via `config.toml` → `global_database` with your API URL and server key. Supports 3 player categories: `ban` (blocked globally), `high_risk` (extra monitoring), `flagged` (staff attention).
+Every Paradox install automatically connects to the **Global Ban API** — a shared database for bans, high-risk flags, and violation reports across all servers running the plugin.
 
-All data is stored in SQLite with WAL mode. Use `/ac-debug-db` or the GUI's Database section to inspect tables directly.
+| Feature | Details |
+|---------|---------|
+| **Zero Config** | Works out of the box — auto-registers on first startup |
+| **Ban Sharing** | `/ac-ban` on any server → player blocked on ALL servers |
+| **Auto-Ban Sharing** | Violation engine auto-bans also push globally |
+| **Violation Reports** | All detections (fly, killaura, xray, etc.) reported for cross-server intelligence |
+| **3 Categories** | `ban` (kicked everywhere), `high_risk` (staff alerted), `flagged` (staff alerted) |
+| **5-Minute Sync** | New bans/flags pulled every 5 minutes from the API |
+| **Self-Hosted Option** | Run your own API for private server networks |
+
+To opt out: set `global_database.enabled = false` in `config.toml`.
 
 ---
 

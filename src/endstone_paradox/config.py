@@ -36,9 +36,10 @@ DEFAULT_CONFIG = {
         },
     },
     "global_database": {
-        "enabled": False,
-        "api_url": "",
-        "api_key": "",
+        "enabled": True,
+        "api_url": "",               # Auto-resolved if empty (official endpoint)
+        "api_key": "",               # Auto-populated on first connect
+        "server_name": "",           # Auto-set to hostname if empty
         "sync_interval": 300,
     },
 }

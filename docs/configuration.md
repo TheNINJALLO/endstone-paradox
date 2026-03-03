@@ -28,13 +28,14 @@ secret_key = "change-this-secret-key"
 ### Global Database
 ```toml
 [global_database]
-enabled = false
-api_url = ""               # URL of your Paradox Global Ban API instance
-api_key = ""               # Server API key from registration
-sync_interval = 300        # Sync every 5 minutes (in seconds)
+enabled = true             # On by default — auto-connects to official API
+api_url = ""               # Leave empty for official; set custom for self-hosted
+api_key = ""               # Auto-populated on first connect
+server_name = ""           # Defaults to hostname
+sync_interval = 300        # Sync every 5 minutes
 ```
 
-See the standalone [Paradox Global Ban API](https://github.com/TheNINJALLO/endstone-paradox) for setup.
+See [Global Ban Database](global-database.md) for full documentation.
 
 ### Modules
 Module states and sensitivity values are stored in the **SQLite database**, not the config file. This ensures they persist independently and can be modified at runtime via commands, GUI, or web UI.
@@ -63,6 +64,8 @@ Tables include:
 - `homes` — Player home points
 - `inv_snapshots` — Inventory sync snapshots
 - `violations` — Violation engine evidence and enforcement history
+- `global_bans` — Synced global ban cache (from Global Ban API)
+- `global_flags` — Synced global flags cache (high_risk, flagged)
 - `skin_log` — SkinGuard violation records
 - `spoof_log` — NameSpoof detection events
 - `antidupe_log` — Anti-dupe detection events
