@@ -95,7 +95,7 @@ This opens the full admin panel where you can manage **everything** — modules,
 
 ## ✨ Features
 
-### 🛡️ 20 Detection & Admin Modules
+### 🛡️ 21 Detection & Admin Modules
 
 | Module | What It Detects |
 |--------|-----------------|
@@ -119,6 +119,7 @@ This opens the full admin panel where you can manage **everything** — modules,
 | **Anti-Dupe** | 4-layer duplication prevention — bundle blocking, hopper cluster monitoring (allows clocks), piston entity tracking, packet analysis (off by default) |
 | **Crash-Drop** | Anti-crash-drop — tracks disconnect locations, removes duped item entities, detects rapid disconnect cycling (off by default) |
 | **Inv-Sync** | Inventory synchronization — DB-persisted snapshots, detects excess items on rejoin from dupe exploits (off by default) |
+| **SkinGuard** | Skin validation — blocks 4D geometry, tiny/invisible skins, non-standard dimensions, sub-pixel bone exploits |
 
 Every module can be toggled individually via commands **or** the GUI. The 3 anti-dupe modules are **off by default** and should be tuned per-server.
 

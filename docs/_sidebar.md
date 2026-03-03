@@ -22,6 +22,7 @@
   - [Anti-Dupe](modules/antidupe.md)
   - [Crash-Drop](modules/crashdrop.md)
   - [Inventory Sync](modules/invsync.md)
+  - [SkinGuard](modules/skinguard.md)
 - **Commands**
   - [Moderation Commands](commands/moderation.md)
   - [Utility Commands](commands/utility.md)

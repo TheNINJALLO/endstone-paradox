@@ -1,6 +1,6 @@
 # Modules Overview
 
-Paradox AntiCheat includes **20 detection and admin modules**, each independently toggleable and configurable.
+Paradox AntiCheat includes **21 detection and admin modules**, each independently toggleable and configurable.
 
 ## Module Categories
 
@@ -19,6 +19,7 @@ These modules actively monitor player behavior and flag suspicious activity.
 | NameSpoof | `/ac-namespoof` | ON | Name manipulation detection |
 | Self-Infliction | — | ON | Self-damage exploit detection |
 | Vision | `/ac-vision` | ON | Aimbot/snap aim detection |
+| SkinGuard | `/ac-skinguard` | ON | 4D/tiny/invisible skin detection |
 
 ### Prevention Modules
 These modules actively prevent exploits.

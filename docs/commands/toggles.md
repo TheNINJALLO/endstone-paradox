@@ -18,6 +18,7 @@ Each detection module has a dedicated toggle command. These are shortcuts for `/
 | `/ac-lagclear` | Lag Clear |
 | `/ac-ratelimit` | Rate Limiter |
 | `/ac-packetmonitor` | Packet Monitor |
+| `/ac-skinguard` | SkinGuard (4D/tiny/invisible skin detection) |
 
 ## Setting Sensitivity
 

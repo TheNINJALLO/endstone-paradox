@@ -63,6 +63,7 @@ class ParadoxPlugin(Plugin):
         "ac-namespoof": {"description": "Toggle name spoofing detection on or off", "usages": ["/ac-namespoof"], "permissions": ["paradox.settings"]},
         "ac-packetmonitor": {"description": "Toggle packet spam monitoring on or off", "usages": ["/ac-packetmonitor"], "permissions": ["paradox.settings"]},
         "ac-containersee": {"description": "Toggle container vision for admins (see contents by looking)", "usages": ["/ac-containersee"], "permissions": ["paradox.settings"]},
+        "ac-skinguard": {"description": "Toggle skin validation (blocks 4D/tiny/invisible skins)", "usages": ["/ac-skinguard"], "permissions": ["paradox.settings"]},
         # --- Utility ---
         "ac-home": {"description": "Manage homes: set/delete/list or teleport by name", "usages": ["/ac-home [args: message]"], "permissions": ["paradox.home"]},
         "ac-tpr": {"description": "Teleport to a random location, optionally set radius", "usages": ["/ac-tpr [radius: int]"], "permissions": ["paradox.tpr"]},
@@ -251,6 +252,7 @@ class ParadoxPlugin(Plugin):
         from endstone_paradox.modules.antidupe import AntiDupeModule
         from endstone_paradox.modules.crashdrop import CrashDropModule
         from endstone_paradox.modules.invsync import InvSyncModule
+        from endstone_paradox.modules.skinguard import SkinGuardModule
 
         module_classes = {
             "fly": FlyModule,
@@ -273,6 +275,7 @@ class ParadoxPlugin(Plugin):
             "antidupe": AntiDupeModule,
             "crashdrop": CrashDropModule,
             "invsync": InvSyncModule,
+            "skinguard": SkinGuardModule,
         }
 
         # these are off by default since they need tuning per-server
@@ -505,6 +508,12 @@ class ParadoxPlugin(Plugin):
         player_data["name"] = player.name
         player_data["last_join"] = __import__("time").time()
         self.db.set("players", uuid_str, player_data)
+
+        # skin validation (before module notifications)
+        skinguard = self._modules.get("skinguard")
+        if skinguard and skinguard.running:
+            if not skinguard.check_player(player):
+                return  # kicked for invalid skin
 
         # notify modules about the join (e.g. invsync)
         for module in self._modules.values():
