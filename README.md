@@ -57,7 +57,7 @@ Drop the `.whl` file into your Endstone server's `plugins/` folder:
 your-server/
 ├── endstone.toml
 ├── plugins/
-│   └── endstone_paradox-1.0.0-py3-none-any.whl   ← drop it here
+│   └── endstone_paradox-1.5.0-py3-none-any.whl   ← drop it here
 └── ...
 ```
 
@@ -66,9 +66,9 @@ your-server/
 Start (or restart) your Endstone server. You'll see Paradox load in the console:
 
 ```
-[ParadoxAC] Paradox AntiCheat v1.0.0 loaded!
+[ParadoxAC] Paradox AntiCheat v1.5.0 loaded!
 [ParadoxAC] Database initialized at plugins/ParadoxAC/paradox.db
-[ParadoxAC] 14 detection modules registered.
+[ParadoxAC] 20 detection modules registered.
 ```
 
 ### Step 4 — Set Your Admin Password
