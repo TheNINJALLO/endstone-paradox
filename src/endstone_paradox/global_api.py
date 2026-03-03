@@ -7,7 +7,7 @@ import socket
 import time
 import urllib.request
 import urllib.error
-from threading import Thread
+from threading import Thread, Lock
 from typing import Optional
 
 # ── Obfuscated official endpoint ─────────────────────────
@@ -50,6 +50,8 @@ class GlobalAPIClient:
         self._running = False
         self._report_buffer = []
         self._sync_task = None
+        self._register_lock = Lock()
+        self._registered = False
 
     # ── Lifecycle ────────────────────────────────────────────
 
@@ -90,8 +92,15 @@ class GlobalAPIClient:
     # ── Auto-Registration ────────────────────────────────────
 
     def _auto_register(self):
-        """Register this server with the Global Ban API."""
+        """Register this server with the Global Ban API (thread-safe)."""
+        # Prevent concurrent registration attempts
+        if not self._register_lock.acquire(blocking=False):
+            return False  # Another thread is already registering
         try:
+            # Double-check after acquiring lock
+            if self._api_key or self._registered:
+                return True
+
             body = json.dumps({"name": self._server_name}).encode("utf-8")
             req = urllib.request.Request(
                 f"{self._api_url}/api/servers/self-register",
@@ -107,6 +116,7 @@ class GlobalAPIClient:
 
             if api_key:
                 self._api_key = api_key
+                self._registered = True
                 # Persist the key to config.toml
                 self.config.set("global_database", "api_key", api_key)
                 self.logger.info(
@@ -134,6 +144,8 @@ class GlobalAPIClient:
         except Exception as e:
             self.logger.warning(f"§2[§7Paradox§2]§e Global DB: Registration pending: {e}")
             return False
+        finally:
+            self._register_lock.release()
 
     # ── Sync Loop ────────────────────────────────────────────
 

@@ -390,7 +390,12 @@ def _register_routes(app):
     def global_db():
         cfg = app.config["PARADOX_CONFIG"]
         global_cfg = cfg.get("global_database", default={})
-        return render_template_string(GLOBAL_HTML, config=global_cfg)
+        g_bans = _db_get_all("global_bans")
+        g_flags = _db_get_all("global_flags")
+        return render_template_string(
+            GLOBAL_HTML, config=global_cfg,
+            global_bans=g_bans, global_flags=g_flags
+        )
 
     # ── API Stats ──
 
@@ -1307,36 +1312,91 @@ LISTS_HTML = """<!DOCTYPE html>
 </div>
 </body></html>"""
 
-# ── Global DB (placeholder) ──
+# ── Global DB ──
 
 GLOBAL_HTML = """<!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Paradox — Global Database</title>
 """ + BASE_CSS + """
+<style>
+.stat-row { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:24px; }
+.stat-item { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:16px 20px; min-width:160px; }
+.stat-label { font-size:11px; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px; }
+.stat-value { font-size:22px; font-weight:700; color:#f3f4f6; margin-top:4px; }
+.cat-ban { color:#ef4444; }
+.cat-high { color:#f59e0b; }
+.cat-flag { color:#3b82f6; }
+</style>
 </head><body>
 <div class="layout">
 """ + SIDEBAR_HTML + """
 <div class="main">
-    <h2>Global Ban Database</h2>
-    <div class="placeholder-card">
-        <h3 style="margin-bottom:12px;color:#9ca3af;">Coming Soon</h3>
-        <p style="margin-bottom:16px;">
-            The Global Ban Database will allow cross-server sharing of:<br>
-            <strong style="color:#ef4444;">Banned members</strong> and
-            <strong style="color:#f59e0b;">High-risk players</strong>
-        </p>
-        <div class="card" style="display:inline-block;text-align:left;max-width:400px;">
-            <div style="font-size:13px;color:#6b7280;">
-                <p><strong>Status:</strong> {% if config.get('enabled', False) %}<span class="badge badge-on">Connected</span>{% else %}<span class="badge badge-off">Not Configured</span>{% endif %}</p>
-                <p style="margin-top:8px;"><strong>API URL:</strong> {{ config.get('api_url', 'Not set') or 'Not set' }}</p>
-                <p style="margin-top:4px;"><strong>Sync Interval:</strong> {{ config.get('sync_interval', 300) }}s</p>
-            </div>
+    <h2>🌍 Global Ban Database</h2>
+
+    <div class="stat-row">
+        <div class="stat-item">
+            <div class="stat-label">Status</div>
+            <div class="stat-value">{% if config.get('enabled', False) %}<span class="badge badge-on">Connected</span>{% else %}<span class="badge badge-off">Disabled</span>{% endif %}</div>
         </div>
-        <p style="margin-top:20px;font-size:12px;color:#4b5563;">
-            Configure in <code>config.toml</code> &rarr; <code>global_database</code> section
-        </p>
+        <div class="stat-item">
+            <div class="stat-label">API Key</div>
+            <div class="stat-value">{% if config.get('api_key', '') %}<span class="badge badge-on">Registered</span>{% else %}<span class="badge badge-off">Pending</span>{% endif %}</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">Server Name</div>
+            <div class="stat-value" style="font-size:16px;">{{ config.get('server_name', '') or 'Auto' }}</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">Sync Interval</div>
+            <div class="stat-value">{{ config.get('sync_interval', 300) }}s</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">Global Bans</div>
+            <div class="stat-value cat-ban">{{ global_bans|length }}</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">Flags / High-Risk</div>
+            <div class="stat-value cat-high">{{ global_flags|length }}</div>
+        </div>
     </div>
+
+    <div class="card" style="margin-bottom:24px;">
+        <h3 style="margin-bottom:12px;font-size:16px;color:#ef4444;">🚫 Global Bans ({{ global_bans|length }})</h3>
+        <p style="font-size:12px;color:#6b7280;margin-bottom:12px;">Players banned across all servers — kicked on every join attempt.</p>
+        <table>
+        <tr><th>Player</th><th>Reason</th><th>Source</th></tr>
+        {% for ban in global_bans %}
+        <tr>
+            <td style="color:#f87171;font-weight:600;">{{ ban.get('name', '') }}</td>
+            <td>{{ ban.get('reason', '') }}</td>
+            <td style="color:#6b7280;font-size:12px;">{{ ban.get('source', 'global') }}</td>
+        </tr>
+        {% endfor %}
+        {% if not global_bans %}<tr><td colspan="3" style="text-align:center;color:#6b7280;">No global bans synced yet</td></tr>{% endif %}
+        </table>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-bottom:12px;font-size:16px;color:#f59e0b;">⚠️ Flags &amp; High-Risk ({{ global_flags|length }})</h3>
+        <p style="font-size:12px;color:#6b7280;margin-bottom:12px;">Players flagged across servers — staff alerted on join, NOT kicked.</p>
+        <table>
+        <tr><th>Player</th><th>Category</th><th>Reason</th><th>Source</th></tr>
+        {% for flag in global_flags %}
+        <tr>
+            <td style="color:#fbbf24;font-weight:600;">{{ flag.get('name', '') }}</td>
+            <td>{% if flag.get('category') == 'high_risk' %}<span class="cat-high">High Risk</span>{% else %}<span class="cat-flag">Flagged</span>{% endif %}</td>
+            <td>{{ flag.get('reason', '') }}</td>
+            <td style="color:#6b7280;font-size:12px;">{{ flag.get('source', 'global') }}</td>
+        </tr>
+        {% endfor %}
+        {% if not global_flags %}<tr><td colspan="4" style="text-align:center;color:#6b7280;">No flags synced yet</td></tr>{% endif %}
+        </table>
+    </div>
+
+    <p style="margin-top:16px;font-size:12px;color:#4b5563;">
+        Data syncs automatically every {{ config.get('sync_interval', 300) }} seconds. Bans from <code>/ac-ban</code> and auto-bans from the violation engine are pushed to all servers.
+    </p>
 </div>
 </div>
 </body></html>"""
