@@ -16,7 +16,7 @@ endstone-paradox/
     ├── globalban.py            # 509 known cheaters from original Paradox
     ├── core/                   # Core engine components
     │   └── violation_engine.py #   Centralized violation processing
-    ├── modules/                # 20 detection & admin modules
+    ├── modules/                # 21 detection & admin modules
     │   ├── base.py             #   Abstract base class + sensitivity + emit()
     │   ├── fly.py              #   Flight/hover detection
     │   ├── killaura.py         #   Combat bot detection
@@ -37,7 +37,8 @@ endstone-paradox/
     │   ├── containersee.py     #   Container vision (admin)
     │   ├── antidupe.py         #   4-layer dupe prevention
     │   ├── crashdrop.py        #   Anti-crash-drop
-    │   └── invsync.py          #   Inventory sync
+    │   ├── invsync.py          #   Inventory sync
+    │   └── skinguard.py        #   4D/tiny/invisible skin detection
     ├── commands/
     │   ├── moderation/         # 18 admin/moderation commands
     │   ├── settings/           # Module toggle handler
@@ -52,7 +53,7 @@ endstone-paradox/
 ## Design Patterns
 
 ### BaseModule Pattern
-All 20 modules extend `BaseModule`, which provides:
+All 21 modules extend `BaseModule`, which provides:
 - **Lifecycle management**: `start()`, `stop()`, `on_start()`, `on_stop()`
 - **Periodic checks**: Scheduler-based `check()` method at configurable intervals
 - **Sensitivity scaling**: `_scale()` method for threshold adjustment
@@ -72,7 +73,7 @@ The `ViolationEngine` (in `core/violation_engine.py`) centralizes all enforcemen
 
 ### Event Routing
 The main `paradox.py` registers for Endstone events and routes them to the appropriate modules:
-- `on_player_join` → module `on_player_join` (invsync)
+- `on_player_join` → namespoof check, skinguard check, module `on_player_join` (invsync)
 - `on_player_quit` → module `on_player_leave` (all modules) + violation engine cleanup
 - `on_actor_damage` → killaura, reach, autoclicker, pvp, selfinfliction, fly (knockback tracking)
 - `on_block_break` → xray

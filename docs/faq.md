@@ -59,7 +59,7 @@ Module states are stored in the database. Try:
 to verify the stored state. If there's a mismatch, toggle it off and on again.
 
 ### The web UI won't start
-Check that port 8005 is not in use by another process. Also verify Flask is installed:
+Check that port 8080 is not in use by another process. Also verify Flask is installed:
 ```
 pip install flask
 ```

@@ -9,7 +9,7 @@ Paradox includes a full in-game GUI accessible via `/ac-gui` (requires L2 cleara
 The GUI contains **8 sections**:
 
 ### 1. Module Management
-Toggle any of the 20 modules on or off, and adjust sensitivity settings.
+Toggle any of the 21 modules on or off, and adjust sensitivity settings.
 
 ### 2. Player Management
 View online players, check their clearance levels, and perform moderation actions.

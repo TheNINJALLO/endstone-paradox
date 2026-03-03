@@ -57,7 +57,7 @@ Drop the `.whl` file into your Endstone server's `plugins/` folder:
 your-server/
 ├── endstone.toml
 ├── plugins/
-│   └── endstone_paradox-1.5.2-py3-none-any.whl   ← drop it here
+│   └── endstone_paradox-1.5.4-py3-none-any.whl   ← drop it here
 └── ...
 ```
 
@@ -66,9 +66,9 @@ your-server/
 Start (or restart) your Endstone server. You'll see Paradox load in the console:
 
 ```
-[ParadoxAC] Paradox AntiCheat v1.5.2 loaded!
+[ParadoxAC] Paradox AntiCheat v1.5.4 loaded!
 [ParadoxAC] Database initialized at plugins/ParadoxAC/paradox.db
-[ParadoxAC] 20 detection modules registered.
+[ParadoxAC] 21 detection modules registered.
 ```
 
 ### Step 4 — Set Your Admin Password
@@ -238,6 +238,7 @@ Everything saves automatically and survives server restarts:
 | `/ac-namespoof` | Toggle name spoofing detection |
 | `/ac-packetmonitor` | Toggle packet spam monitoring |
 | `/ac-containersee` | Toggle container vision for admins (off by default) |
+| `/ac-skinguard` | Toggle skin validation (4D/tiny/invisible skin detection) |
 
 > **Tip:** Any detection command accepts `sensitivity N` — e.g., `/ac-killaura sensitivity 3` for lenient or `/ac-xray sensitivity 9` for strict.
 
@@ -276,7 +277,7 @@ Type `/ac-gui` to open the complete admin panel. **Every feature is accessible f
 
 | Section | What You Can Do |
 |---------|-----------------|
-| **Modules** | Toggle all 17 detection modules on/off, adjust sensitivity per-module with a slider (1-10) |
+| **Modules** | Toggle all 21 detection modules on/off, adjust sensitivity per-module with a slider (1-10) |
 | **Moderation** | Vanish, lockdown, lockdown level selector (L4 only / L4+L3), kick, ban, unban, freeze, punish, despawn entities, manage allow/white lists, view spoof logs, change prefix |
 | **Players** | Select any online player → kick, ban, freeze, warn, teleport to/from them, set rank, view inventory — all from one screen |
 | **Utilities** | Homes (set, delete, update, teleport), random TP, PvP toggle (personal + global), chat channels (create, join, leave, send), TPA, ranks |
@@ -331,11 +332,11 @@ name = "paradox"
 user = "paradox"
 password = ""
 
-[global_database]          # Cross-server ban list (coming soon)
+[global_database]          # Cross-server global ban/flag sharing
 enabled = false
-api_url = ""
-api_key = ""
-sync_interval = 300
+api_url = ""               # URL of your Paradox Global Ban API instance
+api_key = ""               # Server API key from registration
+sync_interval = 300        # Sync every 5 minutes
 ```
 
 ---
@@ -365,14 +366,14 @@ Paradox includes a built-in web admin panel accessible from any browser.
 | Page | What You Can Do |
 |------|-----------------|
 | **Dashboard** | Overview cards: module count, bans (server + 509 global), frozen, vanished, lockdown status, module status table |
-| **Modules** | Toggle all 17 modules on/off + adjust sensitivity (1-10 sliders) |
+| **Modules** | Toggle all 21 modules on/off + adjust sensitivity (1-10 sliders) |
 | **Bans** | View server bans, add/remove bans, browse the 509-name Global Ban List with search |
 | **Players** | Player records, warnings, frozen/vanished lists, ranks |
 | **Permissions** | View and set player clearance levels (1-4) |
 | **Logs** | Namespoof detection log, detection events |
 | **Config** | Edit all DB settings, view config.toml, database mode info |
 | **Allow/Whitelist** | Add/remove players from allowlist and whitelist |
-| **Global DB** | Cross-server ban database status (coming soon) |
+| **Global DB** | Cross-server ban database — configure the [Paradox Global Ban API](https://github.com/TheNINJALLO/endstone-paradox) |
 
 ### Database Modes
 
@@ -385,9 +386,9 @@ Paradox includes a built-in web admin panel accessible from any browser.
 
 Paradox ships with a **hardcoded list of 509 known cheaters** from the [original Paradox AntiCheat](https://github.com/Visual1mpact/Paradox_AntiCheat). Players matching these names are automatically kicked on join. The full list is viewable and searchable in the Web UI's Bans page.
 
-### Global Ban Database (Coming Soon)
+### Global Ban Database
 
-A shared cross-server database for **banned members** and **high-risk players**. Configure via `config.toml` → `global_database`.
+A separate standalone API service (**Paradox Global Ban API**) centralizes bans, high-risk flags, and violation reports across all servers running Paradox. Deploy it as a companion service and configure via `config.toml` → `global_database` with your API URL and server key. Supports 3 player categories: `ban` (blocked globally), `high_risk` (extra monitoring), `flagged` (staff attention).
 
 All data is stored in SQLite with WAL mode. Use `/ac-debug-db` or the GUI's Database section to inspect tables directly.
 
@@ -401,15 +402,17 @@ endstone-paradox/
 ├── README.md
 └── src/endstone_paradox/
     ├── __init__.py
-    ├── paradox.py              # Main plugin (31 commands, event handlers)
+    ├── paradox.py              # Main plugin (35+ commands, event handlers)
     ├── database.py             # SQLite persistence (WAL mode)
     ├── security.py             # 4-level clearance + SHA-256 auth
-    ├── modules/                # 20 detection & admin modules
-    │   ├── base.py             #   Abstract base class + sensitivity
-    │   ├── fly.py              #   Flight/hover (surrounding-block check)
-    │   ├── killaura.py         #   Combat bot (dynamic thresholds)
-    │   ├── reach.py            #   Reach hack (Catmull-Rom interpolation)
-    │   ├── autoclicker.py      #   CPS tracking
+    ├── core/                   # Centralized systems
+    │   └── violation_engine.py #   Violation processing pipeline (290 lines)
+    ├── modules/                # 21 detection & admin modules
+    │   ├── base.py             #   Abstract base class + sensitivity + emit()
+    │   ├── fly.py              #   Flight/hover (surrounding-block check, knockback/slime exemptions)
+    │   ├── killaura.py         #   Combat bot (dynamic thresholds, latency tolerance)
+    │   ├── reach.py            #   Reach hack (Catmull-Rom interpolation, latency tolerance)
+    │   ├── autoclicker.py      #   CPS tracking (PC/Mobile/Console, air-click, CV analysis)
     │   ├── scaffold.py         #   Speed bridge (air-below filtering)
     │   ├── xray.py             #   X-ray (weighted suspicion scoring)
     │   ├── gamemode.py         #   Gamemode change blocking
@@ -417,6 +420,7 @@ endstone-paradox/
     │   ├── self_infliction.py  #   Self-damage detection
     │   ├── afk.py              #   AFK idle tracking
     │   ├── vision.py           #   Aimbot detection
+    │   ├── skinguard.py        #   4D/tiny/invisible skin detection
     │   ├── world_border.py     #   Border enforcement
     │   ├── lag_clear.py        #   Entity cleanup
     │   ├── rate_limit.py       #   Packet flood detection

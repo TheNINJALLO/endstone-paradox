@@ -19,7 +19,7 @@ Place the `.whl` file in your Endstone server's `plugins/` directory:
 ```
 your-server/
 ├── plugins/
-│   └── endstone_paradox-1.5.0-py3-none-any.whl
+│   └── endstone_paradox-1.5.4-py3-none-any.whl
 ├── endstone.toml
 └── ...
 ```
@@ -30,7 +30,7 @@ Start (or restart) your Endstone server. You should see Paradox load in the cons
 
 ```
 [Paradox] ════════════════════════════════════════════════════════
-[Paradox]   AntiCheat v1.5.0
+[Paradox]   AntiCheat v1.5.4
 [Paradox]   Designed by Visual1mpact
 [Paradox]   Ported to Endstone by TheN1NJ4LL0
 [Paradox] ════════════════════════════════════════════════════════
@@ -38,7 +38,7 @@ Start (or restart) your Endstone server. You should see Paradox load in the cons
 [Paradox] Module 'killaura' started
 ...
 [Paradox] Loaded successfully!
-[Paradox] Modules loaded: 20
+[Paradox] Modules loaded: 21
 ```
 
 ### Step 4: Set Up Your Admin Password
@@ -73,10 +73,10 @@ Toggle modules via:
 
 ### Step 6: (Optional) Enable the Web Admin Panel
 
-The web UI starts automatically on port `8005`. Access it at:
+The web UI starts automatically on port `8080`. Access it at:
 
 ```
-http://your-server-ip:8005
+http://your-server-ip:8080
 ```
 
 The default secret key is configured in `config.toml`. See [Web Admin Panel](webui.md) for full setup instructions.

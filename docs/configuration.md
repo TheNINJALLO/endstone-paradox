@@ -20,16 +20,21 @@ mode = "sqlite"     # SQLite with WAL mode
 ```toml
 [web_ui]
 enabled = true
-port = 8005
-secret = "change-this-secret-key"
-admin_hash = ""     # SHA-256 hash of admin password (auto-set)
+port = 8080
+host = "0.0.0.0"
+secret_key = "change-this-secret-key"
 ```
 
 ### Global Database
 ```toml
 [global_database]
-enabled = true      # Enable global ban list checking
+enabled = false
+api_url = ""               # URL of your Paradox Global Ban API instance
+api_key = ""               # Server API key from registration
+sync_interval = 300        # Sync every 5 minutes (in seconds)
 ```
+
+See the standalone [Paradox Global Ban API](https://github.com/TheNINJALLO/endstone-paradox) for setup.
 
 ### Modules
 Module states and sensitivity values are stored in the **SQLite database**, not the config file. This ensures they persist independently and can be modified at runtime via commands, GUI, or web UI.
@@ -57,6 +62,9 @@ Tables include:
 - `vanished_players` — Currently vanished players
 - `homes` — Player home points
 - `inv_snapshots` — Inventory sync snapshots
+- `violations` — Violation engine evidence and enforcement history
+- `skin_log` — SkinGuard violation records
+- `spoof_log` — NameSpoof detection events
 - `antidupe_log` — Anti-dupe detection events
 - `crashdrop_log` — Crash-drop detection events
 - `invsync_log` — Inventory sync detection events

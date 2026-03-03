@@ -18,13 +18,15 @@ Unlike the original Script API version, the Endstone port runs **server-side** w
 
 | Feature | Description |
 |---------|-------------|
-| **20 Modules** | Detection, prevention, and admin utilities — all individually toggleable |
+| **21 Modules** | Detection, prevention, and admin utilities — all individually toggleable |
 | **4-Level Security** | Clearance system with SHA-256 authentication (no operator abuse) |
+| **Violation Engine** | Centralized enforcement pipeline with rolling buffers, escalation ladder, and evidence logging |
 | **Web Admin Panel** | Full-featured web UI with dashboard, module management, bans, players, permissions, anti-dupe monitoring, and more |
 | **In-Game GUI** | 8-section form-based GUI accessible via `/ac-gui` |
-| **31 Commands** | 18 moderation + 9 utility + module toggles |
+| **35+ Commands** | 18 moderation + 9 utility + module toggles + violation engine |
 | **Sensitivity Scaling** | Every detection module has a 1-10 sensitivity scale |
 | **Global Ban List** | 509 known cheaters from the original Paradox, checked on join |
+| **Global Ban API** | Separate standalone API for cross-server ban/flag/report sharing |
 | **TOML Configuration** | Clean, human-readable config file |
 
 ### Credits

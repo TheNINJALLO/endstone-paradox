@@ -6,10 +6,10 @@ Paradox includes a built-in **Flask-based web admin panel** that runs alongside 
 
 ## Accessing the Web UI
 
-The web UI starts automatically on port **8005**:
+The web UI starts automatically on port **8080**:
 
 ```
-http://your-server-ip:8005
+http://your-server-ip:8080
 ```
 
 ### Authentication
@@ -17,8 +17,9 @@ Login with the secret key configured in `config.toml`:
 ```toml
 [web_ui]
 enabled = true
-port = 8005
-secret = "your-secret-key"
+port = 8080
+host = "0.0.0.0"
+secret_key = "your-secret-key"
 ```
 
 ## Pages
@@ -31,7 +32,7 @@ Overview of your server including:
 - Module status summary
 
 ### Modules
-Toggle all 20 modules on/off and adjust sensitivity (1-10) per module.
+Toggle all 21 modules on/off and adjust sensitivity (1-10) per module.
 
 ### Bans
 - View all server bans
