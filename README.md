@@ -30,8 +30,66 @@ A full Python port of the original [Paradox AntiCheat](https://github.com/Visual
 
 ---
 
+## 🗺️ Development Roadmap
+
+<table>
+<tr>
+<td width="50%">
+
+### ✅ Tier 1 — Complete
+
+```
+██████████████████████ 100%
+```
+
+🟢 NoClip / Phase Detection
+🟢 WaterWalk / Jesus Hack
+🟢 Step Hack Detection
+🟢 Timer Hack (Packet Frequency)
+🟢 Blink / Teleport Detection
+🟢 Anti-Knockback
+🟢 Criticals Hack Detection
+🟢 Hit Through Walls (LoS)
+🟢 TriggerBot Detection
+🟢 Illegal Item Scanner
+
+</td>
+<td width="50%">
+
+### 📋 Tier 2 — Next Up
+
+```
+░░░░░░░░░░░░░░░░░░░░░   0%
+```
+
+⬜ Discord Integration (Webhooks)
+⬜ Chat Protection & Filters
+⬜ Anti-Grief / World Protection
+⬜ Evidence Replay System
+
+### 🔮 Tier 3 — Future
+
+```
+░░░░░░░░░░░░░░░░░░░░░   0%
+```
+
+⬜ Analytics Dashboard & Charts
+⬜ Bot Detection (Behavioral)
+⬜ Player Report System
+⬜ Session Fingerprinting
+⬜ Adaptive Check Frequency
+
+</td>
+</tr>
+</table>
+
+<p align="center"><sub>📖 <a href="https://theninjallo.github.io/endstone-paradox/#/roadmap">Full roadmap with implementation details →</a></sub></p>
+
+---
+
 ## 📋 Table of Contents
 
+- [Roadmap](#️-development-roadmap)
 - [Quick Start](#-quick-start)
 - [Features](#-features)
 - [Commands](#-commands)
@@ -57,7 +115,7 @@ Drop the `.whl` file into your Endstone server's `plugins/` folder:
 your-server/
 ├── endstone.toml
 ├── plugins/
-│   └── endstone_paradox-1.5.4-py3-none-any.whl   ← drop it here
+│   └── endstone_paradox-1.6.0-py3-none-any.whl   ← drop it here
 └── ...
 ```
 
@@ -66,9 +124,9 @@ your-server/
 Start (or restart) your Endstone server. You'll see Paradox load in the console:
 
 ```
-[ParadoxAC] Paradox AntiCheat v1.5.4 loaded!
+[ParadoxAC] Paradox AntiCheat v1.6.0 loaded!
 [ParadoxAC] Database initialized at plugins/ParadoxAC/paradox.db
-[ParadoxAC] 21 detection modules registered.
+[ParadoxAC] 31 detection modules registered.
 ```
 
 ### Step 4 — Set Your Admin Password
@@ -529,47 +587,6 @@ When lockdown is active (`/ac-lockdown` or via GUI), access is restricted based 
 
 Set the level with `/ac-lockdown level 2` or via GUI → **Moderation** → **Lockdown Level**.
 </details>
-
----
-
-## 🗺️ Roadmap
-
-> Track our progress toward making Paradox the most comprehensive Bedrock anti-cheat available.
-
-### ✅ Tier 1 — Completed (v1.6.0)
-
-<table>
-<tr><th>Category</th><th>Feature</th><th>Status</th></tr>
-<tr><td rowspan="5"><b>Movement</b></td><td>NoClip / Phase (walking through blocks)</td><td>✅ Done</td></tr>
-<tr><td>Jesus / WaterWalk (walking on water)</td><td>✅ Done</td></tr>
-<tr><td>Step Hack (stepping up blocks without jumping)</td><td>✅ Done</td></tr>
-<tr><td>Timer Hack (game speed manipulation via packet frequency)</td><td>✅ Done</td></tr>
-<tr><td>Blink / Teleport (position jumps without server teleport)</td><td>✅ Done</td></tr>
-<tr><td rowspan="4"><b>Combat</b></td><td>Anti-Knockback (not taking knockback after damage)</td><td>✅ Done</td></tr>
-<tr><td>Criticals (always getting critical hits without falling)</td><td>✅ Done</td></tr>
-<tr><td>Hit Through Walls (line-of-sight validation)</td><td>✅ Done</td></tr>
-<tr><td>TriggerBot (instant attack when crosshair enters hitbox)</td><td>✅ Done</td></tr>
-<tr><td><b>Items</b></td><td>Illegal Item Scanner (enchantments, stack sizes, creative-only)</td><td>✅ Done</td></tr>
-</table>
-
-### 📋 Tier 2 — Planned
-
-| Feature | Description |
-|---------|-------------|
-| **Discord Integration** | Webhook alerts, ban notifications, evidence embeds, configurable severity filters |
-| **Chat Protection** | Spam detection, ad filter, swear filter, caps limiter, command throttle, mute system |
-| **Anti-Grief / World Protection** | Anti-nuke, explosion logging, lava/water tracking, build protection zones |
-| **Evidence Replay** | Record player actions before violations, staff can replay to investigate |
-
-### 🔮 Tier 3 — Future
-
-| Feature | Description |
-|---------|-------------|
-| **Analytics Dashboard** | Violation charts, heatmaps, player risk scores, server health metrics |
-| **Bot Detection** | Behavioral entropy analysis, connection patterns, honeypot blocks |
-| **Player Reports** | `/report` command, web UI queue, auto-escalation, staff claim/resolve |
-| **Session Fingerprinting** | Device fingerprint → alt account detection, ban evasion tracking |
-| **Adaptive Check Frequency** | Clean players checked less often, suspicious players checked every tick |
 
 ---
 
