@@ -31,9 +31,9 @@ A full Python port of the original [Paradox AntiCheat](https://github.com/Visual
 ---
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Tier_1-Complete-00C853?style=for-the-badge" alt="Tier 1">
-  <img src="https://img.shields.io/badge/Tier_2-Planned-FFA726?style=for-the-badge" alt="Tier 2">
-  <img src="https://img.shields.io/badge/Tier_3-Future-7C4DFF?style=for-the-badge" alt="Tier 3">
+  <img src="https://img.shields.io/badge/Tier_1-✓_Complete-00C853?style=for-the-badge" alt="Tier 1 Complete">
+  <img src="https://img.shields.io/badge/Tier_2-⚡_In_Progress-FF6D00?style=for-the-badge" alt="Tier 2 In Progress">
+  <img src="https://img.shields.io/badge/Tier_3-◇_Future-7C4DFF?style=for-the-badge" alt="Tier 3 Future">
 </p>
 
 <details open>
@@ -41,24 +41,27 @@ A full Python port of the original [Paradox AntiCheat](https://github.com/Visual
 
 <br>
 
-> 🟢 NoClip / Phase Detection &nbsp;&nbsp;·&nbsp;&nbsp; 🟢 WaterWalk / Jesus Hack &nbsp;&nbsp;·&nbsp;&nbsp; 🟢 Step Hack Detection
->
-> 🟢 Timer Hack &nbsp;&nbsp;·&nbsp;&nbsp; 🟢 Blink / Teleport &nbsp;&nbsp;·&nbsp;&nbsp; 🟢 Anti-Knockback
->
-> 🟢 Criticals Detection &nbsp;&nbsp;·&nbsp;&nbsp; 🟢 Hit Through Walls &nbsp;&nbsp;·&nbsp;&nbsp; 🟢 TriggerBot
->
-> 🟢 Illegal Item Scanner
+| Feature | Status | Feature | Status |
+|:--------|:------:|:--------|:------:|
+| NoClip / Phase | ✅ | Anti-Knockback | ✅ |
+| WaterWalk / Jesus | ✅ | Criticals Detection | ✅ |
+| Step Hack | ✅ | Hit Through Walls | ✅ |
+| Timer Hack | ✅ | TriggerBot | ✅ |
+| Blink / Teleport | ✅ | Illegal Item Scanner | ✅ |
 
 </details>
 
-<details>
-<summary><h3>📋 Tier 2 — Community & Moderation</h3></summary>
+<details open>
+<summary><h3>⚡ Tier 2 — Community & Moderation</h3></summary>
 
 <br>
 
-> ⬜ Discord Integration (Webhooks) &nbsp;&nbsp;·&nbsp;&nbsp; ⬜ Chat Protection & Filters
->
-> ⬜ Anti-Grief / World Protection &nbsp;&nbsp;·&nbsp;&nbsp; ⬜ Evidence Replay System
+| Feature | Description | Status |
+|:--------|:------------|:------:|
+| Discord Integration | Webhook alerts, ban notifications, evidence embeds | 🔨 Building |
+| Chat Protection | Spam detection, ad filter, swear filter, mute system | 🔨 Building |
+| Anti-Grief / World Protection | Anti-nuke, explosion logging, build protection zones | 🔨 Building |
+| Evidence Replay | Record player actions before violations, staff replay | 🔨 Building |
 
 </details>
 
@@ -67,9 +70,13 @@ A full Python port of the original [Paradox AntiCheat](https://github.com/Visual
 
 <br>
 
-> ⬜ Analytics Dashboard &nbsp;&nbsp;·&nbsp;&nbsp; ⬜ Bot Detection &nbsp;&nbsp;·&nbsp;&nbsp; ⬜ Player Reports
->
-> ⬜ Session Fingerprinting &nbsp;&nbsp;·&nbsp;&nbsp; ⬜ Adaptive Check Frequency
+| Feature | Description | Status |
+|:--------|:------------|:------:|
+| Analytics Dashboard | Violation charts, heatmaps, player risk scores | ⬜ Planned |
+| Bot Detection | Behavioral entropy, connection patterns, honeypots | ⬜ Planned |
+| Player Report System | `/report` command, web queue, auto-escalation | ⬜ Planned |
+| Session Fingerprinting | Device fingerprint, alt detection, ban evasion | ⬜ Planned |
+| Adaptive Check Frequency | Risk-based check intervals, resource optimization | ⬜ Planned |
 
 </details>
 
