@@ -158,7 +158,7 @@ class ParadoxPlugin(Plugin):
         self.logger.info("  §f§l ██      ██   ██ ██   ██ ██   ██ ██   ██ ██    ██  ██ ██")
         self.logger.info("  §f§l ██      ██   ██ ██   ██ ██   ██ ██████   ██████  ██   ██")
         self.logger.info("")
-        self.logger.info("  §7AntiCheat §ev1.5.6")
+        self.logger.info("  §7AntiCheat §ev1.5.7")
         self.logger.info("  §7Designed by §fVisual1mpact")
         self.logger.info("  §7Ported to Endstone by §a§lTheN1NJ4LL0")
         self.logger.info("")
@@ -606,7 +606,7 @@ class ParadoxPlugin(Plugin):
 
     @event_handler
     def on_actor_damage(self, event: ActorDamageEvent):
-        for module_name in ("killaura", "reach", "autoclicker", "pvp", "selfinfliction"):
+        for module_name in ("killaura", "reach", "autoclicker", "pvp", "selfinfliction", "vision"):
             module = self._modules.get(module_name)
             if module and module.running:
                 try:

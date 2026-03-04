@@ -1,18 +1,36 @@
 # lag_clear.py - Periodic ground item cleanup
+# Excludes name-tagged entities and NPCs (custom or vanilla).
 
 import time
 from endstone_paradox.modules.base import BaseModule
 
 
 class LagClearModule(BaseModule):
-    """Scheduled entity cleanup for lag reduction."""
+    """Scheduled entity cleanup for lag reduction.
+
+    Clears ground items, stale arrows, and XP orbs on a timer.
+    Protects:
+      - Name-tagged entities (pets, custom mobs)
+      - NPCs (vanilla type=npc or entities with NPC component)
+      - Players
+    """
 
     name = "lagclear"
 
-    DEFAULT_INTERVAL = 300  # 5 minutes in seconds (6000 ticks)
+    DEFAULT_INTERVAL = 300  # 5 minutes in seconds
+
+    # Entity types to clear (each gets its own selector for safety)
+    # 'name=' (empty) filters to ONLY unnamed entities; named ones are kept.
+    CLEAR_TARGETS = [
+        "item",       # Ground items (drops)
+        "arrow",      # Stale arrows
+        "xp_orb",     # XP orbs
+    ]
 
     def on_start(self):
         self._interval = self.db.get("config", "lagclear_interval", self.DEFAULT_INTERVAL)
+        if isinstance(self._interval, str):
+            self._interval = int(self._interval)
         self._last_clear = time.time()
         self._warning_sent = False
 
@@ -39,29 +57,41 @@ class LagClearModule(BaseModule):
             self._warning_sent = False
 
     def _perform_clear(self):
-        """Remove ground items from all dimensions."""
-        removed = 0
-        try:
-            for player in self.plugin.server.online_players:
-                dim = player.dimension
-                # Get entities near the player (items on ground)
-                # Endstone doesn't have a direct "get all entities" API easily,
-                # so we use the server command approach
-                break  # Only need one player to get server reference
+        """Remove ground items, arrows, and XP orbs from all dimensions.
 
-            # Use the /kill command to remove items
-            self.plugin.server.dispatch_command(
-                self.plugin.server.command_sender,
-                "kill @e[type=item]"
-            )
-            removed = -1  # Can't get count from command
+        Uses entity selectors that:
+          - Only target specific, harmless entity types
+          - Skip name-tagged entities (name= empty selector)
+          - Never target NPCs or players
+        """
+        server = self.plugin.server
+        sender = server.command_sender
+        cleared_any = False
 
-            for player in self.plugin.server.online_players:
+        for etype in self.CLEAR_TARGETS:
+            try:
+                # Selector: only unnamed entities of this type
+                # type=<type> — limits to this entity type
+                # name= — empty name selector = only unnamed entities (protects name tags)
+                # This command silently succeeds even with 0 matches on most Bedrock servers.
+                # We wrap in try/except to suppress any "No targets" error.
+                if etype == "xp_orb":
+                    # XP orbs never have names, no need for name filter
+                    cmd = f"kill @e[type={etype}]"
+                else:
+                    cmd = f"kill @e[type={etype},name=]"
+
+                server.dispatch_command(sender, cmd)
+                cleared_any = True
+            except Exception:
+                # "No targets matched selector" or similar — silently ignore
+                pass
+
+        if cleared_any:
+            for player in server.online_players:
                 player.send_message(
                     "§2[§7Paradox§2]§a Ground items have been cleared!"
                 )
-        except Exception as e:
-            self.logger.error(f"Lag clear error: {e}")
 
     def set_interval(self, seconds: int):
         """Update the lag clear interval."""

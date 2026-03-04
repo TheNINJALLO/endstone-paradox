@@ -80,10 +80,10 @@ Modules use **dual-layer detection**: fixed threshold catches obvious cheats, ba
 The main `paradox.py` registers for Endstone events and routes them to the appropriate modules:
 - `on_player_join` → global API ban check, namespoof check, skinguard check, baseline load, module `on_player_join` (invsync)
 - `on_player_quit` → module `on_player_leave` (all modules) + violation engine cleanup + baseline flush
-- `on_actor_damage` → killaura, reach, autoclicker, pvp, selfinfliction, fly (knockback tracking)
+- `on_actor_damage` → killaura (multi-target + baselines), reach, autoclicker (click_rate baseline), pvp, selfinfliction, fly (knockback tracking), vision (pre-attack snap)
 - `on_block_break` → xray
-- `on_block_place` → scaffold, antidupe
-- `on_packet_receive` → ratelimit, packetmonitor, antidupe, autoclicker
+- `on_block_place` → scaffold (backwards detection + baseline), antidupe
+- `on_packet_receive` → ratelimit, packetmonitor (emits violations), antidupe, autoclicker
 
 ### Database Design
 Uses SQLite in **WAL mode** for concurrent read/write. Data is stored as JSON-serialized values in key-value tables, providing flexibility without schema migrations. The `violations` table stores enforcement evidence with write-behind buffering for performance. The `baselines` table stores per-player EMA profiles (rolling averages, variance, sample counts).

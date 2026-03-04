@@ -99,22 +99,22 @@ This opens the full admin panel where you can manage **everything** — modules,
 
 | Module | What It Detects |
 |--------|-----------------|
-| **Fly** | Flight/hover hacks — surrounding-block air-majority check, velocity analysis, trident exemption, knockback/slime/honey exemptions |
-| **KillAura** | Combat bots — dynamic threshold adaptation, facing angle validation, attack rate + pattern analysis, latency tolerance |
-| **Reach** | Extended reach hacks — Catmull-Rom cubic interpolation for accurate distance checks, latency tolerance |
-| **AutoClicker** | Click bots — per-platform CPS (PC/Mobile/Console), air-click tracking via packets, click consistency (CV) analysis |
-| **Scaffold** | Speed bridging — air-below filtering, axis pattern analysis, excludes sneaking/farmland |
+| **Fly** | Flight/hover hacks + **speed hacks** — surrounding-block check, velocity analysis, position-delta speed tracking (7.3 bps threshold), trident/knockback/slime/honey/gliding exemptions |
+| **KillAura** | Combat bots — dynamic thresholds, facing angle, attack rate + pattern analysis, **multi-target detection** (>2 targets in 0.5s), latency tolerance, hit_angle + timing_variance baselines |
+| **Reach** | Extended reach hacks — Catmull-Rom cubic interpolation for accurate distance checks, latency tolerance, reach_distance baseline |
+| **AutoClicker** | Click bots — per-platform CPS (PC/Mobile/Console), air-click tracking via packets, click consistency (CV) analysis, **click_rate baseline deviation** |
+| **Scaffold** | Speed bridging — air-below filtering, axis pattern analysis, **backwards placement detection**, placement_rate baseline, excludes sneaking/farmland |
 | **X-Ray** | Mining hacks — weighted suspicion scoring, hidden ore detection, vein-jumping, ore ratios, suspicion decay, graduated escalation (alert → priority → freeze) |
 | **GameMode** | Unauthorized gamemode changes — instant blocking |
 | **Namespoof** | Name manipulation — length, character, and duplicate checks |
 | **Self-Infliction** | Self-damage exploits |
 | **AFK** | Idle players — position tracking with warnings before kick |
-| **Vision** | Aimbot/snap aim — rotation snap-count analysis |
+| **Vision** | Aimbot/snap aim — rotation snap-count analysis, **rotation acceleration** (still→snap aimbot detection), **pre-attack snap correlation** |
 | **World Border** | Border enforcement — configurable radius with teleport-back |
 | **Rate Limiter** | Packet floods — automatic DoS lockdown |
-| **Packet Monitor** | Packet spam — per-type frequency monitoring |
+| **Packet Monitor** | Packet spam — per-type frequency monitoring, **emits violations** into enforcement engine |
 | **PvP Manager** | PvP system — per-player toggles, combat tagging, log detection |
-| **Lag Clear** | Entity cleanup — scheduled clearing with 30-second warnings |
+| **Lag Clear** | Entity cleanup — scheduled clearing with 30-second warnings, **excludes name-tagged entities and NPCs**, clears arrows + XP orbs |
 | **Container See** | Admin tool — see container contents and player inventories by looking at them (L4 only, off by default) |
 | **Anti-Dupe** | 4-layer duplication prevention — bundle blocking, hopper cluster monitoring (allows clocks), piston entity tracking, packet analysis (off by default) |
 | **Crash-Drop** | Anti-crash-drop — tracks disconnect locations, removes duped item entities, detects rapid disconnect cycling (off by default) |
@@ -418,10 +418,12 @@ Every player builds an **individual behavioral baseline** using Exponential Movi
 
 | Module | Metric | What It Learns |
 |--------|--------|---------|
-| Fly | `fly.h_speed`, `fly.hover_time` | Player’s normal horizontal speed and airtime |
-| KillAura | `combat.attack_rate` | Player’s typical attack speed |
-| Reach | `combat.reach_distance` | Player’s normal hit distance |
-| X-Ray | `mining.ore_ratio`, `mining.vein_jump_dist` | Player’s mining patterns |
+| Fly | `fly.h_speed`, `fly.hover_time`, `fly.ground_speed` | Player's normal horizontal speed, airtime, and ground movement |
+| KillAura | `combat.attack_rate`, `combat.hit_angle`, `combat.timing_variance` | Player's typical attack speed, aim precision, and click timing patterns |
+| Reach | `combat.reach_distance` | Player's normal hit distance |
+| AutoClicker | `combat.click_rate` | Player's normal CPS for their platform |
+| Scaffold | `build.placement_rate` | Player's normal block placement speed |
+| X-Ray | `mining.ore_ratio`, `mining.vein_jump_dist` | Player's mining patterns |
 
 ---
 

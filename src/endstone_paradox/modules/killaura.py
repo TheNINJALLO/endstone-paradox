@@ -21,6 +21,7 @@ class KillAuraModule(BaseModule):
     def on_start(self):
         self._attack_data = {}  # uuid -> deque of timestamps
         self._recent_damage = {}  # uuid -> last_damage_time (for knockback)
+        self._target_data = {}  # uuid -> deque of (timestamp, victim_uuid)
         self._apply_sensitivity()
 
         custom = self.db.get("config", "latency_tolerance")
@@ -35,11 +36,13 @@ class KillAuraModule(BaseModule):
     def on_stop(self):
         self._attack_data.clear()
         self._recent_damage.clear()
+        self._target_data.clear()
 
     def on_player_leave(self, player):
         uuid_str = str(player.unique_id)
         self._attack_data.pop(uuid_str, None)
         self._recent_damage.pop(uuid_str, None)
+        self._target_data.pop(uuid_str, None)
 
     def on_damage(self, event):
         # The VICTIM is event.actor; the ATTACKER is event.damager
@@ -83,6 +86,48 @@ class KillAuraModule(BaseModule):
 
         # Record baseline metrics (always, on every hit)
         rate_dev = self.record_baseline(attacker, "combat.attack_rate", attack_rate)
+
+        # Multi-target detection: track unique victims within 0.5s
+        victim_uuid = str(victim.unique_id) if hasattr(victim, 'unique_id') else None
+        if victim_uuid:
+            targets = self._target_data.setdefault(uuid_str, deque())
+            targets.append((now, victim_uuid))
+            # Prune old entries
+            while targets and (now - targets[0][0]) > 0.5:
+                targets.popleft()
+            # Count unique targets in 0.5s window
+            unique_targets = len(set(t[1] for t in targets))
+            if unique_targets > 2:
+                self.emit(attacker, 4, {
+                    "type": "multi_aura",
+                    "targets": unique_targets,
+                    "window": "0.5s",
+                }, action_hint="cancel")
+                self._target_data[uuid_str] = deque()
+
+        # Record hit angle baseline (only when facing check passes = normal hits)
+        if facing_ok:
+            try:
+                a_loc = attacker.location
+                v_loc = victim.location
+                if a_loc and v_loc:
+                    d_x = v_loc.x - a_loc.x
+                    d_z = v_loc.z - a_loc.z
+                    target_yaw = math.degrees(math.atan2(-d_x, d_z))
+                    a_yaw = getattr(a_loc, 'yaw', 0) or 0
+                    angle = abs(((a_yaw - target_yaw + 180) % 360) - 180)
+                    self.record_baseline(attacker, "combat.hit_angle", angle)
+            except Exception:
+                pass
+
+        # Record timing variance baseline
+        if len(attacks) >= 5:
+            intervals = [attacks[i] - attacks[i - 1] for i in range(1, len(attacks))]
+            if intervals:
+                avg_iv = sum(intervals) / len(intervals)
+                if avg_iv > 0:
+                    variance = sum((iv - avg_iv) ** 2 for iv in intervals) / len(intervals)
+                    self.record_baseline(attacker, "combat.timing_variance", variance)
 
         # Flag if any check fails
         if not distance_ok or not facing_ok or not rate_ok or not pattern_ok:

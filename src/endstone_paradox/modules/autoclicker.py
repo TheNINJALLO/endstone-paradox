@@ -165,12 +165,21 @@ class AutoClickerModule(BaseModule):
             except Exception:
                 pass
             self._flags[uuid_str] += 1
-            self.emit(actor, 3, {
+            cps_dev = self.record_baseline(actor, "combat.click_rate", float(cps))
+            severity = 3
+            evidence = {
                 "type": "cps",
                 "cps": cps,
                 "max": max_cps,
                 "platform": platform,
-            }, action_hint="cancel")
+            }
+            if cps_dev and cps_dev.is_deviation:
+                severity = 4
+                evidence["baseline_deviation"] = cps_dev.z_score
+            self.emit(actor, severity, evidence, action_hint="cancel")
+        else:
+            # Record normal click rate baseline (even under threshold)
+            self.record_baseline(actor, "combat.click_rate", float(cps))
 
         # Consistency check (only when enough samples)
         if not flagged and len(clicks) >= self.MIN_CLICKS_FOR_CV:

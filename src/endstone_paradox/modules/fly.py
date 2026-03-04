@@ -15,6 +15,7 @@ class FlyModule(BaseModule):
     BASE_V_THRESHOLD = 0.15
     BASE_H_THRESHOLD = 0.15
     BASE_HOVER_THRESHOLD = 2  # seconds
+    BASE_SPEED_THRESHOLD = 7.3  # blocks/second — sprint cap ~5.6, generous for latency
 
     def on_start(self):
         self._player_data = {}  # uuid -> {landing, hover_time, trident_used}
@@ -25,6 +26,7 @@ class FlyModule(BaseModule):
         self.v_threshold = self._scale(self.BASE_V_THRESHOLD)
         self.h_threshold = self._scale(self.BASE_H_THRESHOLD)
         self.hover_threshold = self._scale(self.BASE_HOVER_THRESHOLD)
+        self.speed_threshold = self._scale(self.BASE_SPEED_THRESHOLD)
 
     def on_stop(self):
         self._player_data.clear()
@@ -79,14 +81,56 @@ class FlyModule(BaseModule):
             "landing": None,
             "hover_time": 0,
             "trident_used": False,
+            "last_pos": None,
+            "last_time": 0,
+            "speed_flags": 0,
         })
 
         # trident riptide exemption
         if data["trident_used"]:
             data["trident_used"] = False
+            data["last_pos"] = None  # reset speed tracking after riptide
             return
 
         loc = player.location
+        now = _t.time()
+
+        # ── Speed hack detection (works on ground AND in air) ──
+        if data["last_pos"] is not None and data["last_time"] > 0:
+            dt = now - data["last_time"]
+            if 0.05 < dt < 5.0:  # sane time delta
+                prev = data["last_pos"]
+                dx = loc.x - prev[0]
+                dz = loc.z - prev[1]
+                h_dist = math.sqrt(dx * dx + dz * dz)
+                h_speed_bps = h_dist / dt  # blocks per second
+
+                # Always record baseline (ground and air)
+                self.record_baseline(player, "fly.ground_speed", h_speed_bps)
+
+                # Check against speed threshold
+                if h_speed_bps > self.speed_threshold:
+                    data["speed_flags"] += 1
+                    if data["speed_flags"] >= 3:  # 3 consecutive = flag
+                        speed_dev = self.record_baseline(
+                            player, "fly.speed_deviation", h_speed_bps
+                        )
+                        severity = 3
+                        evidence = {
+                            "speed": f"{h_speed_bps:.1f}",
+                            "max": f"{self.speed_threshold:.1f}",
+                            "type": "speed_hack",
+                        }
+                        if speed_dev and speed_dev.is_deviation:
+                            severity = 4
+                            evidence["baseline_deviation"] = speed_dev.z_score
+                        self.emit(player, severity, evidence, action_hint="setback")
+                        data["speed_flags"] = 0
+                else:
+                    data["speed_flags"] = max(0, data["speed_flags"] - 1)
+
+        data["last_pos"] = (loc.x, loc.z)
+        data["last_time"] = now
 
         if player.is_on_ground:
             data["landing"] = loc

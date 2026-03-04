@@ -19,7 +19,7 @@ Place the `.whl` file in your Endstone server's `plugins/` directory:
 ```
 your-server/
 ├── plugins/
-│   └── endstone_paradox-1.5.6-py3-none-any.whl
+│   └── endstone_paradox-1.5.7-py3-none-any.whl
 ├── endstone.toml
 └── ...
 ```
@@ -30,7 +30,7 @@ Start (or restart) your Endstone server. You should see Paradox load in the cons
 
 ```
 [Paradox] ════════════════════════════════════════════════════════
-[Paradox]   AntiCheat v1.5.6
+[Paradox]   AntiCheat v1.5.7
 [Paradox]   Designed by Visual1mpact
 [Paradox]   Ported to Endstone by TheN1NJ4LL0
 [Paradox] ════════════════════════════════════════════════════════

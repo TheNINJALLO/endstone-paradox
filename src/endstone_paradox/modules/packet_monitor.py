@@ -62,10 +62,12 @@ class PacketMonitorModule(BaseModule):
 
         # Check for spam
         if len(timestamps) >= self.SPAM_THRESHOLD:
-            self.logger.warning(
-                f"[Paradox] Packet spam: {player.name} sent "
-                f"{len(timestamps)}x {packet_type} in {self.WINDOW_SIZE}s"
-            )
+            self.emit(player, 3, {
+                "type": "packet_spam",
+                "packet": packet_type,
+                "count": len(timestamps),
+                "window": f"{self.WINDOW_SIZE}s",
+            }, action_hint="kick")
             timestamps.clear()
 
     def check(self):

@@ -3,6 +3,7 @@
 # scaffolding/farmland, and returns items on detection.
 
 import time
+import math
 from collections import deque
 from endstone_paradox.modules.base import BaseModule
 
@@ -115,15 +116,47 @@ class ScaffoldModule(BaseModule):
         constant_axes = sum([x_match, y_match, z_match])
 
         if constant_axes >= 2:
+            # Check for backwards placement (block behind facing direction)
+            backwards = False
+            try:
+                p_loc = player.location
+                if p_loc and hasattr(p_loc, 'yaw'):
+                    # Player facing direction (unit vector)
+                    yaw_rad = math.radians(p_loc.yaw)
+                    face_x = -math.sin(yaw_rad)
+                    face_z = math.cos(yaw_rad)
+                    # Direction from player to placed block
+                    bx = block.x + 0.5 - p_loc.x
+                    bz = block.z + 0.5 - p_loc.z
+                    # Dot product: negative = behind player
+                    dot = face_x * bx + face_z * bz
+                    if dot < 0:
+                        backwards = True
+            except Exception:
+                pass
+
             # Cancel the placement
             try:
                 event.is_cancelled = True
             except Exception:
                 pass
 
-            self.emit(player, 3, {
+            # Record placement rate baseline
+            rate = self.MAX_PLACEMENTS / max(self.TIME_WINDOW, 0.01)
+            rate_dev = self.record_baseline(player, "build.placement_rate", rate)
+
+            severity = 3
+            evidence = {
                 "blocks": self.MAX_PLACEMENTS,
                 "window": f"{self.TIME_WINDOW:.1f}s",
-            }, action_hint="cancel")
+            }
+            if backwards:
+                evidence["backwards"] = True
+                severity = 4  # backwards placement = stronger signal
+            elif rate_dev and rate_dev.is_deviation:
+                severity = 4
+                evidence["baseline_deviation"] = rate_dev.z_score
+
+            self.emit(player, severity, evidence, action_hint="cancel")
             # Clear data to prevent repeated flagging
             self._placement_data[uuid_str] = {"positions": [], "times": []}

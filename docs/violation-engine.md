@@ -70,8 +70,13 @@ When a module detects a violation **AND** the player's [Player Baseline](archite
 | Module | Normal Flag | Baseline Deviation Flag |
 |--------|------------|------------------------|
 | Fly | Severity 3 (hover) | Severity 4 (hover + abnormal for this player) |
+| Fly (Speed) | Severity 3 (speed hack) | Severity 4 (speed + deviation from ground speed baseline) |
 | KillAura | Severity 3 (rate/dist/angle) | Severity 4 (plus attack rate deviation) |
+| KillAura (Multi) | Severity 4 (multi-target) | N/A (always severity 4) |
 | Reach | Severity 3 (distance) | Severity 4 (plus reach distance deviation) |
+| AutoClicker | Severity 3 (CPS) | Severity 4 (plus click rate deviation) |
+| Scaffold | Severity 3 (pattern) | Severity 4 (backwards placement or rate deviation) |
+| Vision | Severity 3 (snap count) | Severity 4 (pre-attack snap: snap within 0.3s of hit) |
 | X-Ray | Normal suspicion | +2 extra suspicion (vein jump deviation) |
 
 ## Rate-Limited Alerts
