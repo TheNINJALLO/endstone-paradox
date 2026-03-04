@@ -30,58 +30,48 @@ A full Python port of the original [Paradox AntiCheat](https://github.com/Visual
 
 ---
 
-## 🗺️ Development Roadmap
+<p align="center">
+  <img src="https://img.shields.io/badge/Tier_1-Complete-00C853?style=for-the-badge" alt="Tier 1">
+  <img src="https://img.shields.io/badge/Tier_2-Planned-FFA726?style=for-the-badge" alt="Tier 2">
+  <img src="https://img.shields.io/badge/Tier_3-Future-7C4DFF?style=for-the-badge" alt="Tier 3">
+</p>
 
-<table>
-<tr>
-<td width="50%">
+<details open>
+<summary><h3>✅ Tier 1 — Movement, Combat & Item Protection</h3></summary>
 
-### ✅ Tier 1 — Complete
+<br>
 
-```
-██████████████████████ 100%
-```
+> 🟢 NoClip / Phase Detection &nbsp;&nbsp;·&nbsp;&nbsp; 🟢 WaterWalk / Jesus Hack &nbsp;&nbsp;·&nbsp;&nbsp; 🟢 Step Hack Detection
+>
+> 🟢 Timer Hack &nbsp;&nbsp;·&nbsp;&nbsp; 🟢 Blink / Teleport &nbsp;&nbsp;·&nbsp;&nbsp; 🟢 Anti-Knockback
+>
+> 🟢 Criticals Detection &nbsp;&nbsp;·&nbsp;&nbsp; 🟢 Hit Through Walls &nbsp;&nbsp;·&nbsp;&nbsp; 🟢 TriggerBot
+>
+> 🟢 Illegal Item Scanner
 
-🟢 NoClip / Phase Detection
-🟢 WaterWalk / Jesus Hack
-🟢 Step Hack Detection
-🟢 Timer Hack (Packet Frequency)
-🟢 Blink / Teleport Detection
-🟢 Anti-Knockback
-🟢 Criticals Hack Detection
-🟢 Hit Through Walls (LoS)
-🟢 TriggerBot Detection
-🟢 Illegal Item Scanner
+</details>
 
-</td>
-<td width="50%">
+<details>
+<summary><h3>📋 Tier 2 — Community & Moderation</h3></summary>
 
-### 📋 Tier 2 — Next Up
+<br>
 
-```
-░░░░░░░░░░░░░░░░░░░░░   0%
-```
+> ⬜ Discord Integration (Webhooks) &nbsp;&nbsp;·&nbsp;&nbsp; ⬜ Chat Protection & Filters
+>
+> ⬜ Anti-Grief / World Protection &nbsp;&nbsp;·&nbsp;&nbsp; ⬜ Evidence Replay System
 
-⬜ Discord Integration (Webhooks)
-⬜ Chat Protection & Filters
-⬜ Anti-Grief / World Protection
-⬜ Evidence Replay System
+</details>
 
-### 🔮 Tier 3 — Future
+<details>
+<summary><h3>🔮 Tier 3 — Intelligence & Analytics</h3></summary>
 
-```
-░░░░░░░░░░░░░░░░░░░░░   0%
-```
+<br>
 
-⬜ Analytics Dashboard & Charts
-⬜ Bot Detection (Behavioral)
-⬜ Player Report System
-⬜ Session Fingerprinting
-⬜ Adaptive Check Frequency
+> ⬜ Analytics Dashboard &nbsp;&nbsp;·&nbsp;&nbsp; ⬜ Bot Detection &nbsp;&nbsp;·&nbsp;&nbsp; ⬜ Player Reports
+>
+> ⬜ Session Fingerprinting &nbsp;&nbsp;·&nbsp;&nbsp; ⬜ Adaptive Check Frequency
 
-</td>
-</tr>
-</table>
+</details>
 
 <p align="center"><sub>📖 <a href="https://theninjallo.github.io/endstone-paradox/#/roadmap">Full roadmap with implementation details →</a></sub></p>
 
