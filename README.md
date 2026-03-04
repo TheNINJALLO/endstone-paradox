@@ -522,6 +522,47 @@ Set the level with `/ac-lockdown level 2` or via GUI → **Moderation** → **Lo
 
 ---
 
+## 🗺️ Roadmap
+
+> Track our progress toward making Paradox the most comprehensive Bedrock anti-cheat available.
+
+### 🔨 Tier 1 — In Progress
+
+<table>
+<tr><th>Category</th><th>Feature</th><th>Status</th></tr>
+<tr><td rowspan="5"><b>Movement</b></td><td>NoClip / Phase (walking through blocks)</td><td>🔨 Building</td></tr>
+<tr><td>Jesus / WaterWalk (walking on water)</td><td>🔨 Building</td></tr>
+<tr><td>Step Hack (stepping up blocks without jumping)</td><td>🔨 Building</td></tr>
+<tr><td>Timer Hack (game speed manipulation via packet frequency)</td><td>🔨 Building</td></tr>
+<tr><td>Blink / Teleport (position jumps without server teleport)</td><td>🔨 Building</td></tr>
+<tr><td rowspan="4"><b>Combat</b></td><td>Anti-Knockback (not taking knockback after damage)</td><td>🔨 Building</td></tr>
+<tr><td>Criticals (always getting critical hits without falling)</td><td>🔨 Building</td></tr>
+<tr><td>Hit Through Walls (line-of-sight validation)</td><td>🔨 Building</td></tr>
+<tr><td>TriggerBot (instant attack when crosshair enters hitbox)</td><td>🔨 Building</td></tr>
+<tr><td><b>Items</b></td><td>Illegal Item Scanner (enchantments, stack sizes, creative-only)</td><td>🔨 Building</td></tr>
+</table>
+
+### 📋 Tier 2 — Planned
+
+| Feature | Description |
+|---------|-------------|
+| **Discord Integration** | Webhook alerts, ban notifications, evidence embeds, configurable severity filters |
+| **Chat Protection** | Spam detection, ad filter, swear filter, caps limiter, command throttle, mute system |
+| **Anti-Grief / World Protection** | Anti-nuke, explosion logging, lava/water tracking, build protection zones |
+| **Evidence Replay** | Record player actions before violations, staff can replay to investigate |
+
+### 🔮 Tier 3 — Future
+
+| Feature | Description |
+|---------|-------------|
+| **Analytics Dashboard** | Violation charts, heatmaps, player risk scores, server health metrics |
+| **Bot Detection** | Behavioral entropy analysis, connection patterns, honeypot blocks |
+| **Player Reports** | `/report` command, web UI queue, auto-escalation, staff claim/resolve |
+| **Session Fingerprinting** | Device fingerprint → alt account detection, ban evasion tracking |
+| **Adaptive Check Frequency** | Clean players checked less often, suspicious players checked every tick |
+
+---
+
 ## 📄 License
 
 GPL-3.0 — see [LICENSE](LICENSE) for details. Originally licensed under GPL-3.0 by [Visual1mpact](https://github.com/Visual1mpact/Paradox_AntiCheat).

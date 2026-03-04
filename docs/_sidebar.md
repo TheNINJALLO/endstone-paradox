@@ -36,3 +36,4 @@
 - [Configuration](configuration.md)
 - [Architecture](architecture.md)
 - [FAQ](faq.md)
+- [Roadmap](roadmap.md)
