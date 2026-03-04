@@ -402,6 +402,27 @@ Every Paradox install automatically connects to the **Global Ban API** — a sha
 
 To opt out: set `global_database.enabled = false` in `config.toml`.
 
+### 📊 Player Baseline Profiling
+
+Every player builds an **individual behavioral baseline** using Exponential Moving Averages (EMA). Modules record metrics during normal play, and deviations from a player’s own rolling average trigger escalated alerts — catching subtle cheats that pass fixed thresholds.
+
+| Feature | Details |
+|---------|---------|
+| **EMA Tracker** | Efficient O(1) per-sample rolling average + variance |
+| **Z-Score Detection** | Flags when current value > 2.5σ from player’s own norm |
+| **Warmup Period** | First 30 samples build baseline without false positives |
+| **Dual-Layer** | Baseline + fixed thresholds = two independent detection layers |
+| **Persistent** | Baselines save to DB across sessions |
+
+**Tracked Metrics:**
+
+| Module | Metric | What It Learns |
+|--------|--------|---------|
+| Fly | `fly.h_speed`, `fly.hover_time` | Player’s normal horizontal speed and airtime |
+| KillAura | `combat.attack_rate` | Player’s typical attack speed |
+| Reach | `combat.reach_distance` | Player’s normal hit distance |
+| X-Ray | `mining.ore_ratio`, `mining.vein_jump_dist` | Player’s mining patterns |
+
 ---
 
 ## 🏗️ Architecture
@@ -416,7 +437,8 @@ endstone-paradox/
     ├── database.py             # SQLite persistence (WAL mode)
     ├── security.py             # 4-level clearance + SHA-256 auth
     ├── core/                   # Centralized systems
-    │   └── violation_engine.py #   Violation processing pipeline (290 lines)
+    │   ├── violation_engine.py #   Violation processing pipeline (290 lines)
+    │   └── player_baseline.py  #   EMA behavioral profiling per player
     ├── modules/                # 21 detection & admin modules
     │   ├── base.py             #   Abstract base class + sensitivity + emit()
     │   ├── fly.py              #   Flight/hover (surrounding-block check, knockback/slime exemptions)

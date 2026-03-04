@@ -208,6 +208,9 @@ class XrayModule(BaseModule):
 
         ratio = profile["window_rare"] / profile["window_blocks"]
 
+        # Record baseline for ore ratio
+        self.record_baseline(player, "mining.ore_ratio", ratio)
+
         # Thresholds scale with ore rarity
         if weight >= 5:
             threshold_high = 0.08
@@ -240,11 +243,18 @@ class XrayModule(BaseModule):
         dz = loc[2] - last[2]
         distance = math.sqrt(dx * dx + dy * dy + dz * dz)
 
+        # Record baseline for vein jump distance
+        vein_dev = self.record_baseline(player, "mining.vein_jump_dist", distance)
+
         if distance > self.VEIN_JUMP_DIST:
             profile["vein_chain"] += 1
             if profile["vein_chain"] >= 3:
+                extra = 3
+                # Extra suspicion if vein jump distance deviates from baseline
+                if vein_dev and vein_dev.is_deviation:
+                    extra += 2
                 self._add_suspicion(
-                    uuid_str, player, profile, weight + 3,
+                    uuid_str, player, profile, weight + extra,
                     f"Vein jumping ({block_type}, {distance:.0f}blocks)"
                 )
                 profile["vein_chain"] = 0

@@ -134,3 +134,16 @@ class BaseModule(ABC):
             ev_str = ', '.join(f'{k}={v}' for k, v in evidence.items())
             name = getattr(player, 'name', '?')
             self.alert_admins(f"§c{name}§e {self.name} ({ev_str})")
+
+    def record_baseline(self, player, metric: str, value: float):
+        """Record a metric sample to the player's behavioral baseline.
+
+        Returns DeviationResult or None if baseline not available.
+        """
+        baseline = getattr(self.plugin, 'player_baseline', None)
+        if baseline is None:
+            return None
+        uuid_str = str(player.unique_id) if hasattr(player, 'unique_id') else None
+        if uuid_str is None:
+            return None
+        return baseline.record(uuid_str, metric, value)

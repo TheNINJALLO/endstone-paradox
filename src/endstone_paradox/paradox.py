@@ -137,6 +137,9 @@ class ParadoxPlugin(Plugin):
         # Violation engine (initialized in on_enable)
         self.violation_engine: ViolationEngine = None
 
+        # Player baseline (initialized in on_enable)
+        self.player_baseline = None
+
         # Global API client (initialized in on_enable)
         self._global_api = None
 
@@ -155,7 +158,7 @@ class ParadoxPlugin(Plugin):
         self.logger.info("  §f§l ██      ██   ██ ██   ██ ██   ██ ██   ██ ██    ██  ██ ██")
         self.logger.info("  §f§l ██      ██   ██ ██   ██ ██   ██ ██████   ██████  ██   ██")
         self.logger.info("")
-        self.logger.info("  §7AntiCheat §ev1.5.5")
+        self.logger.info("  §7AntiCheat §ev1.5.6")
         self.logger.info("  §7Designed by §fVisual1mpact")
         self.logger.info("  §7Ported to Endstone by §a§lTheN1NJ4LL0")
         self.logger.info("")
@@ -183,10 +186,16 @@ class ParadoxPlugin(Plugin):
         # Init violation engine
         self.violation_engine = ViolationEngine(self)
 
+        # Init player baseline
+        from endstone_paradox.core.player_baseline import PlayerBaseline
+        self.player_baseline = PlayerBaseline(self.db, self.logger)
+
         # Periodic flush task (every 30s = 600 ticks)
         def _flush_violations():
             if self.violation_engine:
                 self.violation_engine.maybe_flush()
+            if self.player_baseline:
+                self.player_baseline.flush()
             self.server.scheduler.run_task(self, _flush_violations, delay=600)
         self.server.scheduler.run_task(self, _flush_violations, delay=600)
 
@@ -540,6 +549,10 @@ class ParadoxPlugin(Plugin):
             if not skinguard.check_player(player):
                 return  # kicked for invalid skin
 
+        # load player baseline from DB
+        if self.player_baseline:
+            self.player_baseline.load(uuid_str)
+
         # notify modules about the join (e.g. invsync)
         for module in self._modules.values():
             try:
@@ -567,6 +580,8 @@ class ParadoxPlugin(Plugin):
                 pass
         if self.violation_engine:
             self.violation_engine.on_player_leave(player)
+        if self.player_baseline:
+            self.player_baseline.on_player_leave(str(player.unique_id))
         self._player_jump_flags.pop(str(player.unique_id), None)
 
     @event_handler

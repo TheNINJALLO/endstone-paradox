@@ -102,15 +102,25 @@ class ReachModule(BaseModule):
             dz = a_pos[2] - vz
             distance = math.sqrt(dx * dx + dy * dy + dz * dz)
 
+            # Record baseline (always, on every hit)
+            reach_dev = self.record_baseline(attacker, "combat.reach_distance", distance)
+
             if distance > self.MAX_ATTACK_DISTANCE:
                 try:
                     event.cancelled = True
                 except Exception:
                     pass
-                self.emit(attacker, 3, {
+
+                severity = 3
+                evidence = {
                     "dist": f"{distance:.2f}",
                     "max": f"{self.MAX_ATTACK_DISTANCE:.1f}",
-                }, action_hint="cancel")
+                }
+                if reach_dev and reach_dev.is_deviation:
+                    severity = 4
+                    evidence["baseline_deviation"] = reach_dev.z_score
+
+                self.emit(attacker, severity, evidence, action_hint="cancel")
         except Exception:
             pass
 

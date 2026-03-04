@@ -71,14 +71,19 @@ The `ViolationEngine` (in `core/violation_engine.py`) centralizes all enforcemen
 - Rate-limited staff alerts (10s per player per module)
 - Write-behind evidence persistence to SQLite (30s flush)
 
+### Player Baseline (EMA Profiling)
+Each player builds a **behavioral baseline** via Exponential Moving Averages. Modules record metrics (hit distance, attack rate, hover time, ore ratio, etc.) during normal play. The `PlayerBaseline` class tracks rolling averages and variance per metric, then detects statistical deviations (z-score > 2.5σ). First 30 samples per metric are warmup (no false positives). Saves to `baselines` table in DB across sessions.
+
+Modules use **dual-layer detection**: fixed threshold catches obvious cheats, baseline deviation catches subtle behavior shifts (e.g., a player whose reach distance suddenly increases by 2 blocks).
+
 ### Event Routing
 The main `paradox.py` registers for Endstone events and routes them to the appropriate modules:
-- `on_player_join` → global API ban check, namespoof check, skinguard check, module `on_player_join` (invsync)
-- `on_player_quit` → module `on_player_leave` (all modules) + violation engine cleanup
+- `on_player_join` → global API ban check, namespoof check, skinguard check, baseline load, module `on_player_join` (invsync)
+- `on_player_quit` → module `on_player_leave` (all modules) + violation engine cleanup + baseline flush
 - `on_actor_damage` → killaura, reach, autoclicker, pvp, selfinfliction, fly (knockback tracking)
 - `on_block_break` → xray
 - `on_block_place` → scaffold, antidupe
 - `on_packet_receive` → ratelimit, packetmonitor, antidupe, autoclicker
 
 ### Database Design
-Uses SQLite in **WAL mode** for concurrent read/write. Data is stored as JSON-serialized values in key-value tables, providing flexibility without schema migrations. The `violations` table stores enforcement evidence with write-behind buffering for performance.
+Uses SQLite in **WAL mode** for concurrent read/write. Data is stored as JSON-serialized values in key-value tables, providing flexibility without schema migrations. The `violations` table stores enforcement evidence with write-behind buffering for performance. The `baselines` table stores per-player EMA profiles (rolling averages, variance, sample counts).

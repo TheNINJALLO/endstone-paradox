@@ -63,6 +63,17 @@ Each module assigns a severity to its violations:
 | 4 | HIGH | 4 | AutoClicker consistency, Gamemode exploit |
 | 5 | CRITICAL | 5 | NameSpoof, X-Ray freeze |
 
+### Baseline Escalation
+
+When a module detects a violation **AND** the player's [Player Baseline](architecture.md#player-baseline-ema-profiling) shows a statistical deviation (z-score > 2.5σ), severity is automatically escalated from 3 → 4. This means behavior that deviates from the player's own established norm is treated more seriously:
+
+| Module | Normal Flag | Baseline Deviation Flag |
+|--------|------------|------------------------|
+| Fly | Severity 3 (hover) | Severity 4 (hover + abnormal for this player) |
+| KillAura | Severity 3 (rate/dist/angle) | Severity 4 (plus attack rate deviation) |
+| Reach | Severity 3 (distance) | Severity 4 (plus reach distance deviation) |
+| X-Ray | Normal suspicion | +2 extra suspicion (vein jump deviation) |
+
 ## Rate-Limited Alerts
 
 Staff receive at most **1 alert per player per module every 10 seconds** to prevent console/chat spam. Evidence is still logged regardless of alert cooldowns.

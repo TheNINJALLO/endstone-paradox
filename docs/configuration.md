@@ -65,7 +65,7 @@ Tables include:
 - `inv_snapshots` — Inventory sync snapshots
 - `violations` — Violation engine evidence and enforcement history
 - `global_bans` — Synced global ban cache (from Global Ban API)
-- `global_flags` — Synced global flags cache (high_risk, flagged)
+- `global_flags` — Synced global flags cache (high_risk, flagged)\r\n- `baselines` — Per-player EMA behavioral profiles (rolling averages, variance per metric)
 - `skin_log` — SkinGuard violation records
 - `spoof_log` — NameSpoof detection events
 - `antidupe_log` — Anti-dupe detection events

@@ -67,6 +67,7 @@ class KillAuraModule(BaseModule):
 
         # Count recent attacks (last 1 second)
         recent = [t for t in attacks if now - t <= 1.0]
+        attack_rate = float(len(recent))
 
         # Check 1: Distance check (attacker -> victim)
         distance_ok = self._check_distance(attacker, victim)
@@ -75,10 +76,13 @@ class KillAuraModule(BaseModule):
         facing_ok = self._check_facing(attacker, victim)
 
         # Check 3: Attack rate
-        rate_ok = len(recent) < self.MAX_ATTACKS
+        rate_ok = attack_rate < self.MAX_ATTACKS
 
         # Check 4: Pattern consistency (dynamic threshold)
         pattern_ok = not self._is_suspicious_pattern(list(attacks))
+
+        # Record baseline metrics (always, on every hit)
+        rate_dev = self.record_baseline(attacker, "combat.attack_rate", attack_rate)
 
         # Flag if any check fails
         if not distance_ok or not facing_ok or not rate_ok or not pattern_ok:
@@ -97,10 +101,17 @@ class KillAuraModule(BaseModule):
             if not pattern_ok:
                 reasons.append("pattern")
 
-            self.emit(attacker, 3, {
+            # Escalate if baseline deviation detected
+            severity = 3
+            evidence = {
                 "reasons": ", ".join(reasons),
                 "attacks": len(recent),
-            }, action_hint="cancel")
+            }
+            if rate_dev and rate_dev.is_deviation:
+                severity = 4
+                evidence["baseline_deviation"] = rate_dev.z_score
+
+            self.emit(attacker, severity, evidence, action_hint="cancel")
             self._attack_data[uuid_str] = deque(maxlen=self.BUFFER_SIZE)
 
     def _check_distance(self, attacker, victim):

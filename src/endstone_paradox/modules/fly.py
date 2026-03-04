@@ -112,15 +112,29 @@ class FlyModule(BaseModule):
             (abs(vel.y) >= self.v_threshold or h_speed >= self.h_threshold)
         )
 
+        # Record baseline metrics (always, even when not suspicious)
+        self.record_baseline(player, "fly.h_speed", h_speed)
+
         if is_suspicious and not player.is_on_ground:
             data["hover_time"] += 1
 
             if data["hover_time"] >= self.hover_threshold:
-                landing = data.get("landing")
-                self.emit(player, 3, {
+                # Record hover time baseline sample
+                hover_dev = self.record_baseline(
+                    player, "fly.hover_time", float(data["hover_time"])
+                )
+
+                # Escalate severity if baseline deviation detected
+                severity = 3
+                evidence = {
                     "hover": data["hover_time"],
                     "threshold": self.hover_threshold,
-                }, action_hint="setback")
+                }
+                if hover_dev and hover_dev.is_deviation:
+                    severity = 4
+                    evidence["baseline_deviation"] = hover_dev.z_score
+
+                self.emit(player, severity, evidence, action_hint="setback")
                 data["hover_time"] = 0
         else:
             data["hover_time"] = max(0, data["hover_time"] - 1)
