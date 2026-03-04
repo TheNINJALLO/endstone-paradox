@@ -42,6 +42,45 @@ DEFAULT_CONFIG = {
         "server_name": "",           # Auto-set to hostname if empty
         "sync_interval": 300,
     },
+    "modules": {
+        # Movement Detection
+        "fly": {"enabled": True, "sensitivity": 5},
+        "noclip": {"enabled": True, "sensitivity": 5},
+        "waterwalk": {"enabled": True, "sensitivity": 5},
+        "stephack": {"enabled": True, "sensitivity": 5},
+        "timer": {"enabled": True, "sensitivity": 5},
+        "blink": {"enabled": True, "sensitivity": 5},
+        # Combat Detection
+        "killaura": {"enabled": True, "sensitivity": 5},
+        "reach": {"enabled": True, "sensitivity": 5},
+        "autoclicker": {"enabled": True, "sensitivity": 5},
+        "antikb": {"enabled": True, "sensitivity": 5},
+        "criticals": {"enabled": True, "sensitivity": 5},
+        "wallhit": {"enabled": True, "sensitivity": 5},
+        "triggerbot": {"enabled": True, "sensitivity": 5},
+        "vision": {"enabled": True, "sensitivity": 5},
+        # Mining / Building
+        "scaffold": {"enabled": True, "sensitivity": 5},
+        "xray": {"enabled": True, "sensitivity": 5},
+        # Player Validation
+        "gamemode": {"enabled": True, "sensitivity": 5},
+        "namespoof": {"enabled": True, "sensitivity": 5},
+        "selfinfliction": {"enabled": True, "sensitivity": 5},
+        "skinguard": {"enabled": True, "sensitivity": 5},
+        "illegalitems": {"enabled": True, "sensitivity": 5},
+        # Server Management
+        "afk": {"enabled": True, "sensitivity": 5},
+        "worldborder": {"enabled": True, "sensitivity": 5},
+        "lagclear": {"enabled": True, "sensitivity": 5},
+        "pvp": {"enabled": True, "sensitivity": 5},
+        # Advanced (off by default — need tuning)
+        "ratelimit": {"enabled": False, "sensitivity": 5},
+        "packetmonitor": {"enabled": False, "sensitivity": 5},
+        "containersee": {"enabled": False, "sensitivity": 5},
+        "antidupe": {"enabled": False, "sensitivity": 5},
+        "crashdrop": {"enabled": False, "sensitivity": 5},
+        "invsync": {"enabled": False, "sensitivity": 5},
+    },
 }
 
 

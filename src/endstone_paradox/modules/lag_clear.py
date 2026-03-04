@@ -59,38 +59,40 @@ class LagClearModule(BaseModule):
     def _perform_clear(self):
         """Remove ground items, arrows, and XP orbs from all dimensions.
 
-        Uses entity selectors that:
-          - Only target specific, harmless entity types
-          - Skip name-tagged entities (name= empty selector)
-          - Never target NPCs or players
+        Uses the Endstone dimension API to iterate entities directly,
+        avoiding command selector syntax issues.  Skips any entity that
+        has a custom name (name-tagged pets, custom mobs).
         """
-        server = self.plugin.server
-        sender = server.command_sender
-        cleared_any = False
+        total_cleared = 0
 
-        for etype in self.CLEAR_TARGETS:
+        for player in self.plugin.server.online_players:
             try:
-                # Selector: only unnamed entities of this type
-                # type=<type> — limits to this entity type
-                # name= — empty name selector = only unnamed entities (protects name tags)
-                # This command silently succeeds even with 0 matches on most Bedrock servers.
-                # We wrap in try/except to suppress any "No targets" error.
-                if etype == "xp_orb":
-                    # XP orbs never have names, no need for name filter
-                    cmd = f"kill @e[type={etype}]"
-                else:
-                    cmd = f"kill @e[type={etype},name=]"
+                dim = player.dimension
+                for entity in dim.get_entities():
+                    try:
+                        etype = str(entity.type).lower().replace("minecraft:", "")
 
-                server.dispatch_command(sender, cmd)
-                cleared_any = True
+                        # Only clear our target types
+                        if etype not in ("item", "arrow", "xp_orb"):
+                            continue
+
+                        # Skip named entities (name-tagged pets, etc.)
+                        if etype != "xp_orb":  # XP orbs never have names
+                            ent_name = getattr(entity, 'name_tag', None) or getattr(entity, 'custom_name', None)
+                            if ent_name and str(ent_name).strip():
+                                continue
+
+                        entity.kill()
+                        total_cleared += 1
+                    except Exception:
+                        pass
             except Exception:
-                # "No targets matched selector" or similar — silently ignore
                 pass
 
-        if cleared_any:
-            for player in server.online_players:
+        if total_cleared > 0:
+            for player in self.plugin.server.online_players:
                 player.send_message(
-                    "§2[§7Paradox§2]§a Ground items have been cleared!"
+                    f"§2[§7Paradox§2]§a Cleared {total_cleared} ground items/arrows/XP orbs!"
                 )
 
     def set_interval(self, seconds: int):

@@ -158,7 +158,7 @@ class ParadoxPlugin(Plugin):
         self.logger.info("  §f§l ██      ██   ██ ██   ██ ██   ██ ██   ██ ██    ██  ██ ██")
         self.logger.info("  §f§l ██      ██   ██ ██   ██ ██   ██ ██████   ██████  ██   ██")
         self.logger.info("")
-        self.logger.info("  §7AntiCheat §ev1.5.7")
+        self.logger.info("  §7AntiCheat §ev1.6.0")
         self.logger.info("  §7Designed by §fVisual1mpact")
         self.logger.info("  §7Ported to Endstone by §a§lTheN1NJ4LL0")
         self.logger.info("")
@@ -282,6 +282,16 @@ class ParadoxPlugin(Plugin):
         from endstone_paradox.modules.crashdrop import CrashDropModule
         from endstone_paradox.modules.invsync import InvSyncModule
         from endstone_paradox.modules.skinguard import SkinGuardModule
+        from endstone_paradox.modules.noclip import NoClipModule
+        from endstone_paradox.modules.waterwalk import WaterWalkModule
+        from endstone_paradox.modules.stephack import StepHackModule
+        from endstone_paradox.modules.timer import TimerModule
+        from endstone_paradox.modules.blink import BlinkModule
+        from endstone_paradox.modules.antikb import AntiKBModule
+        from endstone_paradox.modules.criticals import CriticalsModule
+        from endstone_paradox.modules.wallhit import WallHitModule
+        from endstone_paradox.modules.triggerbot import TriggerBotModule
+        from endstone_paradox.modules.illegal_items import IllegalItemsModule
 
         module_classes = {
             "fly": FlyModule,
@@ -305,6 +315,16 @@ class ParadoxPlugin(Plugin):
             "crashdrop": CrashDropModule,
             "invsync": InvSyncModule,
             "skinguard": SkinGuardModule,
+            "noclip": NoClipModule,
+            "waterwalk": WaterWalkModule,
+            "stephack": StepHackModule,
+            "timer": TimerModule,
+            "blink": BlinkModule,
+            "antikb": AntiKBModule,
+            "criticals": CriticalsModule,
+            "wallhit": WallHitModule,
+            "triggerbot": TriggerBotModule,
+            "illegalitems": IllegalItemsModule,
         }
 
         # these are off by default since they need tuning per-server
@@ -606,7 +626,7 @@ class ParadoxPlugin(Plugin):
 
     @event_handler
     def on_actor_damage(self, event: ActorDamageEvent):
-        for module_name in ("killaura", "reach", "autoclicker", "pvp", "selfinfliction", "vision"):
+        for module_name in ("killaura", "reach", "autoclicker", "pvp", "selfinfliction", "vision", "antikb", "criticals", "wallhit", "triggerbot"):
             module = self._modules.get(module_name)
             if module and module.running:
                 try:
@@ -644,7 +664,7 @@ class ParadoxPlugin(Plugin):
 
     @event_handler
     def on_packet_receive(self, event: PacketReceiveEvent):
-        for module_name in ("ratelimit", "packetmonitor", "antidupe", "autoclicker"):
+        for module_name in ("ratelimit", "packetmonitor", "antidupe", "autoclicker", "timer"):
             module = self._modules.get(module_name)
             if module and module.running:
                 try:

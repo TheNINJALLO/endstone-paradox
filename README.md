@@ -95,31 +95,41 @@ This opens the full admin panel where you can manage **everything** — modules,
 
 ## ✨ Features
 
-### 🛡️ 21 Detection & Admin Modules
+### 🛡️ 31 Detection & Admin Modules
 
 | Module | What It Detects |
 |--------|-----------------|
 | **Fly** | Flight/hover hacks + **speed hacks** — surrounding-block check, velocity analysis, position-delta speed tracking (7.3 bps threshold), trident/knockback/slime/honey/gliding exemptions |
-| **KillAura** | Combat bots — dynamic thresholds, facing angle, attack rate + pattern analysis, **multi-target detection** (>2 targets in 0.5s), latency tolerance, hit_angle + timing_variance baselines |
-| **Reach** | Extended reach hacks — Catmull-Rom cubic interpolation for accurate distance checks, latency tolerance, reach_distance baseline |
-| **AutoClicker** | Click bots — per-platform CPS (PC/Mobile/Console), air-click tracking via packets, click consistency (CV) analysis, **click_rate baseline deviation** |
-| **Scaffold** | Speed bridging — air-below filtering, axis pattern analysis, **backwards placement detection**, placement_rate baseline, excludes sneaking/farmland |
-| **X-Ray** | Mining hacks — weighted suspicion scoring, hidden ore detection, vein-jumping, ore ratios, suspicion decay, graduated escalation (alert → priority → freeze) |
+| **NoClip** | Phase/noclip hacks — ray-traces movement path through solid blocks (3 consecutive flags) |
+| **WaterWalk** | Jesus hacks — standing on water without Frost Walker, ice, or lily pads (4 flags) |
+| **Step Hack** | Step hacks — climbing full blocks without jumping, exempts stairs/slabs/slime (3 flags) |
+| **Timer** | Timer hacks — PlayerAuthInputPacket frequency analysis (>23 pps fast, <15 pps slow, 4 windows) |
+| **Blink** | Teleport/blink hacks — position jumps >10 blocks without server teleport (3s grace, 2 flags) |
+| **KillAura** | Combat bots — dynamic thresholds, facing angle, attack rate + pattern, **multi-target** (>2 in 0.5s), baselines |
+| **Reach** | Extended reach — Catmull-Rom cubic interpolation, latency tolerance, reach_distance baseline |
+| **AutoClicker** | Click bots — per-platform CPS, air-click tracking, consistency (CV), **click_rate baseline** |
+| **Anti-KB** | Anti-knockback — tracks post-hit displacement, flags if player doesn't move within 3 ticks (3 flags) |
+| **Criticals** | Criticals hack — detects ground-level hits with minimal Y change (5 flags) |
+| **Wall Hit** | Hit through walls — LoS ray-trace from attacker eye to victim, checks for solid blocks (3 flags) |
+| **TriggerBot** | TriggerBot — rotation→attack timing <100ms consistently (4/10 in analysis window) |
+| **Scaffold** | Speed bridging — air-below filtering, axis patterns, **backwards placement**, placement_rate baseline |
+| **X-Ray** | Mining hacks — weighted suspicion, hidden ore, vein-jumping, ore ratios, graduated escalation |
 | **GameMode** | Unauthorized gamemode changes — instant blocking |
 | **Namespoof** | Name manipulation — length, character, and duplicate checks |
 | **Self-Infliction** | Self-damage exploits |
 | **AFK** | Idle players — position tracking with warnings before kick |
-| **Vision** | Aimbot/snap aim — rotation snap-count analysis, **rotation acceleration** (still→snap aimbot detection), **pre-attack snap correlation** |
+| **Vision** | Aimbot/snap aim — snap counting, **rotation acceleration**, **pre-attack snap correlation** |
 | **World Border** | Border enforcement — configurable radius with teleport-back |
 | **Rate Limiter** | Packet floods — automatic DoS lockdown |
-| **Packet Monitor** | Packet spam — per-type frequency monitoring, **emits violations** into enforcement engine |
+| **Packet Monitor** | Packet spam — per-type frequency monitoring, **emits violations** into engine |
 | **PvP Manager** | PvP system — per-player toggles, combat tagging, log detection |
-| **Lag Clear** | Entity cleanup — scheduled clearing with 30-second warnings, **excludes name-tagged entities and NPCs**, clears arrows + XP orbs |
-| **Container See** | Admin tool — see container contents and player inventories by looking at them (L4 only, off by default) |
-| **Anti-Dupe** | 4-layer duplication prevention — bundle blocking, hopper cluster monitoring (allows clocks), piston entity tracking, packet analysis (off by default) |
-| **Crash-Drop** | Anti-crash-drop — tracks disconnect locations, removes duped item entities, detects rapid disconnect cycling (off by default) |
-| **Inv-Sync** | Inventory synchronization — DB-persisted snapshots, detects excess items on rejoin from dupe exploits (off by default) |
-| **SkinGuard** | Skin validation — blocks 4D geometry, tiny/invisible skins, non-standard dimensions, sub-pixel bone exploits |
+| **Lag Clear** | Entity cleanup — API-based clearing, **excludes name-tagged/NPC entities**, counts cleared |
+| **Illegal Items** | Illegal item scanner — enchantment levels, stack sizes, creative-only items, auto-remove |
+| **Container See** | Admin tool — see container/player inventories by looking (L4 only, off by default) |
+| **Anti-Dupe** | 4-layer dupe prevention — bundle, hopper, piston, packet analysis (off by default) |
+| **Crash-Drop** | Anti-crash-drop — disconnect tracking, duped entity removal (off by default) |
+| **Inv-Sync** | Inventory sync — DB snapshots, detects excess items on rejoin (off by default) |
+| **SkinGuard** | Skin validation — blocks 4D geometry, tiny/invisible skins, sub-pixel bone exploits |
 
 Every module can be toggled individually via commands **or** the GUI. The 3 anti-dupe modules are **off by default** and should be tuned per-server.
 
@@ -526,20 +536,20 @@ Set the level with `/ac-lockdown level 2` or via GUI → **Moderation** → **Lo
 
 > Track our progress toward making Paradox the most comprehensive Bedrock anti-cheat available.
 
-### 🔨 Tier 1 — In Progress
+### ✅ Tier 1 — Completed (v1.6.0)
 
 <table>
 <tr><th>Category</th><th>Feature</th><th>Status</th></tr>
-<tr><td rowspan="5"><b>Movement</b></td><td>NoClip / Phase (walking through blocks)</td><td>🔨 Building</td></tr>
-<tr><td>Jesus / WaterWalk (walking on water)</td><td>🔨 Building</td></tr>
-<tr><td>Step Hack (stepping up blocks without jumping)</td><td>🔨 Building</td></tr>
-<tr><td>Timer Hack (game speed manipulation via packet frequency)</td><td>🔨 Building</td></tr>
-<tr><td>Blink / Teleport (position jumps without server teleport)</td><td>🔨 Building</td></tr>
-<tr><td rowspan="4"><b>Combat</b></td><td>Anti-Knockback (not taking knockback after damage)</td><td>🔨 Building</td></tr>
-<tr><td>Criticals (always getting critical hits without falling)</td><td>🔨 Building</td></tr>
-<tr><td>Hit Through Walls (line-of-sight validation)</td><td>🔨 Building</td></tr>
-<tr><td>TriggerBot (instant attack when crosshair enters hitbox)</td><td>🔨 Building</td></tr>
-<tr><td><b>Items</b></td><td>Illegal Item Scanner (enchantments, stack sizes, creative-only)</td><td>🔨 Building</td></tr>
+<tr><td rowspan="5"><b>Movement</b></td><td>NoClip / Phase (walking through blocks)</td><td>✅ Done</td></tr>
+<tr><td>Jesus / WaterWalk (walking on water)</td><td>✅ Done</td></tr>
+<tr><td>Step Hack (stepping up blocks without jumping)</td><td>✅ Done</td></tr>
+<tr><td>Timer Hack (game speed manipulation via packet frequency)</td><td>✅ Done</td></tr>
+<tr><td>Blink / Teleport (position jumps without server teleport)</td><td>✅ Done</td></tr>
+<tr><td rowspan="4"><b>Combat</b></td><td>Anti-Knockback (not taking knockback after damage)</td><td>✅ Done</td></tr>
+<tr><td>Criticals (always getting critical hits without falling)</td><td>✅ Done</td></tr>
+<tr><td>Hit Through Walls (line-of-sight validation)</td><td>✅ Done</td></tr>
+<tr><td>TriggerBot (instant attack when crosshair enters hitbox)</td><td>✅ Done</td></tr>
+<tr><td><b>Items</b></td><td>Illegal Item Scanner (enchantments, stack sizes, creative-only)</td><td>✅ Done</td></tr>
 </table>
 
 ### 📋 Tier 2 — Planned
