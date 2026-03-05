@@ -64,6 +64,25 @@ class ParadoxPlugin(Plugin):
         "ac-packetmonitor": {"description": "Toggle packet spam monitoring on or off", "usages": ["/ac-packetmonitor"], "permissions": ["paradox.settings"]},
         "ac-containersee": {"description": "Toggle container vision for admins (see contents by looking)", "usages": ["/ac-containersee"], "permissions": ["paradox.settings"]},
         "ac-skinguard": {"description": "Toggle skin validation (blocks 4D/tiny/invisible skins)", "usages": ["/ac-skinguard"], "permissions": ["paradox.settings"]},
+        "ac-noclip": {"description": "Toggle noclip hack detection on or off", "usages": ["/ac-noclip"], "permissions": ["paradox.settings"]},
+        "ac-waterwalk": {"description": "Toggle water-walk hack detection on or off", "usages": ["/ac-waterwalk"], "permissions": ["paradox.settings"]},
+        "ac-stephack": {"description": "Toggle step-hack detection on or off", "usages": ["/ac-stephack"], "permissions": ["paradox.settings"]},
+        "ac-timer": {"description": "Toggle timer hack detection on or off", "usages": ["/ac-timer"], "permissions": ["paradox.settings"]},
+        "ac-blink": {"description": "Toggle blink/teleport hack detection on or off", "usages": ["/ac-blink"], "permissions": ["paradox.settings"]},
+        "ac-antikb": {"description": "Toggle anti-knockback detection on or off", "usages": ["/ac-antikb"], "permissions": ["paradox.settings"]},
+        "ac-criticals": {"description": "Toggle criticals hack detection on or off", "usages": ["/ac-criticals"], "permissions": ["paradox.settings"]},
+        "ac-wallhit": {"description": "Toggle wall-hit detection on or off", "usages": ["/ac-wallhit"], "permissions": ["paradox.settings"]},
+        "ac-triggerbot": {"description": "Toggle triggerbot detection on or off", "usages": ["/ac-triggerbot"], "permissions": ["paradox.settings"]},
+        "ac-illegalitems": {"description": "Toggle illegal item detection on or off", "usages": ["/ac-illegalitems"], "permissions": ["paradox.settings"]},
+        "ac-selfinfliction": {"description": "Toggle self-infliction detection on or off", "usages": ["/ac-selfinfliction"], "permissions": ["paradox.settings"]},
+        "ac-pvptoggle": {"description": "Toggle PvP module on or off", "usages": ["/ac-pvptoggle"], "permissions": ["paradox.settings"]},
+        "ac-antidupe": {"description": "Toggle anti-dupe detection on or off", "usages": ["/ac-antidupe"], "permissions": ["paradox.settings"]},
+        "ac-crashdrop": {"description": "Toggle crash-drop prevention on or off", "usages": ["/ac-crashdrop"], "permissions": ["paradox.settings"]},
+        "ac-invsync": {"description": "Toggle inventory sync module on or off", "usages": ["/ac-invsync"], "permissions": ["paradox.settings"]},
+        "ac-discord": {"description": "Toggle Discord webhook integration on or off", "usages": ["/ac-discord"], "permissions": ["paradox.settings"]},
+        "ac-chatprotection": {"description": "Toggle chat protection (spam/ads/swear filter) on or off", "usages": ["/ac-chatprotection"], "permissions": ["paradox.settings"]},
+        "ac-antigrief": {"description": "Toggle anti-grief (nuke/rapid place detection) on or off", "usages": ["/ac-antigrief"], "permissions": ["paradox.settings"]},
+        "ac-evidencereplay": {"description": "Toggle evidence replay system on or off", "usages": ["/ac-evidencereplay"], "permissions": ["paradox.settings"]},
         # --- Utility ---
         "ac-home": {"description": "Manage homes: set/delete/list or teleport by name", "usages": ["/ac-home [args: message]"], "permissions": ["paradox.home"]},
         "ac-tpr": {"description": "Teleport to a random location, optionally set radius", "usages": ["/ac-tpr [radius: int]"], "permissions": ["paradox.tpr"]},
@@ -292,6 +311,10 @@ class ParadoxPlugin(Plugin):
         from endstone_paradox.modules.wallhit import WallHitModule
         from endstone_paradox.modules.triggerbot import TriggerBotModule
         from endstone_paradox.modules.illegal_items import IllegalItemsModule
+        from endstone_paradox.modules.discord_webhook import DiscordWebhookModule
+        from endstone_paradox.modules.chat_protection import ChatProtectionModule
+        from endstone_paradox.modules.antigrief import AntiGriefModule
+        from endstone_paradox.modules.evidence_replay import EvidenceReplayModule
 
         module_classes = {
             "fly": FlyModule,
@@ -325,10 +348,15 @@ class ParadoxPlugin(Plugin):
             "wallhit": WallHitModule,
             "triggerbot": TriggerBotModule,
             "illegalitems": IllegalItemsModule,
+            "discord": DiscordWebhookModule,
+            "chatprotection": ChatProtectionModule,
+            "antigrief": AntiGriefModule,
+            "evidencereplay": EvidenceReplayModule,
         }
 
         # these are off by default since they need tuning per-server
-        default_off = {"ratelimit", "packetmonitor", "containersee", "antidupe", "crashdrop", "invsync"}
+        default_off = {"ratelimit", "packetmonitor", "containersee", "antidupe", "crashdrop", "invsync",
+                        "discord", "chatprotection", "antigrief", "evidencereplay"}
 
         for name, cls in module_classes.items():
             try:
@@ -343,6 +371,10 @@ class ParadoxPlugin(Plugin):
                     self.logger.info(f"  §2[§7Paradox§2]§7 Module '{name}' disabled")
             except Exception as e:
                 self.logger.error(f"  §2[§7Paradox§2]§c Failed to init module '{name}': {e}")
+
+        # Hook Discord + Evidence Replay into the violation engine
+        if hasattr(self, 'violation_engine') and self.violation_engine:
+            self._hook_violation_engine()
 
     def get_module(self, name: str):
         return self._modules.get(name)
@@ -427,11 +459,19 @@ class ParadoxPlugin(Plugin):
         self._command_handlers["ac-prefix"] = handle_prefix
 
         # all detection toggles share one handler
+        # We create a closure that captures cmd so handle_toggle gets cmd_name
         for cmd in [
             "ac-fly", "ac-killaura", "ac-reach", "ac-autoclicker",
             "ac-scaffold", "ac-xray", "ac-gamemode", "ac-afk",
             "ac-vision", "ac-worldborder", "ac-lagclear", "ac-ratelimit",
             "ac-namespoof", "ac-packetmonitor", "ac-containersee",
+            # Tier 1
+            "ac-skinguard", "ac-noclip", "ac-waterwalk", "ac-stephack",
+            "ac-timer", "ac-blink", "ac-antikb", "ac-criticals",
+            "ac-wallhit", "ac-triggerbot", "ac-illegalitems",
+            "ac-selfinfliction", "ac-pvptoggle", "ac-antidupe", "ac-crashdrop", "ac-invsync",
+            # Tier 2
+            "ac-discord", "ac-chatprotection", "ac-antigrief", "ac-evidencereplay",
         ]:
             self._command_handlers[cmd] = handle_toggle
 
@@ -484,7 +524,10 @@ class ParadoxPlugin(Plugin):
                     return False
 
         try:
-            return handler(self, sender, args)
+            try:
+                return handler(self, sender, args, cmd_name=cmd_name)
+            except TypeError:
+                return handler(self, sender, args)
         except Exception as e:
             self.logger.error(f"Error executing {cmd_name}: {e}")
             sender.send_message(f"§2[§7Paradox§2]§c Error: {e}")
@@ -543,11 +586,13 @@ class ParadoxPlugin(Plugin):
             player.kick(f"§c{reason}")
             return
 
-        # allowlist enforcement
+        # allowlist = anticheat exemption (for bots, etc.)
         if self.db.count("allowlist") > 0:
-            if not self.db.has("allowlist", uuid_str) and not self.db.has("allowlist", player.name.lower()):
-                player.kick("§cYou are not on the allow list.")
-                return
+            allowed = (self.db.has("allowlist", uuid_str) or
+                       self.db.has("allowlist", player.name.lower()) or
+                       self.db.has("allowlist", player.name))
+            if allowed and self.violation_engine:
+                self.violation_engine.add_exemption(uuid_str, "all", 86400 * 365)
 
         if self._lockdown_active:
             from endstone_paradox.commands.moderation.lockdown_cmd import _player_meets_lockdown
@@ -702,3 +747,89 @@ class ParadoxPlugin(Plugin):
         for player in self.server.online_players:
             if self.security.is_level4(player):
                 player.send_message(message)
+
+    # -------------------------------------------------------------------
+    # Tier 2 Event Handlers
+    # -------------------------------------------------------------------
+
+    @event_handler
+    def on_player_chat(self, event: PlayerChatEvent):
+        """Route chat events to chat protection module."""
+        module = self._modules.get("chatprotection")
+        if module and module.running:
+            try:
+                blocked = module.on_player_chat(event)
+                if blocked:
+                    event.cancelled = True
+            except Exception as e:
+                self.logger.error(f"ChatProtection error: {e}")
+
+    @event_handler
+    def on_block_break(self, event: BlockBreakEvent):
+        """Route block break events to anti-grief module."""
+        # Evidence replay: record action
+        replay = self._modules.get("evidencereplay")
+        if replay and replay.running:
+            try:
+                uuid_str = str(event.player.unique_id)
+                block_type = str(event.block.type) if event.block else ""
+                replay.record_action(uuid_str, "breaking", block_type)
+            except Exception:
+                pass
+
+        module = self._modules.get("antigrief")
+        if module and module.running:
+            try:
+                module.on_block_break(event)
+            except Exception as e:
+                self.logger.error(f"AntiGrief break error: {e}")
+
+    @event_handler
+    def on_block_place(self, event: BlockPlaceEvent):
+        """Route block place events to anti-grief and scaffold modules."""
+        # Evidence replay: record action
+        replay = self._modules.get("evidencereplay")
+        if replay and replay.running:
+            try:
+                uuid_str = str(event.player.unique_id)
+                block_type = str(event.block.type) if event.block else ""
+                replay.record_action(uuid_str, "placing", block_type)
+            except Exception:
+                pass
+
+        module = self._modules.get("antigrief")
+        if module and module.running:
+            try:
+                module.on_block_place(event)
+            except Exception as e:
+                self.logger.error(f"AntiGrief place error: {e}")
+
+    def _hook_violation_engine(self):
+        """Hook Discord and Evidence Replay into the violation engine."""
+        engine = self.violation_engine
+        original_emit = engine.emit_violation
+
+        def hooked_emit(player, module, severity, evidence, action_hint=None):
+            original_emit(player, module, severity, evidence, action_hint)
+
+            # Forward to Discord webhook
+            discord = self._modules.get("discord")
+            if discord and discord.running:
+                try:
+                    # Resolve the action the engine would take
+                    name = player.name if hasattr(player, 'name') else "?"
+                    uuid_str = str(player.unique_id) if hasattr(player, 'unique_id') else ""
+                    discord.on_violation(name, uuid_str, module, severity,
+                                        evidence, action_hint or "warn")
+                except Exception:
+                    pass
+
+            # Forward to Evidence Replay
+            replay = self._modules.get("evidencereplay")
+            if replay and replay.running:
+                try:
+                    replay.on_violation(player, module, severity, evidence)
+                except Exception:
+                    pass
+
+        engine.emit_violation = hooked_emit

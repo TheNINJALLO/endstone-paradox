@@ -26,6 +26,17 @@ ALL_MODULES = {
     "selfinfliction": True, "pvp": True, "ratelimit": False,
     "packetmonitor": False, "containersee": False,
     "antidupe": False, "crashdrop": False, "invsync": False,
+    "skinguard": True, "noclip": True, "waterwalk": True, "stephack": True,
+    "timer": True, "blink": True, "antikb": True, "criticals": True,
+    "wallhit": True, "triggerbot": True, "illegalitems": True,
+    "discord": False, "chatprotection": False, "antigrief": False,
+    "evidencereplay": False,
+}
+
+# Modules that DON'T use sensitivity (utility/feature modules)
+NO_SENSITIVITY = {
+    "containersee", "afk", "lagclear", "worldborder", "gamemode",
+    "pvp", "invsync", "discord", "evidencereplay", "crashdrop",
 }
 
 
@@ -253,19 +264,27 @@ def _register_routes(app):
     @app.route("/modules")
     @login_required
     def modules():
-        # Build complete module list from hardcoded names + DB overrides
-        mod_list = []
+        # Build two separate lists: detection (has sensitivity) and utility (toggle only)
+        detection = []
+        utility = []
         for name, default_on in ALL_MODULES.items():
             enabled = _db_get("modules", name, default_on)
             sens = _db_get("modules", f"{name}_sensitivity", 5)
-            mod_list.append({"key": name, "value": enabled, "sensitivity": sens})
-        return render_template_string(MODULES_HTML, modules=mod_list)
+            has_sens = name not in NO_SENSITIVITY
+            item = {"key": name, "value": enabled, "sensitivity": sens, "has_sensitivity": has_sens}
+            if has_sens:
+                detection.append(item)
+            else:
+                utility.append(item)
+        return render_template_string(MODULES_HTML, detection=detection, utility=utility)
 
     @app.route("/modules/<name>/toggle", methods=["POST"])
     @login_required
     def toggle_module(name):
-        current = _db_get("modules", name, True)
-        _db_set("modules", name, not current)
+        default = ALL_MODULES.get(name, False)
+        current = _db_get("modules", name, default)
+        new_state = not bool(current)
+        _db_set("modules", name, new_state)
         return redirect(url_for("modules"))
 
     @app.route("/modules/<name>/sensitivity", methods=["POST"])
@@ -371,7 +390,7 @@ def _register_routes(app):
         table = "allowlist" if list_type == "allow" else "whitelist"
         name = request.form.get("player_name", "").strip()
         if name:
-            _db_set(table, name, True)
+            _db_set(table, name.lower(), True)
         return redirect(url_for("lists"))
 
     @app.route("/lists/<list_type>/remove", methods=["POST"])
@@ -947,44 +966,101 @@ MODULES_HTML = """<!DOCTYPE html>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Paradox — Modules</title>
 """ + BASE_CSS + """
+<style>
+.mod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.mod-card {
+    background: rgba(17,24,39,0.7); border: 1px solid rgba(34,197,94,0.15);
+    border-radius: 12px; padding: 16px; transition: border-color 0.2s;
+}
+.mod-card:hover { border-color: rgba(34,197,94,0.4); }
+.mod-card.off { opacity: 0.6; }
+.mod-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.mod-name { font-weight: 700; font-size: 14px; color: #f3f4f6; text-transform: capitalize; }
+.mod-badge { padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+.mod-badge.on { background: rgba(34,197,94,0.15); color: #22c55e; }
+.mod-badge.off { background: rgba(239,68,68,0.15); color: #ef4444; }
+.mod-toggle { margin-top: 10px; }
+.mod-toggle form { display: inline; }
+.mod-toggle button {
+    padding: 6px 18px; border: none; border-radius: 8px; cursor: pointer;
+    font-size: 12px; font-weight: 600; transition: all 0.2s;
+}
+.mod-toggle .btn-enable { background: rgba(34,197,94,0.2); color: #22c55e; }
+.mod-toggle .btn-enable:hover { background: rgba(34,197,94,0.35); }
+.mod-toggle .btn-disable { background: rgba(239,68,68,0.2); color: #ef4444; }
+.mod-toggle .btn-disable:hover { background: rgba(239,68,68,0.35); }
+.sens-row {
+    display: flex; align-items: center; gap: 8px; margin-top: 10px;
+    padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06);
+}
+.sens-row input[type=range] { flex: 1; accent-color: #22c55e; height: 4px; }
+.sens-val { min-width: 22px; color: #22c55e; font-weight: 700; font-size: 13px; text-align: center; }
+.sens-btn {
+    padding: 3px 10px; background: rgba(34,197,94,0.15); border: none;
+    border-radius: 6px; color: #22c55e; font-size: 11px; font-weight: 600; cursor: pointer;
+}
+.sens-btn:hover { background: rgba(34,197,94,0.3); }
+.section-title {
+    font-size: 18px; font-weight: 700; color: #f3f4f6; margin: 24px 0 14px 0;
+    padding-bottom: 8px; border-bottom: 1px solid rgba(34,197,94,0.2);
+}
+.section-sub { font-size: 13px; color: #9ca3af; font-weight: 400; margin-left: 8px; }
+</style>
 </head><body>
 <div class="layout">
 """ + SIDEBAR_HTML + """
 <div class="main">
     <h2>Module Management</h2>
-    <div class="table-wrap">
-    <table>
-        <tr><th>Module</th><th>Status</th><th>Toggle</th><th>Sensitivity</th></tr>
-        {% for m in modules %}
-        <tr>
-            <td style="font-weight:600;">{{ m.key }}</td>
-            <td>
-                {% if m.value %}<span class="badge badge-on">ON</span>
-                {% else %}<span class="badge badge-off">OFF</span>{% endif %}
-            </td>
-            <td>
-                <form method="POST" action="/modules/{{ m.key }}/toggle" style="display:inline;">
-                    <button type="submit" class="btn btn-sm {% if m.value %}btn-danger{% else %}btn-primary{% endif %}">
+
+    <div class="section-title">🛡️ Detection Modules <span class="section-sub">Anti-cheat detection with adjustable sensitivity</span></div>
+    <div class="mod-grid">
+        {% for m in detection %}
+        <div class="mod-card {% if not m.value %}off{% endif %}">
+            <div class="mod-header">
+                <span class="mod-name">{{ m.key }}</span>
+                <span class="mod-badge {% if m.value %}on{% else %}off{% endif %}">{% if m.value %}ON{% else %}OFF{% endif %}</span>
+            </div>
+            <div class="mod-toggle">
+                <form method="POST" action="/modules/{{ m.key }}/toggle">
+                    <button type="submit" class="{% if m.value %}btn-disable{% else %}btn-enable{% endif %}">
                         {% if m.value %}Disable{% else %}Enable{% endif %}
                     </button>
                 </form>
-            </td>
-            <td>
-                <form method="POST" action="/modules/{{ m.key }}/sensitivity" style="display:flex;align-items:center;gap:8px;">
-                    <input type="range" name="sensitivity" min="1" max="10"
-                           value="{{ m.sensitivity }}"
-                           oninput="this.nextElementSibling.textContent=this.value">
-                    <span style="min-width:20px;color:#22c55e;font-weight:600;">{{ m.sensitivity }}</span>
-                    <button type="submit" class="btn btn-sm btn-primary">Set</button>
-                </form>
-            </td>
-        </tr>
+            </div>
+            <form method="POST" action="/modules/{{ m.key }}/sensitivity" class="sens-row">
+                <span style="color:#9ca3af;font-size:12px;">Sens:</span>
+                <input type="range" name="sensitivity" min="1" max="10" value="{{ m.sensitivity }}"
+                       oninput="this.nextElementSibling.textContent=this.value">
+                <span class="sens-val">{{ m.sensitivity }}</span>
+                <button type="submit" class="sens-btn">Set</button>
+            </form>
+        </div>
         {% endfor %}
-    </table>
     </div>
+
+    <div class="section-title">⚙️ Server Features <span class="section-sub">Utilities and tools — toggle only</span></div>
+    <div class="mod-grid">
+        {% for m in utility %}
+        <div class="mod-card {% if not m.value %}off{% endif %}">
+            <div class="mod-header">
+                <span class="mod-name">{{ m.key }}</span>
+                <span class="mod-badge {% if m.value %}on{% else %}off{% endif %}">{% if m.value %}ON{% else %}OFF{% endif %}</span>
+            </div>
+            <div class="mod-toggle">
+                <form method="POST" action="/modules/{{ m.key }}/toggle">
+                    <button type="submit" class="{% if m.value %}btn-disable{% else %}btn-enable{% endif %}">
+                        {% if m.value %}Disable{% else %}Enable{% endif %}
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
 </div>
 </div>
 </body></html>"""
+
 
 # ── Bans ──
 

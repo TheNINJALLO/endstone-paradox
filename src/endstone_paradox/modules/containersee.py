@@ -41,14 +41,17 @@ class ContainerSeeModule(BaseModule):
         self._last_target.pop(uid, None)
 
     def check(self):
-        """Run vision check on all Level 4 admins."""
-        for player in self.plugin.server.online_players:
-            try:
-                if not self.plugin.security.is_level4(player):
-                    continue
-                self._check_player(player)
-            except Exception:
-                pass
+        """Run vision check on all OP or Level 4 admins."""
+        try:
+            for player in self.plugin.server.online_players:
+                try:
+                    if not self.plugin.security.is_level4(player) and not getattr(player, 'is_op', False):
+                        continue
+                    self._check_player(player)
+                except Exception:
+                    pass
+        except Exception:
+            pass
 
     def _check_player(self, admin):
         uid = str(admin.unique_id)
@@ -65,20 +68,23 @@ class ContainerSeeModule(BaseModule):
             return
 
         # Priority 2: Check if looking at a container block
+        target_block = None
         try:
-            target_block = admin.get_target_block(self.MAX_DISTANCE)
+            target_block = self._raycast_block(admin)
         except Exception:
-            target_block = None
+            pass
 
         if target_block is not None:
-            container = self._get_container(target_block)
-            if container is not None:
-                target_key = f"block:{target_block.x},{target_block.y},{target_block.z}"
+            block_type = str(target_block.type).lower()
+            # Only process known container block types
+            if self._is_container_type(block_type):
+                bx, by, bz = target_block.x, target_block.y, target_block.z
+                target_key = f"block:{bx},{by},{bz}"
                 if self._last_target.get(uid) != target_key:
                     self._last_target[uid] = target_key
                     self._page[uid] = 0
                     self._cooldown[uid] = 0
-                self._show_container(admin, container, uid)
+                self._show_container_via_command(admin, bx, by, bz, uid)
                 return
 
         # Nothing found — cleanup
@@ -183,9 +189,10 @@ class ContainerSeeModule(BaseModule):
 
         # Build display
         if not counts and not armor_items:
-            admin.send_message(
-                f"§2[§7Paradox§2]§7 {target.name}'s inventory is empty"
-            )
+            try:
+                admin.send_tip(f"§2[Paradox]§7 {target.name}'s inventory is empty")
+            except Exception:
+                admin.send_message(f"§2[Paradox]§7 {target.name}'s inventory is empty")
             self._page[uid] = 0
             return
 
@@ -196,19 +203,25 @@ class ContainerSeeModule(BaseModule):
         start = current_page * self.ITEMS_PER_PAGE
         page_entries = entries[start:start + self.ITEMS_PER_PAGE]
 
-        admin.send_message(
-            f"§2[§7Paradox§2]§b {target.name}§a's Inventory:"
-            + (f" §8(Page {current_page + 1}/{total_pages})" if total_pages > 1 else "")
-        )
+        lines = []
+        header = f"§2[Paradox]§b {target.name}§a's Inventory:"
+        if total_pages > 1:
+            header += f" §8({current_page + 1}/{total_pages})"
+        lines.append(header)
 
         # Show armor on first page
         if current_page == 0 and armor_items:
-            admin.send_message("  §3Armor:")
             for a in armor_items:
-                admin.send_message(f"    {a}")
+                lines.append(f"  {a}")
 
         for item_name, amount in page_entries:
-            admin.send_message(f"  §2[§f{item_name}§2]§7 x{amount}")
+            lines.append(f"  §f{item_name}§7 x{amount}")
+
+        try:
+            admin.send_tip("\n".join(lines))
+        except Exception:
+            for line in lines:
+                admin.send_message(line)
 
         # Auto-rotate
         cd = self._cooldown.get(uid, 0) + 1
@@ -220,59 +233,84 @@ class ContainerSeeModule(BaseModule):
 
     # ─── Container Contents ──────────────────────────────
 
-    def _show_container(self, admin, container, uid):
-        """Show container contents to admin."""
-        counts = {}
+    CONTAINER_TYPES = {
+        "chest", "trapped_chest", "barrel", "shulker_box",
+        "white_shulker_box", "orange_shulker_box", "magenta_shulker_box",
+        "light_blue_shulker_box", "yellow_shulker_box", "lime_shulker_box",
+        "pink_shulker_box", "gray_shulker_box", "silver_shulker_box",
+        "light_gray_shulker_box", "cyan_shulker_box", "purple_shulker_box",
+        "blue_shulker_box", "brown_shulker_box", "green_shulker_box",
+        "red_shulker_box", "black_shulker_box",
+        "hopper", "dispenser", "dropper", "furnace", "blast_furnace",
+        "smoker", "brewing_stand", "undyed_shulker_box",
+    }
+
+    def _is_container_type(self, block_type: str) -> bool:
+        """Check if a block type is a known container."""
+        # Strip minecraft: prefix
+        short = block_type.replace("minecraft:", "")
+        return short in self.CONTAINER_TYPES
+
+    def _show_container_via_command(self, admin, bx, by, bz, uid):
+        """Show container identification to admin via action bar tip.
+
+        Note: Endstone's Block API doesn't expose container inventories.
+        This identifies the container type; player inventory vision (Priority 1)
+        uses player.inventory which IS available.
+        """
         try:
-            for i in range(container.size):
-                item = container.get_item(i)
-                if item is not None:
-                    name = _format_item_name(str(item.type))
-                    counts[name] = counts.get(name, 0) + item.amount
+            block = admin.dimension.get_block_at(bx, by, bz)
+            if block is None:
+                return
+            block_type = str(block.type).replace("minecraft:", "")
+            block_name = _format_item_name(f"minecraft:{block_type}")
+            try:
+                admin.send_tip(f"§2[Paradox]§7 Container: §f{block_name}")
+            except Exception:
+                admin.send_message(f"§2[Paradox]§7 Container: {block_name}")
         except Exception:
             pass
-
-        if not counts:
-            admin.send_message("§2[§7Paradox§2]§o§7 Container is empty")
-            self._page[uid] = 0
-            return
-
-        entries = list(counts.items())
-        total_pages = max(1, -(-len(entries) // self.ITEMS_PER_PAGE))
-        current_page = self._page.get(uid, 0) % total_pages
-        start = current_page * self.ITEMS_PER_PAGE
-        page_entries = entries[start:start + self.ITEMS_PER_PAGE]
-
-        header = "§2[§7Paradox§2]§a Container Contents:"
-        if total_pages > 1:
-            header += f" §8(Page {current_page + 1}/{total_pages})"
-
-        admin.send_message(header)
-        for name, amount in page_entries:
-            admin.send_message(f"  §2[§f{name}§2]§7 x{amount}")
-
-        cd = self._cooldown.get(uid, 0) + 1
-        if cd >= self.ROTATE_EVERY:
-            self._page[uid] = (current_page + 1) % total_pages
-            self._cooldown[uid] = 0
-        else:
-            self._cooldown[uid] = cd
 
     # ─── Utilities ───────────────────────────────────────
 
-    def _get_container(self, block):
-        """Try to get inventory from a block (chest, barrel, shulker, etc)."""
-        try:
-            inv = block.get_component("minecraft:inventory")
-            if inv and hasattr(inv, 'container'):
-                return inv.container
-        except Exception:
-            pass
-        try:
-            if hasattr(block, 'inventory'):
-                return block.inventory
-        except Exception:
-            pass
+    def _raycast_block(self, player):
+        """Manual raycast: step along view direction to find the first non-air block."""
+        loc = player.location
+        ex, ey, ez = loc.x, loc.y + 1.62, loc.z
+
+        yaw_rad = math.radians(loc.yaw)
+        pitch_rad = math.radians(loc.pitch)
+
+        dx = -math.sin(yaw_rad) * math.cos(pitch_rad)
+        dy = -math.sin(pitch_rad)
+        dz = math.cos(yaw_rad) * math.cos(pitch_rad)
+
+        step = 0.5
+        dim = player.dimension
+        prev_bx, prev_by, prev_bz = None, None, None
+
+        for i in range(int(self.MAX_DISTANCE / step) + 1):
+            cx = ex + dx * step * i
+            cy = ey + dy * step * i
+            cz = ez + dz * step * i
+
+            bx = int(cx) if cx >= 0 else int(cx) - 1
+            by = int(cy)
+            bz = int(cz) if cz >= 0 else int(cz) - 1
+
+            if (bx, by, bz) == (prev_bx, prev_by, prev_bz):
+                continue
+            prev_bx, prev_by, prev_bz = bx, by, bz
+
+            try:
+                block = dim.get_block_at(bx, by, bz)
+                if block is not None:
+                    block_type = str(block.type).lower()
+                    if "air" not in block_type:
+                        return block
+            except Exception:
+                pass
+
         return None
 
     def _cleanup(self, uid):

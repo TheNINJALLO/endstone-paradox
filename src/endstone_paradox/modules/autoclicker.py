@@ -215,6 +215,8 @@ class AutoClickerModule(BaseModule):
         The packet contains InputData flags; bit 2 (0x4) = LeftClick (attack/mine).
         We track these even when the player isn't hitting an entity.
         """
+        if not hasattr(event, 'packet'):
+            return
         pkt = event.packet
         pkt_type = type(pkt).__name__
 

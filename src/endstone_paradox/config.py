@@ -80,6 +80,34 @@ DEFAULT_CONFIG = {
         "antidupe": {"enabled": False, "sensitivity": 5},
         "crashdrop": {"enabled": False, "sensitivity": 5},
         "invsync": {"enabled": False, "sensitivity": 5},
+        # Tier 2
+        "discord": {"enabled": True, "sensitivity": 5},
+        "chatprotection": {"enabled": True, "sensitivity": 5},
+        "antigrief": {"enabled": True, "sensitivity": 5},
+        "evidencereplay": {"enabled": True, "sensitivity": 5},
+    },
+    "discord": {
+        "webhook_url": "",
+        "min_severity": 3,
+        "send_bans": True,
+        "send_kicks": True,
+        "footer_text": "Paradox AntiCheat",
+    },
+    "chatprotection": {
+        "anti_spam": True,
+        "anti_ads": True,
+        "anti_swear": True,
+        "caps_limit": True,
+        "caps_threshold": 70,
+        "cmd_throttle": True,
+        "max_cmds_per_sec": 3,
+    },
+    "antigrief": {
+        "break_limit": 45,
+        "break_window": 3,
+        "place_limit": 40,
+        "place_window": 3,
+        "log_explosions": True,
     },
 }
 

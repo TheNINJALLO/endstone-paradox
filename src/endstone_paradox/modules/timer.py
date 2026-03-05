@@ -34,6 +34,8 @@ class TimerModule(BaseModule):
 
     def on_packet(self, event):
         """Track PlayerAuthInputPacket frequency."""
+        if not hasattr(event, 'packet'):
+            return
         pkt = event.packet
         pkt_type = type(pkt).__name__
 

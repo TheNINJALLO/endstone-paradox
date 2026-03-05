@@ -112,7 +112,7 @@ Drop the `.whl` file into your Endstone server's `plugins/` folder:
 your-server/
 ├── endstone.toml
 ├── plugins/
-│   └── endstone_paradox-1.6.0-py3-none-any.whl   ← drop it here
+│   └── endstone_paradox-1.6.1-py3-none-any.whl   ← drop it here
 └── ...
 ```
 
@@ -121,7 +121,7 @@ your-server/
 Start (or restart) your Endstone server. You'll see Paradox load in the console:
 
 ```
-[ParadoxAC] Paradox AntiCheat v1.6.0 loaded!
+[ParadoxAC] Paradox AntiCheat v1.6.1 loaded!
 [ParadoxAC] Database initialized at plugins/ParadoxAC/paradox.db
 [ParadoxAC] 31 detection modules registered.
 ```
@@ -180,7 +180,7 @@ This opens the full admin panel where you can manage **everything** — modules,
 | **PvP Manager** | PvP system — per-player toggles, combat tagging, log detection |
 | **Lag Clear** | Entity cleanup — API-based clearing, **excludes name-tagged/NPC entities**, counts cleared |
 | **Illegal Items** | Illegal item scanner — enchantment levels, stack sizes, creative-only items, auto-remove |
-| **Container See** | Admin tool — see container/player inventories by looking (L4 only, off by default) |
+| **Container See** | Admin tool — see player inventories and identify containers by looking (OP/L4, action bar display, off by default) |
 | **Anti-Dupe** | 4-layer dupe prevention — bundle, hopper, piston, packet analysis (off by default) |
 | **Crash-Drop** | Anti-crash-drop — disconnect tracking, duped entity removal (off by default) |
 | **Inv-Sync** | Inventory sync — DB snapshots, detects excess items on rejoin (off by default) |
@@ -342,7 +342,7 @@ Type `/ac-gui` to open the complete admin panel. **Every feature is accessible f
 
 | Section | What You Can Do |
 |---------|-----------------|
-| **Modules** | Toggle all 21 detection modules on/off, adjust sensitivity per-module with a slider (1-10) |
+| **Modules** | Toggle all 31 detection/admin modules on/off, adjust sensitivity for detection modules with a slider (1-10) |
 | **Moderation** | Vanish, lockdown, lockdown level selector (L4 only / L4+L3), kick, ban, unban, freeze, punish, despawn entities, manage allow/white lists, view spoof logs, change prefix |
 | **Players** | Select any online player → kick, ban, freeze, warn, teleport to/from them, set rank, view inventory — all from one screen |
 | **Utilities** | Homes (set, delete, update, teleport), random TP, PvP toggle (personal + global), chat channels (create, join, leave, send), TPA, ranks |
@@ -431,7 +431,7 @@ Paradox includes a built-in web admin panel accessible from any browser.
 | Page | What You Can Do |
 |------|-----------------|
 | **Dashboard** | Overview cards: module count, bans (server + 509 global), frozen, vanished, lockdown status, module status table |
-| **Modules** | Toggle all 21 modules on/off + adjust sensitivity (1-10 sliders) |
+| **Modules** | Two sections: **Detection Modules** (toggle + sensitivity sliders) and **Server Features** (toggle only). Card-based layout |
 | **Bans** | View server bans, add/remove bans, browse the 509-name Global Ban List with search |
 | **Players** | Player records, warnings, frozen/vanished lists, ranks |
 | **Permissions** | View and set player clearance levels (1-4) |

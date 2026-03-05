@@ -18,29 +18,47 @@ COMMAND_MODULE_MAP = {
     "ac-namespoof": "namespoof",
     "ac-packetmonitor": "packetmonitor",
     "ac-containersee": "containersee",
+    # Tier 1
+    "ac-skinguard": "skinguard",
+    "ac-noclip": "noclip",
+    "ac-waterwalk": "waterwalk",
+    "ac-stephack": "stephack",
+    "ac-timer": "timer",
+    "ac-blink": "blink",
+    "ac-antikb": "antikb",
+    "ac-criticals": "criticals",
+    "ac-wallhit": "wallhit",
+    "ac-triggerbot": "triggerbot",
+    "ac-illegalitems": "illegalitems",
+    "ac-selfinfliction": "selfinfliction",
+    "ac-pvptoggle": "pvp",
+    "ac-antidupe": "antidupe",
+    "ac-crashdrop": "crashdrop",
+    "ac-invsync": "invsync",
+    # Tier 2
+    "ac-discord": "discord",
+    "ac-chatprotection": "chatprotection",
+    "ac-antigrief": "antigrief",
+    "ac-evidencereplay": "evidencereplay",
 }
 
 
-def handle_toggle(plugin, sender, args) -> bool:
+def handle_toggle(plugin, sender, args, **kwargs) -> bool:
     """Handle any /ac-<module> toggle command."""
-    # Get the command name from the sender's last command
-    # The plugin passes this through on_command which knows the command name
-    # We need to determine which module to toggle based on how we were called
-    # Since all these commands route here, we inspect the calling context
-    cmd_name = None
+    cmd_name = kwargs.get('cmd_name')
 
-    # Walk up the call stack to find the command name
-    import inspect
-    frame = inspect.currentframe()
-    try:
-        # The on_command method stores cmd_name locally
-        outer_frames = inspect.getouterframes(frame)
-        for f_info in outer_frames:
-            if 'cmd_name' in f_info[0].f_locals:
-                cmd_name = f_info[0].f_locals['cmd_name']
-                break
-    finally:
-        del frame
+    if cmd_name is None:
+        # Fallback: try frame inspection
+        import inspect
+        frame = inspect.currentframe()
+        try:
+            outer_frames = inspect.getouterframes(frame)
+            for f_info in outer_frames:
+                if 'cmd_name' in f_info[0].f_locals:
+                    cmd_name = f_info[0].f_locals['cmd_name']
+                    break
+        finally:
+            del frame
 
     if cmd_name is None:
         sender.send_message("§2[§7Paradox§2]§c Could not determine which module to toggle.")
