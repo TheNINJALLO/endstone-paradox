@@ -32,8 +32,8 @@ A full Python port of the original [Paradox AntiCheat](https://github.com/Visual
 
 <p align="center">
   <img src="https://img.shields.io/badge/Tier_1-✓_Complete-00C853?style=for-the-badge" alt="Tier 1 Complete">
-  <img src="https://img.shields.io/badge/Tier_2-⚡_In_Progress-FF6D00?style=for-the-badge" alt="Tier 2 In Progress">
-  <img src="https://img.shields.io/badge/Tier_3-◇_Future-7C4DFF?style=for-the-badge" alt="Tier 3 Future">
+  <img src="https://img.shields.io/badge/Tier_2-✓_Complete-00C853?style=for-the-badge" alt="Tier 2 Complete">
+  <img src="https://img.shields.io/badge/Tier_3-⚡_In_Progress-FF6D00?style=for-the-badge" alt="Tier 3 In Progress">
 </p>
 
 <details open>
@@ -52,31 +52,31 @@ A full Python port of the original [Paradox AntiCheat](https://github.com/Visual
 </details>
 
 <details open>
-<summary><h3>⚡ Tier 2 — Community & Moderation</h3></summary>
+<summary><h3>✅ Tier 2 — Community & Moderation — Complete</h3></summary>
 
 <br>
 
 | Feature | Description | Status |
 |:--------|:------------|:------:|
-| Discord Integration | Webhook alerts, ban notifications, evidence embeds | 🔨 Building |
-| Chat Protection | Spam detection, ad filter, swear filter, mute system | 🔨 Building |
-| Anti-Grief / World Protection | Anti-nuke, explosion logging, build protection zones | 🔨 Building |
-| Evidence Replay | Record player actions before violations, staff replay | 🔨 Building |
+| Discord Integration | Webhook alerts, ban notifications, colour-coded severity embeds, rate-limited background sender | ✅ |
+| Chat Protection | Spam detection (flood + repeat), ad filter (IPs/URLs), swear filter, caps limiter, mute system (timed/permanent) | ✅ |
+| Anti-Grief / World Protection | Anti-nuke (mass break), rapid placement detection, explosion audit logging (TNT/creeper) | ✅ |
+| Evidence Replay | Ring-buffer player state recording, auto-snapshots on violations, staff review with frame-by-frame summaries | ✅ |
 
 </details>
 
-<details>
-<summary><h3>🔮 Tier 3 — Intelligence & Analytics</h3></summary>
+<details open>
+<summary><h3>⚡ Tier 3 — Intelligence & Analytics — In Progress</h3></summary>
 
 <br>
 
 | Feature | Description | Status |
 |:--------|:------------|:------:|
-| Analytics Dashboard | Violation charts, heatmaps, player risk scores | ⬜ Planned |
-| Bot Detection | Behavioral entropy, connection patterns, honeypots | ⬜ Planned |
-| Player Report System | `/report` command, web queue, auto-escalation | ⬜ Planned |
-| Session Fingerprinting | Device fingerprint, alt detection, ban evasion | ⬜ Planned |
-| Adaptive Check Frequency | Risk-based check intervals, resource optimization | ⬜ Planned |
+| Analytics Dashboard | Violation charts, heatmaps, player risk scores | 🔨 Building |
+| Bot Detection | Behavioral entropy, connection patterns, honeypots | 🔨 Building |
+| Player Report System | `/report` command, web queue, auto-escalation | 🔨 Building |
+| Session Fingerprinting | Device fingerprint, alt detection, ban evasion | 🔨 Building |
+| Adaptive Check Frequency | Risk-based check intervals, resource optimization | 🔨 Building |
 
 </details>
 
@@ -112,7 +112,7 @@ Drop the `.whl` file into your Endstone server's `plugins/` folder:
 your-server/
 ├── endstone.toml
 ├── plugins/
-│   └── endstone_paradox-1.6.1-py3-none-any.whl   ← drop it here
+│   └── endstone_paradox-1.6.2-py3-none-any.whl   ← drop it here
 └── ...
 ```
 
@@ -121,7 +121,7 @@ your-server/
 Start (or restart) your Endstone server. You'll see Paradox load in the console:
 
 ```
-[ParadoxAC] Paradox AntiCheat v1.6.1 loaded!
+[ParadoxAC] Paradox AntiCheat v1.6.2 loaded!
 [ParadoxAC] Database initialized at plugins/ParadoxAC/paradox.db
 [ParadoxAC] 31 detection modules registered.
 ```
@@ -150,7 +150,7 @@ This opens the full admin panel where you can manage **everything** — modules,
 
 ## ✨ Features
 
-### 🛡️ 31 Detection & Admin Modules
+### 🛡️ 35 Detection, Community & Admin Modules
 
 | Module | What It Detects |
 |--------|-----------------|
@@ -185,8 +185,12 @@ This opens the full admin panel where you can manage **everything** — modules,
 | **Crash-Drop** | Anti-crash-drop — disconnect tracking, duped entity removal (off by default) |
 | **Inv-Sync** | Inventory sync — DB snapshots, detects excess items on rejoin (off by default) |
 | **SkinGuard** | Skin validation — blocks 4D geometry, tiny/invisible skins, sub-pixel bone exploits |
+| **Discord** | Discord webhook integration — colour-coded violation embeds, ban/kick alerts, rate-limited background sender (off by default) |
+| **Chat Protection** | Chat suite — spam detection (flood + repeat), ad filter (IPs/URLs/domains), swear filter, caps limiter, mute system |
+| **Anti-Grief** | World protection — anti-nuke (mass block break), rapid placement rate-limit, explosion audit logging |
+| **Evidence Replay** | Forensic replay — ring-buffer player state recording, auto-snapshots on violations, frame-by-frame staff review |
 
-Every module can be toggled individually via commands **or** the GUI. The 3 anti-dupe modules are **off by default** and should be tuned per-server.
+Every module can be toggled individually via commands **or** the GUI. Advanced modules (anti-dupe, discord, etc.) are **off by default** and should be configured per-server.
 
 #### 🎚️ Module Sensitivity
 
@@ -506,12 +510,21 @@ endstone-paradox/
     ├── core/                   # Centralized systems
     │   ├── violation_engine.py #   Violation processing pipeline (290 lines)
     │   └── player_baseline.py  #   EMA behavioral profiling per player
-    ├── modules/                # 21 detection & admin modules
+    ├── modules/                # 35 detection, community & admin modules
     │   ├── base.py             #   Abstract base class + sensitivity + emit()
     │   ├── fly.py              #   Flight/hover (surrounding-block check, knockback/slime exemptions)
+    │   ├── noclip.py           #   Phase through solid blocks (ray-trace)
+    │   ├── waterwalk.py        #   Jesus hack (Frost Walker/ice/lily exemptions)
+    │   ├── stephack.py         #   Step up blocks without jumping
+    │   ├── timer.py            #   Game speed manipulation (packet frequency)
+    │   ├── blink.py            #   Instant teleport/position jumps
     │   ├── killaura.py         #   Combat bot (dynamic thresholds, latency tolerance)
     │   ├── reach.py            #   Reach hack (Catmull-Rom interpolation, latency tolerance)
     │   ├── autoclicker.py      #   CPS tracking (PC/Mobile/Console, air-click, CV analysis)
+    │   ├── antikb.py           #   Anti-knockback (post-hit displacement)
+    │   ├── criticals.py        #   Always-critical hit exploits
+    │   ├── wallhit.py          #   Hitting through solid blocks (LoS ray-trace)
+    │   ├── triggerbot.py       #   Auto-attack on target acquisition
     │   ├── scaffold.py         #   Speed bridge (air-below filtering)
     │   ├── xray.py             #   X-ray (weighted suspicion scoring)
     │   ├── gamemode.py         #   Gamemode change blocking
@@ -520,22 +533,27 @@ endstone-paradox/
     │   ├── afk.py              #   AFK idle tracking
     │   ├── vision.py           #   Aimbot detection
     │   ├── skinguard.py        #   4D/tiny/invisible skin detection
+    │   ├── illegal_items.py    #   Illegal item scanner (enchants, stacks)
+    │   ├── discord_webhook.py  #   Discord webhook (violations, bans, kicks)
+    │   ├── chat_protection.py  #   Spam/ad/swear filter + mute system
+    │   ├── antigrief.py        #   Anti-nuke, rapid placement, explosion logging
+    │   ├── evidence_replay.py  #   Ring-buffer recording + violation snapshots
     │   ├── world_border.py     #   Border enforcement
     │   ├── lag_clear.py        #   Entity cleanup
     │   ├── rate_limit.py       #   Packet flood detection
     │   ├── packet_monitor.py   #   Packet spam alerts
     │   ├── pvp_manager.py      #   PvP toggle system
-    │   ├── containersee.py     #   Container vision (admin tool)
-    │   ├── antidupe.py         #   4-layer dupe prevention (bundles, hoppers, pistons, packets)
-    │   ├── crashdrop.py        #   Anti-crash-drop (disconnect item removal)
-    │   └── invsync.py          #   Inventory sync (DB snapshots, rejoin diff)
+    │   ├── containersee.py     #   Container/inventory vision (admin)
+    │   ├── antidupe.py         #   4-layer dupe prevention
+    │   ├── crashdrop.py        #   Anti-crash-drop
+    │   └── invsync.py          #   Inventory sync
     ├── commands/
     │   ├── moderation/         # 18 admin/moderation commands
     │   ├── settings/           # Module toggle handler
     │   └── utility/            # 9 utility commands
     ├── gui/
     │   └── form_generator.py   # Full GUI (8 sections, 700+ lines)
-    ├── config.py               # TOML config loader (DB mode, web UI, global DB)
+    ├── config.py               # TOML config loader (DB mode, web UI, global DB, discord)
     ├── globalban.py            # 509 known cheaters from original Paradox
     └── web/                    # Built-in web admin panel
         └── server.py           # Flask server + all routes + embedded templates

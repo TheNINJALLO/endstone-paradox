@@ -1,6 +1,6 @@
 # Modules Overview
 
-Paradox AntiCheat includes **21 detection and admin modules**, each independently toggleable and configurable.
+Paradox AntiCheat includes **35 detection, prevention, and admin modules**, each independently toggleable and configurable.
 
 ## Module Categories
 
@@ -20,6 +20,25 @@ These modules actively monitor player behavior and flag suspicious activity.
 | Self-Infliction | — | ON | Self-damage exploit detection |
 | Vision | `/ac-vision` | ON | Aimbot/snap aim detection |
 | SkinGuard | `/ac-skinguard` | ON | 4D/tiny/invisible skin detection |
+| NoClip | — | ON | Phase/noclip through solid blocks |
+| WaterWalk | — | ON | Walking on water (Jesus hack) |
+| Step Hack | — | ON | Stepping up blocks without jumping |
+| Timer | — | ON | Game speed manipulation |
+| Blink | — | ON | Instant teleport/blink hacks |
+| Anti-KB | — | ON | Anti-knockback (not moving after hit) |
+| Criticals | — | ON | Always-critical hit exploits |
+| Wall Hit | — | ON | Hitting through solid blocks |
+| TriggerBot | — | ON | Auto-attack on target acquisition |
+
+### Community & Moderation Modules (Tier 2)
+These modules handle community management and staff tools.
+
+| Module | Command | Default | Description |
+|--------|---------|---------|-------------|
+| Discord Integration | — | OFF | Webhook alerts for violations, bans, and kicks with colour-coded severity |
+| Chat Protection | — | ON | Spam detection, ad filter, swear filter, caps limiter, mute system |
+| Anti-Grief | — | ON | Anti-nuke, rapid placement detection, explosion logging |
+| Evidence Replay | — | ON | Ring-buffer player action recording, auto-snapshots on violations |
 
 ### Prevention Modules
 These modules actively prevent exploits.
@@ -29,6 +48,7 @@ These modules actively prevent exploits.
 | Anti-Dupe | `/ac-modules antidupe` | OFF | 4-layer dupe prevention |
 | Crash-Drop | `/ac-modules crashdrop` | OFF | Anti-crash-drop protection |
 | Inv-Sync | `/ac-modules invsync` | OFF | Inventory snapshot sync |
+| Illegal Items | — | ON | Enchantment, stack size, creative-only item scanning |
 
 ### Admin & Utility Modules
 These modules provide server management tools.
@@ -41,7 +61,7 @@ These modules provide server management tools.
 | PvP Manager | — | ON | PvP toggle system |
 | Rate Limiter | `/ac-ratelimit` | OFF | Packet flood & DoS protection |
 | Packet Monitor | `/ac-packetmonitor` | OFF | Packet frequency diagnostics |
-| Container See | — | OFF | Admin inventory vision |
+| Container See | `/ac-containersee` | OFF | Admin inventory vision (action bar) |
 
 ## Sensitivity Scaling
 
@@ -56,7 +76,7 @@ Set sensitivity via:
 /ac-modules <module> sensitivity <1-10>
 ```
 
-Or via the Web UI's Modules page.
+Or via the Web UI's Modules page (detection modules only — server features show toggle-only controls).
 
 ## Toggling Modules
 

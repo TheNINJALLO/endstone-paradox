@@ -18,10 +18,10 @@ Unlike the original Script API version, the Endstone port runs **server-side** w
 
 | Feature | Description |
 |---------|-------------|
-| **21 Modules** | Detection, prevention, and admin utilities — all individually toggleable |
+| **35 Modules** | Detection, prevention, community moderation, and admin utilities — all individually toggleable |
 | **4-Level Security** | Clearance system with SHA-256 authentication (no operator abuse) |
 | **Violation Engine** | Centralized enforcement pipeline with rolling buffers, escalation ladder, and evidence logging |
-| **Web Admin Panel** | Full-featured web UI with dashboard, module management, bans, players, permissions, anti-dupe monitoring, and more |
+| **Web Admin Panel** | Full-featured web UI with dashboard, module management (two-section layout), bans, players, permissions, and more |
 | **In-Game GUI** | 8-section form-based GUI accessible via `/ac-gui` |
 | **35+ Commands** | 18 moderation + 9 utility + module toggles + violation engine |
 | **Sensitivity Scaling** | Every detection module has a 1-10 sensitivity scale |

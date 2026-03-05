@@ -19,7 +19,7 @@ Place the `.whl` file in your Endstone server's `plugins/` directory:
 ```
 your-server/
 ├── plugins/
-│   └── endstone_paradox-1.6.0-py3-none-any.whl
+│   └── endstone_paradox-1.6.2-py3-none-any.whl
 ├── endstone.toml
 └── ...
 ```
@@ -30,7 +30,7 @@ Start (or restart) your Endstone server. You should see Paradox load in the cons
 
 ```
 [Paradox] ════════════════════════════════════════════════════════
-[Paradox]   AntiCheat v1.6.0
+[Paradox]   AntiCheat v1.6.2
 [Paradox]   Designed by Visual1mpact
 [Paradox]   Ported to Endstone by TheN1NJ4LL0
 [Paradox] ════════════════════════════════════════════════════════
@@ -38,7 +38,7 @@ Start (or restart) your Endstone server. You should see Paradox load in the cons
 [Paradox] Module 'killaura' started
 ...
 [Paradox] Loaded successfully!
-[Paradox] Modules loaded: 21
+[Paradox] Modules loaded: 35
 ```
 
 ### Step 4: Set Up Your Admin Password
@@ -62,6 +62,7 @@ By default, most detection modules are **enabled**. A few advanced modules are *
 | Rate Limiter | OFF | Needs threshold tuning per server |
 | Packet Monitor | OFF | Diagnostic tool for admins |
 | Container See | OFF | Admin-only vision tool |
+| Discord Integration | OFF | Requires webhook URL configuration |
 | Anti-Dupe | OFF | Needs testing per server |
 | Crash-Drop | OFF | Needs radius/timing tuning |
 | Inventory Sync | OFF | Needs tolerance tuning |
