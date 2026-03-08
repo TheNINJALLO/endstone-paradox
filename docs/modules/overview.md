@@ -1,6 +1,6 @@
 # Modules Overview
 
-Paradox AntiCheat includes **35 detection, prevention, and admin modules**, each independently toggleable and configurable.
+Paradox AntiCheat includes **39 detection, prevention, and admin modules**, each independently toggleable and configurable.
 
 ## Module Categories
 
@@ -39,6 +39,16 @@ These modules handle community management and staff tools.
 | Chat Protection | — | ON | Spam detection, ad filter, swear filter, caps limiter, mute system |
 | Anti-Grief | — | ON | Anti-nuke, rapid placement detection, explosion logging |
 | Evidence Replay | — | ON | Ring-buffer player action recording, auto-snapshots on violations |
+
+### Intelligence & Analytics Modules (Tier 3)
+These modules provide advanced detection intelligence and analytics.
+
+| Module | Command | Default | Description |
+|--------|---------|---------|-------------|
+| Bot Detection | `/ac-botdetection` | OFF | 3-layer: behavioral entropy, connection cycling, honeypot traps |
+| Report System | `/ac-reportsystem` | OFF | Player report queue, auto-escalation, web UI claim/resolve |
+| Session Fingerprint | `/ac-fingerprint` | OFF | Device/IP/XUID hash, alt detection, ban evasion, global sharing |
+| Adaptive Check | `/ac-adaptivecheck` | OFF | Risk-tier-based check intervals, resource optimization |
 
 ### Prevention Modules
 These modules actively prevent exploits.

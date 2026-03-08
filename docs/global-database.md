@@ -70,6 +70,9 @@ api_url = ""             # Auto-resolved to official API
 api_key = ""             # Auto-populated on first connect
 server_name = ""         # Defaults to your server's hostname
 sync_interval = 300      # Sync every 5 minutes
+share_fingerprints = true   # Push fingerprint hashes to the Intelligence Network
+share_telemetry = true      # Push violation/behavioral stats to the network
+auto_tune = false           # Auto-apply crowd-sourced detection thresholds
 ```
 
 ### Disabling
@@ -90,6 +93,10 @@ api_url = "http://your-api-server:8090"
 
 The plugin will auto-register with your private API instead.
 
+## Intelligence Network
+
+Beyond bans, the Global API powers a **crowd-sourced intelligence network**. See [Intelligence Network](intelligence-network.md) for full details.
+
 ## API Endpoints (for developers)
 
 The Global Ban API is a standalone FastAPI service. Key endpoints:
@@ -103,6 +110,9 @@ The Global Ban API is a standalone FastAPI service. Key endpoints:
 | `/api/report/batch` | POST | API Key | Batch submit violation reports |
 | `/api/sync?since={timestamp}` | GET | API Key | Pull updates since timestamp |
 | `/api/flags` | POST | API Key | Flag/high-risk a player |
+| `/api/fingerprints/batch` | POST | API Key | Batch push fingerprint hashes |
+| `/api/telemetry` | POST | API Key | Push behavioral telemetry |
+| `/api/intelligence` | GET | API Key | Pull crowd-sourced insights |
 
 ## Security
 
@@ -110,3 +120,4 @@ The Global Ban API is a standalone FastAPI service. Key endpoints:
 - Self-registration is **rate-limited** (5 per IP per hour)
 - The official API endpoint is **obfuscated** in the plugin source code
 - All communication uses standard HTTPS/HTTP
+- **No PII transmitted** — only hashed identifiers and aggregated metrics

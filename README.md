@@ -33,7 +33,7 @@ A full Python port of the original [Paradox AntiCheat](https://github.com/Visual
 <p align="center">
   <img src="https://img.shields.io/badge/Tier_1-✓_Complete-00C853?style=for-the-badge" alt="Tier 1 Complete">
   <img src="https://img.shields.io/badge/Tier_2-✓_Complete-00C853?style=for-the-badge" alt="Tier 2 Complete">
-  <img src="https://img.shields.io/badge/Tier_3-⚡_In_Progress-FF6D00?style=for-the-badge" alt="Tier 3 In Progress">
+  <img src="https://img.shields.io/badge/Tier_3-✓_Complete-00C853?style=for-the-badge" alt="Tier 3 Complete">
 </p>
 
 <details open>
@@ -66,17 +66,18 @@ A full Python port of the original [Paradox AntiCheat](https://github.com/Visual
 </details>
 
 <details open>
-<summary><h3>⚡ Tier 3 — Intelligence & Analytics — In Progress</h3></summary>
+<summary><h3>✅ Tier 3 — Intelligence & Analytics — Complete</h3></summary>
 
 <br>
 
 | Feature | Description | Status |
 |:--------|:------------|:------:|
-| Analytics Dashboard | Violation charts, heatmaps, player risk scores | 🔨 Building |
-| Bot Detection | Behavioral entropy, connection patterns, honeypots | 🔨 Building |
-| Player Report System | `/report` command, web queue, auto-escalation | 🔨 Building |
-| Session Fingerprinting | Device fingerprint, alt detection, ban evasion | 🔨 Building |
-| Adaptive Check Frequency | Risk-based check intervals, resource optimization | 🔨 Building |
+| Analytics Dashboard | Violation charts (Chart.js), module breakdown, enforcement actions doughnut, top flagged players | ✅ |
+| Bot Detection | 3-layer: behavioral entropy, connection cycling, honeypot traps | ✅ |
+| Player Report System | `/ac-report` command, web queue with claim/resolve, auto-escalation, rate limiting | ✅ |
+| Session Fingerprinting | Device/IP/XUID composite hash, alt detection, ban evasion tracking | ✅ |
+| Adaptive Check Frequency | Risk-tier-based intervals — clean players checked less, flagged players every tick | ✅ |
+| Global Intelligence Network | Crowd-sourced fingerprints, telemetry, reputation scores — smarter with every server | ✅ |
 
 </details>
 
@@ -112,7 +113,7 @@ Drop the `.whl` file into your Endstone server's `plugins/` folder:
 your-server/
 ├── endstone.toml
 ├── plugins/
-│   └── endstone_paradox-1.6.2-py3-none-any.whl   ← drop it here
+│   └── endstone_paradox-1.7.0-py3-none-any.whl   ← drop it here
 └── ...
 ```
 
@@ -121,9 +122,9 @@ your-server/
 Start (or restart) your Endstone server. You'll see Paradox load in the console:
 
 ```
-[ParadoxAC] Paradox AntiCheat v1.6.2 loaded!
+[ParadoxAC] Paradox AntiCheat v1.7.0 loaded!
 [ParadoxAC] Database initialized at plugins/ParadoxAC/paradox.db
-[ParadoxAC] 31 detection modules registered.
+[ParadoxAC] 39 detection modules registered.
 ```
 
 ### Step 4 — Set Your Admin Password
@@ -150,7 +151,7 @@ This opens the full admin panel where you can manage **everything** — modules,
 
 ## ✨ Features
 
-### 🛡️ 35 Detection, Community & Admin Modules
+### 🛡️ 39 Detection, Community & Admin Modules
 
 | Module | What It Detects |
 |--------|-----------------|
@@ -189,6 +190,10 @@ This opens the full admin panel where you can manage **everything** — modules,
 | **Chat Protection** | Chat suite — spam detection (flood + repeat), ad filter (IPs/URLs/domains), swear filter, caps limiter, mute system |
 | **Anti-Grief** | World protection — anti-nuke (mass block break), rapid placement rate-limit, explosion audit logging |
 | **Evidence Replay** | Forensic replay — ring-buffer player state recording, auto-snapshots on violations, frame-by-frame staff review |
+| **Bot Detection** | 3-layer bot detection — behavioral entropy analysis, connection cycling detection, honeypot block traps |
+| **Report System** | Player reports — `/ac-report` command, web queue with claim/resolve, auto-escalation, rate limiting |
+| **Session Fingerprint** | Device fingerprinting — composite IP/OS/XUID hash, alt account detection, ban evasion tracking |
+| **Adaptive Check** | Smart scheduling — risk-tier-based check intervals, clean players checked less, flagged players every tick |
 
 Every module can be toggled individually via commands **or** the GUI. Advanced modules (anti-dupe, discord, etc.) are **off by default** and should be configured per-server.
 
@@ -324,6 +329,7 @@ Everything saves automatically and survives server restarts:
 | `/ac-debug-db [table] [key]` | Inspect the database directly |
 | `/ac-gui` | Open the full admin GUI |
 | `/ac-about` | View plugin version and info |
+| `/ac-report <player> [reason]` | Report a player (available to all) |
 
 ---
 
@@ -346,7 +352,7 @@ Type `/ac-gui` to open the complete admin panel. **Every feature is accessible f
 
 | Section | What You Can Do |
 |---------|-----------------|
-| **Modules** | Toggle all 31 detection/admin modules on/off, adjust sensitivity for detection modules with a slider (1-10) |
+| **Modules** | Toggle all 39 detection/admin modules on/off, adjust sensitivity for detection modules with a slider (1-10) |
 | **Moderation** | Vanish, lockdown, lockdown level selector (L4 only / L4+L3), kick, ban, unban, freeze, punish, despawn entities, manage allow/white lists, view spoof logs, change prefix |
 | **Players** | Select any online player → kick, ban, freeze, warn, teleport to/from them, set rank, view inventory — all from one screen |
 | **Utilities** | Homes (set, delete, update, teleport), random TP, PvP toggle (personal + global), chat channels (create, join, leave, send), TPA, ranks |
@@ -406,6 +412,9 @@ enabled = false
 api_url = ""               # URL of your Paradox Global Ban API instance
 api_key = ""               # Server API key from registration
 sync_interval = 300        # Sync every 5 minutes
+share_fingerprints = true  # Push fingerprint hashes to the Intelligence Network
+share_telemetry = true     # Push violation/behavioral stats to the network
+auto_tune = false          # Auto-apply crowd-sourced detection thresholds
 ```
 
 ---
@@ -440,6 +449,8 @@ Paradox includes a built-in web admin panel accessible from any browser.
 | **Players** | Player records, warnings, frozen/vanished lists, ranks |
 | **Permissions** | View and set player clearance levels (1-4) |
 | **Logs** | Namespoof detection log, detection events |
+| **Analytics** | Violation time-series chart, module breakdown, enforcement doughnut, summary stats |
+| **Reports** | Player report queue with claim/resolve, status filters, priority badges |
 | **Config** | Edit all DB settings, view config.toml, database mode info |
 | **Allow/Whitelist** | Add/remove players from allowlist and whitelist |
 | **Global DB** | Cross-server ban database — configure the [Paradox Global Ban API](https://github.com/TheNINJALLO/endstone-paradox) |
@@ -470,6 +481,19 @@ Every Paradox install automatically connects to the **Global Ban API** — a sha
 | **Self-Hosted Option** | Run your own API for private server networks |
 
 To opt out: set `global_database.enabled = false` in `config.toml`.
+
+### 🧠 Global Intelligence Network
+
+Beyond bans, the Global API powers a **crowd-sourced intelligence network** where every Paradox server contributes anonymized behavioral data — the more servers participate, the smarter detection becomes.
+
+| Feature | Details |
+|---------|---------|
+| **Fingerprint Sharing** | Session fingerprints (hashed, no PII) shared across servers for cross-server alt/evasion detection |
+| **Behavioral Telemetry** | V  iolation rates, risk tier distributions, enforcement outcomes pushed to the network |
+| **Crowd-Sourced Thresholds** | Network recommends sensitivity values based on aggregate data from all servers |
+| **Reputation Scores** | Per-fingerprint scores (0-100) calculated from cross-server violation history |
+| **Auto-Tune** | Optionally auto-apply crowd-sourced thresholds (`auto_tune = true`) |
+| **Graceful Degradation** | Works without new API endpoints — silently skips if not supported |
 
 ### 📊 Player Baseline Profiling
 
@@ -510,7 +534,7 @@ endstone-paradox/
     ├── core/                   # Centralized systems
     │   ├── violation_engine.py #   Violation processing pipeline (290 lines)
     │   └── player_baseline.py  #   EMA behavioral profiling per player
-    ├── modules/                # 35 detection, community & admin modules
+    ├── modules/                # 39 detection, community & admin modules
     │   ├── base.py             #   Abstract base class + sensitivity + emit()
     │   ├── fly.py              #   Flight/hover (surrounding-block check, knockback/slime exemptions)
     │   ├── noclip.py           #   Phase through solid blocks (ray-trace)
@@ -546,15 +570,22 @@ endstone-paradox/
     │   ├── containersee.py     #   Container/inventory vision (admin)
     │   ├── antidupe.py         #   4-layer dupe prevention
     │   ├── crashdrop.py        #   Anti-crash-drop
-    │   └── invsync.py          #   Inventory sync
+    │   ├── invsync.py          #   Inventory sync
+    │   ├── bot_detection.py    #   3-layer bot detection (entropy, cycling, honeypots)
+    │   ├── report_system.py    #   Player report queue + auto-escalation
+    │   ├── session_fingerprint.py #   Device fingerprinting + alt detection
+    │   └── adaptive_check.py   #   Risk-tier check interval optimizer
     ├── commands/
     │   ├── moderation/         # 18 admin/moderation commands
     │   ├── settings/           # Module toggle handler
-    │   └── utility/            # 9 utility commands
+    │   └── utility/            # 10 utility commands (incl. /ac-report)
     ├── gui/
     │   └── form_generator.py   # Full GUI (8 sections, 700+ lines)
-    ├── config.py               # TOML config loader (DB mode, web UI, global DB, discord)
-    ├── globalban.py            # 509 known cheaters from original Paradox
+    ├── core/                   # Centralized systems
+    │   ├── violation_engine.py #   Violation processing pipeline (290 lines)
+    │   ├── player_baseline.py  #   EMA behavioral profiling per player
+    │   └── analytics_collector.py #   Hourly violation data aggregations from original Paradox
+    ├── global_api.py           # Global Ban API + Intelligence Network client
     └── web/                    # Built-in web admin panel
         └── server.py           # Flask server + all routes + embedded templates
 ```

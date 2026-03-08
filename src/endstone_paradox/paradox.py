@@ -83,6 +83,11 @@ class ParadoxPlugin(Plugin):
         "ac-chatprotection": {"description": "Toggle chat protection (spam/ads/swear filter) on or off", "usages": ["/ac-chatprotection"], "permissions": ["paradox.settings"]},
         "ac-antigrief": {"description": "Toggle anti-grief (nuke/rapid place detection) on or off", "usages": ["/ac-antigrief"], "permissions": ["paradox.settings"]},
         "ac-evidencereplay": {"description": "Toggle evidence replay system on or off", "usages": ["/ac-evidencereplay"], "permissions": ["paradox.settings"]},
+        # --- Tier 3 toggles ---
+        "ac-adaptivecheck": {"description": "Toggle adaptive check frequency on or off", "usages": ["/ac-adaptivecheck"], "permissions": ["paradox.settings"]},
+        "ac-botdetection": {"description": "Toggle bot detection on or off", "usages": ["/ac-botdetection"], "permissions": ["paradox.settings"]},
+        "ac-reportsystem": {"description": "Toggle player report system on or off", "usages": ["/ac-reportsystem"], "permissions": ["paradox.settings"]},
+        "ac-fingerprint": {"description": "Toggle session fingerprinting on or off", "usages": ["/ac-fingerprint"], "permissions": ["paradox.settings"]},
         # --- Utility ---
         "ac-home": {"description": "Manage homes: set/delete/list or teleport by name", "usages": ["/ac-home [args: message]"], "permissions": ["paradox.home"]},
         "ac-tpr": {"description": "Teleport to a random location, optionally set radius", "usages": ["/ac-tpr [radius: int]"], "permissions": ["paradox.tpr"]},
@@ -92,6 +97,7 @@ class ParadoxPlugin(Plugin):
         "ac-rank": {"description": "Set or view a player's display rank", "usages": ["/ac-rank <player: player> [rank: message]"], "permissions": ["paradox.rank"]},
         "ac-debug-db": {"description": "Inspect or modify the Paradox database directly", "usages": ["/ac-debug-db [args: message]"], "permissions": ["paradox.debugdb"]},
         "ac-gui": {"description": "Open the Paradox admin GUI menu", "usages": ["/ac-gui"], "permissions": ["paradox.gui"]},
+        "ac-report": {"description": "Report a player for suspicious behavior", "usages": ["/ac-report <player: player> [reason: message]"], "permissions": ["paradox.report"]},
         "ac-about": {"description": "View Paradox AntiCheat version and info", "usages": ["/ac-about"], "permissions": ["paradox.about"]},
         # --- Violation Engine ---
         "ac-case": {"description": "View violation evidence for a player", "usages": ["/ac-case <player: player> [count: int]"], "permissions": ["paradox.case"]},
@@ -129,6 +135,7 @@ class ParadoxPlugin(Plugin):
         "paradox.debugdb": {"description": "Use /ac-debug-db command", "default": "op"},
         "paradox.gui": {"description": "Use /ac-gui command", "default": "op"},
         "paradox.about": {"description": "Use /ac-about command", "default": True},
+        "paradox.report": {"description": "Use /ac-report command", "default": True},
         "paradox.case": {"description": "Use /ac-case command", "default": "op"},
         "paradox.watch": {"description": "Use /ac-watch command", "default": "op"},
         "paradox.mode": {"description": "Use /ac-mode command", "default": "op"},
@@ -158,6 +165,9 @@ class ParadoxPlugin(Plugin):
 
         # Player baseline (initialized in on_enable)
         self.player_baseline = None
+
+        # Analytics collector (initialized in on_enable)
+        self.analytics_collector = None
 
         # Global API client (initialized in on_enable)
         self._global_api = None
@@ -209,12 +219,18 @@ class ParadoxPlugin(Plugin):
         from endstone_paradox.core.player_baseline import PlayerBaseline
         self.player_baseline = PlayerBaseline(self.db, self.logger)
 
+        # Init analytics collector
+        from endstone_paradox.core.analytics_collector import AnalyticsCollector
+        self.analytics_collector = AnalyticsCollector(self.db, self.logger)
+
         # Periodic flush task (every 30s = 600 ticks)
         def _flush_violations():
             if self.violation_engine:
                 self.violation_engine.maybe_flush()
             if self.player_baseline:
                 self.player_baseline.flush()
+            if self.analytics_collector:
+                self.analytics_collector.flush()
             self.server.scheduler.run_task(self, _flush_violations, delay=600)
         self.server.scheduler.run_task(self, _flush_violations, delay=600)
 
@@ -260,9 +276,11 @@ class ParadoxPlugin(Plugin):
                 self.logger.error(f"Error stopping module {name}: {e}")
 
         if self.db:
-            # Final flush of violation evidence
+            # Final flush of violation evidence and analytics
             if self.violation_engine:
                 self.violation_engine.flush()
+            if self.analytics_collector:
+                self.analytics_collector.flush()
             self.db.close()
 
         # Stop global API client
@@ -315,6 +333,11 @@ class ParadoxPlugin(Plugin):
         from endstone_paradox.modules.chat_protection import ChatProtectionModule
         from endstone_paradox.modules.antigrief import AntiGriefModule
         from endstone_paradox.modules.evidence_replay import EvidenceReplayModule
+        # Tier 3
+        from endstone_paradox.modules.adaptive_check import AdaptiveCheckModule
+        from endstone_paradox.modules.bot_detection import BotDetectionModule
+        from endstone_paradox.modules.report_system import ReportSystemModule
+        from endstone_paradox.modules.session_fingerprint import SessionFingerprintModule
 
         module_classes = {
             "fly": FlyModule,
@@ -352,11 +375,17 @@ class ParadoxPlugin(Plugin):
             "chatprotection": ChatProtectionModule,
             "antigrief": AntiGriefModule,
             "evidencereplay": EvidenceReplayModule,
+            # Tier 3
+            "adaptivecheck": AdaptiveCheckModule,
+            "botdetection": BotDetectionModule,
+            "reportsystem": ReportSystemModule,
+            "fingerprint": SessionFingerprintModule,
         }
 
         # these are off by default since they need tuning per-server
         default_off = {"ratelimit", "packetmonitor", "containersee", "antidupe", "crashdrop", "invsync",
-                        "discord", "chatprotection", "antigrief", "evidencereplay"}
+                        "discord", "chatprotection", "antigrief", "evidencereplay",
+                        "adaptivecheck", "botdetection", "reportsystem", "fingerprint"}
 
         for name, cls in module_classes.items():
             try:
@@ -472,6 +501,8 @@ class ParadoxPlugin(Plugin):
             "ac-selfinfliction", "ac-pvptoggle", "ac-antidupe", "ac-crashdrop", "ac-invsync",
             # Tier 2
             "ac-discord", "ac-chatprotection", "ac-antigrief", "ac-evidencereplay",
+            # Tier 3
+            "ac-adaptivecheck", "ac-botdetection", "ac-reportsystem", "ac-fingerprint",
         ]:
             self._command_handlers[cmd] = handle_toggle
 
@@ -485,6 +516,10 @@ class ParadoxPlugin(Plugin):
         self._command_handlers["ac-debug-db"] = handle_debug_db
         self._command_handlers["ac-gui"] = handle_gui
         self._command_handlers["ac-about"] = handle_about
+
+        # Tier 3 - report command
+        from endstone_paradox.commands.utility.report_cmd import handle_report
+        self._command_handlers["ac-report"] = handle_report
 
         # violation engine
         self._command_handlers["ac-case"] = handle_case
@@ -537,7 +572,7 @@ class ParadoxPlugin(Plugin):
         # public (L1) - everyone can use these
         public_commands = {
             "ac-op", "ac-tpa", "ac-home", "ac-tpr", "ac-pvp", "ac-channels",
-            "ac-about",
+            "ac-about", "ac-report",
         }
         level2_commands = set()  # placeholder for future expansion
         # L3 - moderator tools
@@ -671,7 +706,7 @@ class ParadoxPlugin(Plugin):
 
     @event_handler
     def on_actor_damage(self, event: ActorDamageEvent):
-        for module_name in ("killaura", "reach", "autoclicker", "pvp", "selfinfliction", "vision", "antikb", "criticals", "wallhit", "triggerbot"):
+        for module_name in ("killaura", "reach", "autoclicker", "pvp", "selfinfliction", "vision", "antikb", "criticals", "wallhit", "triggerbot", "botdetection"):
             module = self._modules.get(module_name)
             if module and module.running:
                 try:
@@ -829,6 +864,16 @@ class ParadoxPlugin(Plugin):
             if replay and replay.running:
                 try:
                     replay.on_violation(player, module, severity, evidence)
+                except Exception:
+                    pass
+
+            # Forward to Analytics Collector (Tier 3)
+            if self.analytics_collector:
+                try:
+                    uuid_str = str(player.unique_id) if hasattr(player, 'unique_id') else ""
+                    self.analytics_collector.record_violation(
+                        module, severity, action_hint or "warn", uuid_str
+                    )
                 except Exception:
                     pass
 

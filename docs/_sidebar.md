@@ -31,6 +31,11 @@
   - [Chat Protection](modules/chatprotection.md)
   - [Anti-Grief](modules/antigrief.md)
   - [Evidence Replay](modules/evidencereplay.md)
+  - **Intelligence & Analytics (Tier 3)**
+  - [Bot Detection](modules/botdetection.md)
+  - [Report System](modules/reportsystem.md)
+  - [Session Fingerprinting](modules/fingerprint.md)
+  - [Adaptive Check](modules/adaptivecheck.md)
   - **Prevention**
   - [Anti-Dupe](modules/antidupe.md)
   - [Crash-Drop](modules/crashdrop.md)
@@ -50,6 +55,7 @@
   - [Violation Engine Commands](commands/violation.md)
 - [Violation Engine](violation-engine.md)
 - [Global Ban Database](global-database.md)
+- [Intelligence Network](intelligence-network.md)
 - [Security & Clearance](security.md)
 - [In-Game GUI](gui.md)
 - [Web Admin Panel](webui.md)

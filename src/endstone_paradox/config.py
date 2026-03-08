@@ -41,6 +41,10 @@ DEFAULT_CONFIG = {
         "api_key": "",               # Auto-populated on first connect
         "server_name": "",           # Auto-set to hostname if empty
         "sync_interval": 300,
+        # Intelligence Network
+        "share_fingerprints": True,  # Push fingerprint hashes to the network
+        "share_telemetry": True,     # Push violation/behavioral stats
+        "auto_tune": False,          # Auto-apply crowd-sourced thresholds
     },
     "modules": {
         # Movement Detection
@@ -85,6 +89,11 @@ DEFAULT_CONFIG = {
         "chatprotection": {"enabled": True, "sensitivity": 5},
         "antigrief": {"enabled": True, "sensitivity": 5},
         "evidencereplay": {"enabled": True, "sensitivity": 5},
+        # Tier 3 (off by default — need per-server tuning)
+        "adaptivecheck": {"enabled": False, "sensitivity": 5},
+        "botdetection": {"enabled": False, "sensitivity": 5},
+        "reportsystem": {"enabled": False, "sensitivity": 5},
+        "fingerprint": {"enabled": False, "sensitivity": 5},
     },
     "discord": {
         "webhook_url": "",

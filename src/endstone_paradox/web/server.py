@@ -31,12 +31,16 @@ ALL_MODULES = {
     "wallhit": True, "triggerbot": True, "illegalitems": True,
     "discord": False, "chatprotection": False, "antigrief": False,
     "evidencereplay": False,
+    # Tier 3
+    "adaptivecheck": False, "botdetection": False,
+    "reportsystem": False, "fingerprint": False,
 }
 
 # Modules that DON'T use sensitivity (utility/feature modules)
 NO_SENSITIVITY = {
     "containersee", "afk", "lagclear", "worldborder", "gamemode",
     "pvp", "invsync", "discord", "evidencereplay", "crashdrop",
+    "reportsystem", "adaptivecheck",
 }
 
 
@@ -470,6 +474,116 @@ def _register_routes(app):
             invsync_events=invsync_events,
         )
 
+    # ── Analytics Dashboard (Tier 3) ──
+
+    @app.route("/analytics")
+    @login_required
+    def analytics():
+        return render_template_string(ANALYTICS_HTML)
+
+    @app.route("/api/analytics/violations")
+    @login_required
+    def api_analytics_violations():
+        """Return violation time-series data for the last 24 hours."""
+        import time as _time
+        hours = int(request.args.get("hours", 24))
+        now = _time.time()
+        data = []
+        for h in range(hours):
+            ts = now - (h * 3600)
+            t = _time.gmtime(ts)
+            hour_key = f"{t.tm_year:04d}-{t.tm_mon:02d}-{t.tm_mday:02d}T{t.tm_hour:02d}"
+            bucket = _db_get("analytics", hour_key, {})
+            if not isinstance(bucket, dict):
+                bucket = {}
+            data.append({
+                "hour": hour_key,
+                "violations": bucket.get("violations", 0),
+                "modules": bucket.get("modules", {}),
+                "actions": bucket.get("actions", {}),
+                "player_count": len(bucket.get("players", [])),
+            })
+        data.reverse()
+        return jsonify(data)
+
+    @app.route("/api/analytics/top-players")
+    @login_required
+    def api_analytics_top_players():
+        """Return top flagged players by violation count."""
+        from collections import defaultdict as _dd
+        all_violations = _db_get_all("violations")
+        counts = _dd(lambda: {"count": 0, "name": "?", "last_module": "?"})
+        for key, data in all_violations:
+            if not isinstance(data, dict):
+                continue
+            uid = data.get("uuid", key)
+            counts[uid]["count"] += 1
+            counts[uid]["name"] = data.get("name", "?")
+            counts[uid]["last_module"] = data.get("module", "?")
+        top = sorted(counts.items(), key=lambda x: x[1]["count"], reverse=True)[:10]
+        return jsonify([{"uuid": u, **d} for u, d in top])
+
+    @app.route("/api/analytics/modules")
+    @login_required
+    def api_analytics_modules():
+        """Return per-module violation counts across all time."""
+        import time as _time
+        now = _time.time()
+        module_totals = {}
+        for h in range(168):  # last 7 days
+            ts = now - (h * 3600)
+            t = _time.gmtime(ts)
+            hour_key = f"{t.tm_year:04d}-{t.tm_mon:02d}-{t.tm_mday:02d}T{t.tm_hour:02d}"
+            bucket = _db_get("analytics", hour_key, {})
+            if isinstance(bucket, dict):
+                for mod, cnt in bucket.get("modules", {}).items():
+                    module_totals[mod] = module_totals.get(mod, 0) + cnt
+        return jsonify(module_totals)
+
+    # ── Reports (Tier 3) ──
+
+    @app.route("/reports")
+    @login_required
+    def reports_page():
+        all_reports = _db_get_all("reports")
+        reports = []
+        for item in all_reports:
+            data = item.get("value", item) if isinstance(item, dict) else item
+            if isinstance(data, dict):
+                reports.append(data)
+        reports.sort(key=lambda r: (
+            0 if r.get("status") == "priority" else (1 if r.get("status") == "open" else 2),
+            r.get("created_at", 0),
+        ))
+        return render_template_string(REPORTS_HTML, reports=reports)
+
+    @app.route("/reports/claim", methods=["POST"])
+    @login_required
+    def claim_report():
+        report_id = request.form.get("report_id", "").strip()
+        if report_id:
+            report = _db_get("reports", report_id)
+            if isinstance(report, dict) and report.get("status") in ("open", "priority"):
+                report["status"] = "claimed"
+                report["claimed_by"] = "WebUI"
+                _db_set("reports", report_id, report)
+        return redirect(url_for("reports_page"))
+
+    @app.route("/reports/resolve", methods=["POST"])
+    @login_required
+    def resolve_report():
+        import time as _time
+        report_id = request.form.get("report_id", "").strip()
+        resolution = request.form.get("resolution", "Resolved via Web UI")
+        if report_id:
+            report = _db_get("reports", report_id)
+            if isinstance(report, dict):
+                report["status"] = "resolved"
+                report["resolved_at"] = _time.time()
+                report["resolution"] = resolution
+                _db_set("reports", report_id, report)
+        return redirect(url_for("reports_page"))
+
 
 # ══════════════════════════════════════════════════════════
 #  HTML TEMPLATES
@@ -805,6 +919,9 @@ SIDEBAR_HTML = """
     <a class="nav-item" href="/permissions"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg> Permissions</a>
     <a class="nav-item" href="/antidupe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="9" y1="12" x2="15" y2="12"/></svg> Anti-Dupe</a>
     <a class="nav-item" href="/logs"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Logs</a>
+    <div class="nav-section">Intelligence</div>
+    <a class="nav-item" href="/analytics"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Analytics</a>
+    <a class="nav-item" href="/reports"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Reports</a>
     <div class="nav-section">Settings</div>
     <a class="nav-item" href="/config"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Config</a>
     <a class="nav-item" href="/lists"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Allow/Whitelist</a>
@@ -1670,6 +1787,322 @@ function filterEvents() {
     const q = document.getElementById('searchFilter').value.toLowerCase();
     document.querySelectorAll('.event-item').forEach(el => {
         el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+}
+</script>
+</body></html>"""
+
+
+# ── Analytics Dashboard (Tier 3) ──
+
+ANALYTICS_HTML = """<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Paradox — Analytics</title>
+""" + BASE_CSS + """
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+.chart-container {
+    background: rgba(15,21,32,0.8);
+    border: 1px solid rgba(34,197,94,0.1);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+.chart-container canvas { width: 100% !important; max-height: 300px; }
+.chart-title {
+    font-size: 16px; font-weight: 600; color: #f3f4f6;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+}
+.stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card {
+    background: rgba(15,21,32,0.8);
+    border: 1px solid rgba(34,197,94,0.1);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+}
+.stat-number { font-size: 32px; font-weight: 700; color: #22c55e; }
+.stat-label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+.module-bars { display: grid; gap: 8px; }
+.module-bar {
+    display: flex; align-items: center; gap: 12px;
+}
+.module-bar-name { width: 120px; font-size: 13px; color: #9ca3af; text-align: right; }
+.module-bar-fill {
+    flex: 1; height: 24px; background: rgba(34,197,94,0.1); border-radius: 6px; overflow: hidden;
+    position: relative;
+}
+.module-bar-fill .bar {
+    height: 100%; background: linear-gradient(90deg, #22c55e, #10b981);
+    border-radius: 6px; transition: width 0.5s;
+    display: flex; align-items: center; padding-left: 8px;
+    font-size: 11px; font-weight: 600; color: #fff;
+}
+</style>
+</head><body>
+<div class="layout">
+""" + SIDEBAR_HTML + """
+<div class="main">
+    <h2>📊 Analytics Dashboard</h2>
+
+    <div id="stats-row" class="stat-row">
+        <div class="stat-card"><div class="stat-number" id="total-violations">—</div><div class="stat-label">Violations (24h)</div></div>
+        <div class="stat-card"><div class="stat-number info" id="unique-players">—</div><div class="stat-label">Unique Players</div></div>
+        <div class="stat-card"><div class="stat-number warn" id="total-actions">—</div><div class="stat-label">Actions Taken</div></div>
+        <div class="stat-card"><div class="stat-number" id="top-module">—</div><div class="stat-label">Top Module</div></div>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Violations Over Time (24 Hours)
+        </div>
+        <canvas id="violationChart"></canvas>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <div class="chart-container">
+            <div class="chart-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                Violations by Module
+            </div>
+            <div id="module-bars" class="module-bars"></div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                Enforcement Actions
+            </div>
+            <canvas id="actionsChart"></canvas>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+const chartColors = {
+    green: 'rgba(34, 197, 94, 0.8)',
+    greenBg: 'rgba(34, 197, 94, 0.1)',
+    blue: 'rgba(59, 130, 246, 0.8)',
+    yellow: 'rgba(245, 158, 11, 0.8)',
+    red: 'rgba(239, 68, 68, 0.8)',
+    purple: 'rgba(168, 85, 247, 0.8)',
+};
+
+async function loadAnalytics() {
+    try {
+        const resp = await fetch('/api/analytics/violations?hours=24');
+        const data = await resp.json();
+
+        // Stats
+        let totalViols = 0, allPlayers = 0, allActions = 0, moduleCounts = {};
+        data.forEach(h => {
+            totalViols += h.violations;
+            allPlayers += h.player_count;
+            Object.entries(h.modules || {}).forEach(([m, c]) => {
+                moduleCounts[m] = (moduleCounts[m] || 0) + c;
+            });
+            Object.values(h.actions || {}).forEach(c => allActions += c);
+        });
+
+        document.getElementById('total-violations').textContent = totalViols;
+        document.getElementById('unique-players').textContent = allPlayers;
+        document.getElementById('total-actions').textContent = allActions;
+
+        const topMod = Object.entries(moduleCounts).sort((a,b) => b[1]-a[1])[0];
+        document.getElementById('top-module').textContent = topMod ? topMod[0] : 'None';
+
+        // Line chart
+        const labels = data.map(h => h.hour.split('T')[1] + ':00');
+        const values = data.map(h => h.violations);
+        new Chart(document.getElementById('violationChart'), {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Violations',
+                    data: values,
+                    borderColor: chartColors.green,
+                    backgroundColor: chartColors.greenBg,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', maxTicksLimit: 12 } },
+                    y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280' }, beginAtZero: true }
+                }
+            }
+        });
+
+        // Module bars
+        const barContainer = document.getElementById('module-bars');
+        const maxCount = Math.max(...Object.values(moduleCounts), 1);
+        const sorted = Object.entries(moduleCounts).sort((a,b) => b[1]-a[1]).slice(0, 10);
+        sorted.forEach(([mod, count]) => {
+            const pct = (count / maxCount * 100).toFixed(0);
+            barContainer.innerHTML += `
+                <div class="module-bar">
+                    <div class="module-bar-name">${mod}</div>
+                    <div class="module-bar-fill"><div class="bar" style="width:${pct}%">${count}</div></div>
+                </div>`;
+        });
+        if (sorted.length === 0) {
+            barContainer.innerHTML = '<div style="color:#6b7280;text-align:center;padding:20px;">No violation data yet</div>';
+        }
+
+        // Actions doughnut chart
+        const actionLabels = Object.keys(data.reduce((acc, h) => { Object.keys(h.actions || {}).forEach(a => acc[a]=1); return acc; }, {}));
+        const actionValues = actionLabels.map(a => data.reduce((s, h) => s + (h.actions?.[a] || 0), 0));
+        const actionColors = [chartColors.yellow, chartColors.red, chartColors.blue, chartColors.green, chartColors.purple];
+        if (actionLabels.length > 0) {
+            new Chart(document.getElementById('actionsChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: actionLabels,
+                    datasets: [{ data: actionValues, backgroundColor: actionColors.slice(0, actionLabels.length), borderWidth: 0 }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', padding: 12 } } }
+                }
+            });
+        } else {
+            document.getElementById('actionsChart').parentElement.innerHTML += '<div style="color:#6b7280;text-align:center;padding:20px;">No action data yet</div>';
+        }
+
+    } catch (err) {
+        console.error('Analytics load error:', err);
+    }
+}
+
+loadAnalytics();
+</script>
+</body></html>"""
+
+
+# ── Reports Queue (Tier 3) ──
+
+REPORTS_HTML = """<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Paradox — Reports</title>
+""" + BASE_CSS + """
+<style>
+.report-card {
+    background: rgba(15,21,32,0.8);
+    border: 1px solid rgba(34,197,94,0.1);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+}
+.report-card:hover { border-color: rgba(34,197,94,0.3); }
+.report-card.priority { border-left: 3px solid #f59e0b; }
+.report-card.claimed { border-left: 3px solid #3b82f6; }
+.report-card.resolved { border-left: 3px solid #22c55e; opacity: 0.6; }
+.report-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px;
+}
+.report-target { font-size: 16px; font-weight: 600; color: #f3f4f6; }
+.report-meta { font-size: 12px; color: #6b7280; }
+.report-reason { color: #9ca3af; font-size: 14px; margin-bottom: 12px; }
+.report-footer { display: flex; gap: 8px; align-items: center; }
+.report-actions { display: flex; gap: 8px; margin-left: auto; }
+.filter-bar {
+    display: flex; gap: 12px; margin-bottom: 24px; align-items: center;
+}
+.filter-btn {
+    padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    border: 1px solid rgba(255,255,255,0.1); background: transparent;
+    color: #9ca3af; cursor: pointer; transition: all 0.2s;
+}
+.filter-btn.active, .filter-btn:hover {
+    background: rgba(34,197,94,0.1); border-color: #22c55e; color: #22c55e;
+}
+.empty-state {
+    text-align: center; padding: 60px 20px; color: #6b7280;
+}
+.empty-state svg { margin-bottom: 16px; opacity: 0.5; }
+</style>
+</head><body>
+<div class="layout">
+""" + SIDEBAR_HTML + """
+<div class="main">
+    <h2>📋 Player Reports</h2>
+
+    <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterReports('all')">All</button>
+        <button class="filter-btn" onclick="filterReports('priority')">⚠ Priority</button>
+        <button class="filter-btn" onclick="filterReports('open')">Open</button>
+        <button class="filter-btn" onclick="filterReports('claimed')">Claimed</button>
+        <button class="filter-btn" onclick="filterReports('resolved')">Resolved</button>
+        <span style="margin-left:auto;color:#6b7280;font-size:13px;">{{ reports|length }} total reports</span>
+    </div>
+
+    {% if reports %}
+    {% for r in reports %}
+    <div class="report-card {{ r.status }}" data-status="{{ r.status }}">
+        <div class="report-header">
+            <div>
+                <span class="report-target">{{ r.target }}</span>
+                <span class="badge {% if r.status == 'priority' %}badge-warn{% elif r.status == 'open' %}badge-on{% elif r.status == 'claimed' %}badge-off{% else %}badge-on{% endif %}" style="margin-left:8px;">{{ r.status|upper }}</span>
+            </div>
+            <div class="report-meta">
+                ID: {{ r.id or r.get('id', '?') }} &bull; Reported by {{ r.reporter }}
+            </div>
+        </div>
+        <div class="report-reason">{{ r.reason }}</div>
+        <div class="report-footer">
+            <span class="report-meta">
+                {% if r.claimed_by %}Claimed by: {{ r.claimed_by }}{% endif %}
+                {% if r.resolution %} &bull; Resolution: {{ r.resolution }}{% endif %}
+            </span>
+            <div class="report-actions">
+                {% if r.status in ['open', 'priority'] %}
+                <form method="POST" action="/reports/claim" style="display:inline;">
+                    <input type="hidden" name="report_id" value="{{ r.id or r.get('id', '') }}">
+                    <button type="submit" class="btn btn-primary btn-sm">Claim</button>
+                </form>
+                {% endif %}
+                {% if r.status != 'resolved' %}
+                <form method="POST" action="/reports/resolve" style="display:inline;">
+                    <input type="hidden" name="report_id" value="{{ r.id or r.get('id', '') }}">
+                    <input type="hidden" name="resolution" value="Resolved via Web UI">
+                    <button type="submit" class="btn btn-sm" style="background:rgba(34,197,94,0.2);color:#22c55e;">Resolve</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <div style="font-size:16px;font-weight:600;margin-bottom:4px;">No Reports Yet</div>
+        <div>Player reports submitted via /ac-report will appear here.</div>
+    </div>
+    {% endif %}
+</div>
+</div>
+<script>
+function filterReports(status) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    document.querySelectorAll('.report-card').forEach(card => {
+        if (status === 'all' || card.dataset.status === status) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
     });
 }
 </script>

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "endstone-paradox"
-version = "1.6.2"
+version = "1.7.0"
 description = "Paradox AntiCheat - A comprehensive anti-cheat system for Endstone Bedrock servers"
 requires-python = ">=3.9"
 dependencies = [
@@ -21,7 +21,7 @@ packages = ["src/endstone_paradox"]
 
 [tool.endstone]
 name = "ParadoxAC"
-version = "1.6.2"
+version = "1.7.0"
 api = "0.11"
 description = "Paradox AntiCheat - Comprehensive anti-cheat and moderation system"
 authors = ["Paradox Team"]

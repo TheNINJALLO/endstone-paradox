@@ -18,6 +18,10 @@ class ParadoxDatabase:
         "ranks", "player_data", "spoof_log", "tpa_requests",
         "pvp_data", "frozen_players", "vanished_players",
         "violations",
+        # Tier 3
+        "reports", "fingerprints", "honeypots", "analytics",
+        # Global Intelligence Network
+        "global_intelligence",
     ]
 
     DB_VERSION = 2

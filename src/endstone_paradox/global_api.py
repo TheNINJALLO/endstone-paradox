@@ -53,6 +53,13 @@ class GlobalAPIClient:
         self._register_lock = Lock()
         self._registered = False
 
+        # Global Intelligence Network buffers
+        self._fingerprint_buffer = []  # Queued fingerprint hashes for batch push
+        self._telemetry_buffer = []    # Queued behavioral telemetry for batch push
+        self._share_fingerprints = False
+        self._share_telemetry = False
+        self._auto_tune = False
+
     # ── Lifecycle ────────────────────────────────────────────
 
     def start(self):
@@ -72,6 +79,17 @@ class GlobalAPIClient:
         if not self._server_name:
             self._server_name = socket.gethostname()
 
+        # Intelligence network settings
+        self._share_fingerprints = self.config.get(
+            "global_database", "share_fingerprints", default=True
+        )
+        self._share_telemetry = self.config.get(
+            "global_database", "share_telemetry", default=True
+        )
+        self._auto_tune = self.config.get(
+            "global_database", "auto_tune", default=False
+        )
+
         self._running = True
 
         # Auto-register if no API key (runs in background, retries on sync)
@@ -85,9 +103,13 @@ class GlobalAPIClient:
         """Stop the sync loop and flush remaining reports."""
         self._running = False
         self._sync_task = None
-        # Flush any remaining reports
+        # Flush any remaining data
         if self._report_buffer:
             Thread(target=self._flush_reports, daemon=True).start()
+        if self._fingerprint_buffer:
+            Thread(target=self._flush_fingerprints, daemon=True).start()
+        if self._telemetry_buffer:
+            Thread(target=self._flush_telemetry, daemon=True).start()
 
     # ── Auto-Registration ────────────────────────────────────
 
@@ -235,6 +257,13 @@ class GlobalAPIClient:
             # Flush any buffered reports
             self._flush_reports()
 
+            # Intelligence Network: push fingerprints and telemetry, pull insights
+            if self._share_fingerprints:
+                self._flush_fingerprints()
+            if self._share_telemetry:
+                self._flush_telemetry()
+            self._pull_intelligence()
+
         except urllib.error.HTTPError as e:
             if e.code == 401:
                 self.logger.warning(
@@ -361,6 +390,197 @@ class GlobalAPIClient:
                 pass
 
         Thread(target=_push, daemon=True).start()
+
+    # ── Intelligence Network: Fingerprint Sharing ────────────
+
+    def push_fingerprint(self, fingerprint_hash: str, linked_hashes: list = None,
+                         violation_count: int = 0, is_banned: bool = False):
+        """Buffer a fingerprint hash for batch pushing to the network.
+
+        Args:
+            fingerprint_hash: SHA-256 truncated hash (16 chars)
+            linked_hashes: Other fingerprint hashes linked to this player
+            violation_count: Total violation count for this fingerprint
+            is_banned: Whether this fingerprint is locally banned
+        """
+        if not self._share_fingerprints:
+            return
+        self._fingerprint_buffer.append({
+            "fingerprint": fingerprint_hash,
+            "linked": linked_hashes or [],
+            "violations": violation_count,
+            "banned": is_banned,
+        })
+        # Auto-flush if buffer grows large
+        if len(self._fingerprint_buffer) >= 50:
+            Thread(target=self._flush_fingerprints, daemon=True).start()
+
+    def _flush_fingerprints(self):
+        """Push buffered fingerprint hashes to the Global API."""
+        if not self._fingerprint_buffer or not self._api_key or not self._api_url:
+            return
+
+        batch = self._fingerprint_buffer[:]
+        self._fingerprint_buffer.clear()
+
+        try:
+            body = json.dumps({"fingerprints": batch}).encode("utf-8")
+            req = urllib.request.Request(
+                f"{self._api_url}/api/fingerprints/batch",
+                data=body,
+                method="POST",
+                headers={
+                    "Content-Type": "application/json",
+                    "X-API-Key": self._api_key,
+                },
+            )
+            urllib.request.urlopen(req, timeout=15)
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                pass  # API doesn't support fingerprints yet — degrade gracefully
+            else:
+                self._fingerprint_buffer.extend(batch)  # Retry later
+        except Exception:
+            self._fingerprint_buffer.extend(batch)
+
+    # ── Intelligence Network: Telemetry Sharing ──────────────
+
+    def push_telemetry_event(self, module: str, metric: str, value: float,
+                             sample_size: int = 1):
+        """Buffer a telemetry data point for batch pushing.
+
+        Args:
+            module: Module name (e.g., 'fly', 'botdetection')
+            metric: Metric name (e.g., 'violation_rate', 'avg_entropy')
+            value: Metric value
+            sample_size: Number of samples this value represents
+        """
+        if not self._share_telemetry:
+            return
+        self._telemetry_buffer.append({
+            "module": module,
+            "metric": metric,
+            "value": value,
+            "samples": sample_size,
+        })
+
+    def _flush_telemetry(self):
+        """Push buffered telemetry to the Global API."""
+        if not self._telemetry_buffer or not self._api_key or not self._api_url:
+            return
+
+        batch = self._telemetry_buffer[:]
+        self._telemetry_buffer.clear()
+
+        try:
+            body = json.dumps({"telemetry": batch}).encode("utf-8")
+            req = urllib.request.Request(
+                f"{self._api_url}/api/telemetry",
+                data=body,
+                method="POST",
+                headers={
+                    "Content-Type": "application/json",
+                    "X-API-Key": self._api_key,
+                },
+            )
+            urllib.request.urlopen(req, timeout=15)
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                pass  # API doesn't support telemetry yet
+            else:
+                self._telemetry_buffer.extend(batch)
+        except Exception:
+            self._telemetry_buffer.extend(batch)
+
+    # ── Intelligence Network: Pull Crowd-Sourced Insights ────
+
+    def _pull_intelligence(self):
+        """Pull crowd-sourced intelligence from the Global API.
+
+        Returns flagged fingerprints, recommended thresholds,
+        and global reputation scores. Caches locally in DB.
+        """
+        if not self._api_key or not self._api_url:
+            return
+
+        try:
+            req = urllib.request.Request(
+                f"{self._api_url}/api/intelligence",
+                headers={"X-API-Key": self._api_key},
+            )
+            resp = urllib.request.urlopen(req, timeout=15)
+            data = json.loads(resp.read().decode("utf-8"))
+
+            # Cache flagged fingerprints
+            flagged = data.get("flagged_fingerprints", [])
+            if flagged:
+                self.db.set("global_intelligence", "flagged_fingerprints", flagged)
+
+            # Cache recommended thresholds
+            thresholds = data.get("recommended_thresholds", {})
+            if thresholds:
+                self.db.set("global_intelligence", "recommended_thresholds", thresholds)
+
+                # Auto-apply if configured
+                if self._auto_tune and isinstance(thresholds, dict):
+                    self._apply_thresholds(thresholds)
+
+            # Cache reputation scores
+            reputation = data.get("reputation", {})
+            if reputation:
+                self.db.set("global_intelligence", "reputation", reputation)
+
+            count = len(flagged)
+            if count > 0:
+                self.logger.info(
+                    f"§2[§7Paradox§2]§a Intelligence: Synced {count} flagged fingerprints"
+                )
+
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                pass  # API doesn't support intelligence yet
+        except (urllib.error.URLError, ConnectionError, OSError):
+            pass  # Network issue — silent retry next sync
+        except Exception:
+            pass
+
+    def _apply_thresholds(self, thresholds: dict):
+        """Apply crowd-sourced threshold recommendations to modules."""
+        try:
+            for module_name, suggested_sensitivity in thresholds.items():
+                if not isinstance(suggested_sensitivity, (int, float)):
+                    continue
+                val = max(1, min(10, int(suggested_sensitivity)))
+                module = self.plugin._modules.get(module_name)
+                if module and hasattr(module, 'sensitivity'):
+                    old = module.sensitivity
+                    if old != val:
+                        module.sensitivity = val
+                        self.logger.info(
+                            f"§2[§7Paradox§2]§a Auto-tune: {module_name} "
+                            f"sensitivity {old} → {val}"
+                        )
+        except Exception:
+            pass
+
+    def get_flagged_fingerprints(self) -> list:
+        """Return cached list of globally flagged fingerprint hashes."""
+        data = self.db.get("global_intelligence", "flagged_fingerprints", [])
+        return data if isinstance(data, list) else []
+
+    def get_global_reputation(self, fingerprint_hash: str) -> int:
+        """Return the global reputation score (0-100) for a fingerprint.
+        100 = clean, 0 = confirmed cheater.
+        """
+        rep = self.db.get("global_intelligence", "reputation", {})
+        if isinstance(rep, dict):
+            return rep.get(fingerprint_hash, 100)
+        return 100
+
+    def get_recommended_thresholds(self) -> dict:
+        """Return cached crowd-sourced threshold recommendations."""
+        data = self.db.get("global_intelligence", "recommended_thresholds", {})
+        return data if isinstance(data, dict) else {}
 
     # ── Helpers ──────────────────────────────────────────────
 
