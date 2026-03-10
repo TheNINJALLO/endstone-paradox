@@ -378,6 +378,10 @@ def _register_routes(app):
             max_ench = request.form.get("max_enchant_level")
             if max_ench is not None and max_ench.isdigit():
                 _db_set("config", "max_enchant_level", max(1, int(max_ench)))
+            # Handle enforcement mode
+            enf_mode = request.form.get("enforcement_mode")
+            if enf_mode in ("logonly", "soft", "hard"):
+                _db_set("config", "enforcement_mode", enf_mode)
             return redirect(url_for("config_page"))
         all_config = _db_get_all("config")
         paradox_config = app.config["PARADOX_CONFIG"].raw
@@ -588,6 +592,39 @@ def _register_routes(app):
                 _db_set("reports", report_id, report)
         return redirect(url_for("reports_page"))
 
+    @app.route("/reports/delete", methods=["POST"])
+    @login_required
+    def delete_report():
+        report_id = request.form.get("report_id", "").strip()
+        if report_id:
+            try:
+                _db_delete("reports", report_id)
+            except Exception:
+                pass
+        return redirect(url_for("reports_page"))
+
+    @app.route("/reports/clear-all", methods=["POST"])
+    @login_required
+    def clear_all_reports():
+        db = _get_db()
+        try:
+            db.execute("DELETE FROM [reports]")
+            db.commit()
+        except Exception:
+            pass
+        return redirect(url_for("reports_page"))
+
+    @app.route("/analytics/clear", methods=["POST"])
+    @login_required
+    def clear_analytics():
+        db = _get_db()
+        try:
+            db.execute("DELETE FROM [analytics]")
+            db.commit()
+        except Exception:
+            pass
+        return redirect(url_for("analytics"))
+
     # ── Violations (Intelligence) ──
 
     @app.route("/violations")
@@ -677,6 +714,36 @@ def _register_routes(app):
             total=len(entries),
         )
 
+    @app.route("/violations/<uuid_str>/clear", methods=["POST"])
+    @login_required
+    def violations_clear(uuid_str):
+        """Clear all violations and baselines for a player."""
+        try:
+            _db_delete("violations", uuid_str)
+        except Exception:
+            pass
+        try:
+            _db_delete("baselines", uuid_str)
+        except Exception:
+            pass
+        return redirect(url_for("violations_page"))
+
+    @app.route("/violations/clear-all", methods=["POST"])
+    @login_required
+    def violations_clear_all():
+        """Clear all violations and baselines for all players."""
+        db = _get_db()
+        try:
+            db.execute("DELETE FROM [violations]")
+            db.commit()
+        except Exception:
+            pass
+        try:
+            db.execute("DELETE FROM [baselines]")
+            db.commit()
+        except Exception:
+            pass
+        return redirect(url_for("violations_page"))
 
 # ══════════════════════════════════════════════════════════
 #  HTML TEMPLATES
@@ -1510,6 +1577,22 @@ CONFIG_HTML = """<!DOCTYPE html>
         </form>
     </div>
 
+    <h3 style="margin:24px 0 12px;font-size:16px;color:#f3f4f6;">🛡️ Enforcement Mode</h3>
+    <div class="card" style="margin-bottom:24px;">
+        <form method="POST" action="/config" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div class="form-group" style="margin-bottom:0;">
+                <label style="margin-bottom:4px;">Mode</label>
+                <select name="enforcement_mode" style="width:200px;padding:8px 12px;background:#1a1f2e;border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#e0e0e0;font-size:14px;">
+                    {% set current_mode = '' %}{% for c in db_config %}{% if c.key == 'enforcement_mode' %}{% set current_mode = c.value %}{% endif %}{% endfor %}
+                    <option value="logonly" {{ 'selected' if current_mode == 'logonly' else '' }}>📋 Log Only</option>
+                    <option value="soft" {{ 'selected' if current_mode == 'soft' or not current_mode else '' }}>⚖️ Soft (Default)</option>
+                    <option value="hard" {{ 'selected' if current_mode == 'hard' else '' }}>🔨 Hard</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-sm btn-primary" style="margin-top:18px;">Save</button>
+            <span style="font-size:12px;color:#6b7280;margin-top:18px;">Log Only = log violations only. Soft = cancel/setback/kick. Hard = faster escalation.</span>
+        </form>
+    </div>
     <h3 style="margin:24px 0 12px;font-size:16px;color:#f3f4f6;">📁 File Config (config.yml)</h3>
     <div class="card">
         <pre style="font-size:12px;color:#9ca3af;white-space:pre-wrap;font-family:monospace;">{{ file_config }}</pre>
@@ -1951,7 +2034,11 @@ ANALYTICS_HTML = """<!DOCTYPE html>
 <div class="layout">
 """ + SIDEBAR_HTML + """
 <div class="main">
-    <h2>📊 Analytics Dashboard</h2>
+    <h2 style="display:flex;align-items:center;gap:16px;">📊 Analytics Dashboard
+        <form method="POST" action="/analytics/clear" style="margin-left:auto;" onsubmit="return confirm('Clear ALL analytics data? This cannot be undone.');">
+            <button type="submit" class="btn btn-sm btn-danger">🗑️ Clear Analytics</button>
+        </form>
+    </h2>
 
     <div id="stats-row" class="stat-row">
         <div class="stat-card"><div class="stat-number" id="total-violations">—</div><div class="stat-label">Violations (24h)</div></div>
@@ -2143,7 +2230,11 @@ REPORTS_HTML = """<!DOCTYPE html>
 <div class="layout">
 """ + SIDEBAR_HTML + """
 <div class="main">
-    <h2>📋 Player Reports</h2>
+    <h2 style="display:flex;align-items:center;gap:16px;">📋 Player Reports
+        <form method="POST" action="/reports/clear-all" style="margin-left:auto;" onsubmit="return confirm('Delete ALL reports? This cannot be undone.');">
+            <button type="submit" class="btn btn-sm btn-danger">🗑️ Clear All</button>
+        </form>
+    </h2>
 
     <div class="filter-bar">
         <button class="filter-btn active" onclick="filterReports('all')">All</button>
@@ -2186,6 +2277,10 @@ REPORTS_HTML = """<!DOCTYPE html>
                     <button type="submit" class="btn btn-sm" style="background:rgba(34,197,94,0.2);color:#22c55e;">Resolve</button>
                 </form>
                 {% endif %}
+                <form method="POST" action="/reports/delete" style="display:inline;" onsubmit="return confirm('Delete this report?');">
+                    <input type="hidden" name="report_id" value="{{ r.id or r.get('id', '') }}">
+                    <button type="submit" class="btn btn-sm btn-danger">🗑️</button>
+                </form>
             </div>
         </div>
     </div>
@@ -2265,7 +2360,11 @@ VIOLATIONS_HTML = """<!DOCTYPE html>
 <div class="layout">
 """ + SIDEBAR_HTML + """
 <div class="main">
-<h2>⚠️ Violations</h2>
+<h2 style="display:flex;align-items:center;gap:16px;">⚠️ Violations
+    <form method="POST" action="/violations/clear-all" style="margin-left:auto;" onsubmit="return confirm('Clear ALL violations and baselines for ALL players?');">
+        <button type="submit" class="btn btn-sm btn-danger">🗑️ Clear All</button>
+    </form>
+</h2>
 <p style="color:#9ca3af;margin-bottom:20px;font-size:14px;">All players flagged by detection modules. Click a player to view full violation history.</p>
 
 <div class="search-box">
@@ -2421,9 +2520,14 @@ VIOLATIONS_DETAIL_HTML = """<!DOCTYPE html>
         <h3>{{ player_name }}</h3>
         <div class="uuid">{{ player_uuid }}</div>
     </div>
-    <div style="text-align:right;">
-        <div style="font-size:28px;font-weight:700;color:#ef4444;">{{ total }}</div>
-        <div style="font-size:12px;color:#6b7280;text-transform:uppercase;">Total Violations</div>
+    <div style="text-align:right;display:flex;align-items:center;gap:16px;">
+        <div>
+            <div style="font-size:28px;font-weight:700;color:#ef4444;">{{ total }}</div>
+            <div style="font-size:12px;color:#6b7280;text-transform:uppercase;">Total Violations</div>
+        </div>
+        <form method="POST" action="/violations/{{ player_uuid }}/clear" onsubmit="return confirm('Clear all violations and baselines for {{ player_name }}?');">
+            <button type="submit" class="btn btn-sm btn-danger">🗑️ Clear</button>
+        </form>
     </div>
 </div>
 

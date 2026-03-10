@@ -87,13 +87,23 @@ class StepHackModule(BaseModule):
                 if y_delta < 0.55:
                     continue
 
+                # Record baseline to learn normal step-up heights
+                bl = self.record_baseline(player, "stephack.y_delta", y_delta)
+
+                # During warmup, just learn — don't flag
+                if bl and bl.warming_up:
+                    continue
+
                 data["step_flags"] += 1
                 if data["step_flags"] >= self.FLAGS_REQUIRED:
-                    self.emit(player, 3, {
-                        "type": "step_hack",
-                        "y_delta": f"{y_delta:.2f}",
-                        "flags": data["step_flags"],
-                    }, action_hint="setback")
+                    # Only emit if baseline confirms abnormal step
+                    if bl and bl.is_deviation:
+                        self.emit(player, 3, {
+                            "type": "step_hack",
+                            "y_delta": f"{y_delta:.2f}",
+                            "flags": data["step_flags"],
+                            "z_score": bl.z_score,
+                        }, action_hint="setback")
                     data["step_flags"] = 0
 
             except Exception:

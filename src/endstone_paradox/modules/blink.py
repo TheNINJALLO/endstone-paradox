@@ -75,17 +75,28 @@ class BlinkModule(BaseModule):
                     data["blink_flags"] = max(0, data["blink_flags"] - 1)
                     continue
 
+                # Always record baseline to learn normal movement distances
+                bl = self.record_baseline(player, "blink.h_dist", h_dist)
+
                 if h_dist > self.BLINK_DISTANCE:
                     # Skip if player is gliding (elytra can cover distance fast)
                     if player.is_gliding:
                         continue
 
+                    # During warmup, just learn — don't flag
+                    if bl and bl.warming_up:
+                        continue
+
                     data["blink_flags"] += 1
                     if data["blink_flags"] >= self.FLAGS_REQUIRED:
-                        self.emit(player, 4, {
-                            "type": "blink",
-                            "distance": f"{h_dist:.1f}",
-                        }, action_hint="setback")
+                        # Only emit if baseline confirms this is abnormal
+                        if bl and bl.is_deviation:
+                            self.emit(player, 4, {
+                                "type": "blink",
+                                "distance": f"{h_dist:.1f}",
+                                "baseline_avg": f"{bl.avg:.1f}",
+                                "z_score": bl.z_score,
+                            }, action_hint="setback")
                         data["blink_flags"] = 0
                 else:
                     data["blink_flags"] = max(0, data["blink_flags"] - 1)

@@ -220,13 +220,25 @@ class NoClipModule(BaseModule):
                     except Exception:
                         pass
 
+                # Record baseline (1.0 = phase hit, 0.0 = clear) to learn
+                bl = self.record_baseline(
+                    player, "noclip.phase_rate", 1.0 if phase_detected else 0.0
+                )
+
                 if phase_detected:
+                    # During warmup, just learn — don't flag
+                    if bl and bl.warming_up:
+                        continue
+
                     data["phase_flags"] += 1
                     if data["phase_flags"] >= flags_needed:
-                        self.emit(player, 4, {
-                            "type": "noclip",
-                            "distance": f"{dist:.1f}",
-                        }, action_hint="setback")
+                        # Only emit if baseline confirms abnormal phasing
+                        if bl and bl.is_deviation:
+                            self.emit(player, 4, {
+                                "type": "noclip",
+                                "distance": f"{dist:.1f}",
+                                "z_score": bl.z_score,
+                            }, action_hint="setback")
                         data["phase_flags"] = 0
                 else:
                     data["phase_flags"] = max(0, data["phase_flags"] - 1)

@@ -47,7 +47,7 @@ class ViolationEngine:
     rate-limited staff alerts, and write-behind evidence persistence."""
 
     # --- tunables ---
-    DECAY_WINDOW = 300.0          # 5 min rolling window
+    DECAY_WINDOW = 600.0          # 10 min rolling window
     ALERT_COOLDOWN = 10.0         # per-player-per-module staff alert cooldown (s)
     FLUSH_INTERVAL = 30.0         # write-behind buffer flush interval (s)
     MAX_BUFFER_PER_PLAYER = 50    # max violations kept in memory per player
@@ -55,16 +55,16 @@ class ViolationEngine:
     # Escalation thresholds (cumulative score within decay window)
     SOFT_LADDER = {
         0:  ACTION_WARN,
-        5:  ACTION_CANCEL,
-        15: ACTION_SETBACK,
-        40: ACTION_KICK,
-        80: ACTION_BAN,
+        10: ACTION_CANCEL,
+        30: ACTION_SETBACK,
+        60: ACTION_KICK,
+        120: ACTION_BAN,
     }
     HARD_LADDER = {
         0:  ACTION_CANCEL,
-        5:  ACTION_SETBACK,
-        15: ACTION_KICK,
-        30: ACTION_BAN,
+        10: ACTION_SETBACK,
+        25: ACTION_KICK,
+        50: ACTION_BAN,
     }
 
     def __init__(self, plugin):
@@ -230,6 +230,47 @@ class ViolationEngine:
         """Called periodically — flushes if interval elapsed."""
         if time.time() - self._last_flush >= self.FLUSH_INTERVAL:
             self.flush()
+
+    def clear_player(self, uuid_str: str):
+        """Clear all violations and baselines for a player."""
+        self._buffers.pop(uuid_str, None)
+        try:
+            self.db.delete("violations", uuid_str)
+        except Exception:
+            pass
+        try:
+            self.db.delete("baselines", uuid_str)
+        except Exception:
+            pass
+        # Reset baseline in memory
+        baseline = getattr(self.plugin, 'player_baseline', None)
+        if baseline:
+            baseline._profiles.pop(uuid_str, None)
+            baseline._dirty.discard(uuid_str)
+
+    def clear_all(self):
+        """Clear all violations and baselines for all players."""
+        self._buffers.clear()
+        try:
+            for item in self.db.get_all("violations"):
+                if isinstance(item, (list, tuple)) and len(item) == 2:
+                    self.db.delete("violations", item[0])
+                elif isinstance(item, dict) and "key" in item:
+                    self.db.delete("violations", item["key"])
+        except Exception:
+            pass
+        try:
+            for item in self.db.get_all("baselines"):
+                if isinstance(item, (list, tuple)) and len(item) == 2:
+                    self.db.delete("baselines", item[0])
+                elif isinstance(item, dict) and "key" in item:
+                    self.db.delete("baselines", item["key"])
+        except Exception:
+            pass
+        baseline = getattr(self.plugin, 'player_baseline', None)
+        if baseline:
+            baseline._profiles.clear()
+            baseline._dirty.clear()
 
     # ------------------------------------------------------------------
     # Internal

@@ -53,7 +53,7 @@ class PlayerBaseline:
     """
 
     def __init__(self, db, logger, alpha: float = 0.1,
-                 z_threshold: float = 2.5, warmup: int = 30):
+                 z_threshold: float = 3.0, warmup: int = 60):
         self._db = db
         self._logger = logger
         self._alpha = alpha

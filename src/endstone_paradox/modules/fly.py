@@ -110,27 +110,29 @@ class FlyModule(BaseModule):
                 h_dist = math.sqrt(dx * dx + dz * dz)
                 h_speed_bps = h_dist / dt  # blocks per second
 
-                # Always record baseline (ground and air)
-                self.record_baseline(player, "fly.ground_speed", h_speed_bps)
+                # Always record baseline (ground and air) to learn normal speeds
+                speed_bl = self.record_baseline(player, "fly.ground_speed", h_speed_bps)
 
-                # Check against speed threshold
+                # Only flag if baseline is warmed up and this is a deviation
                 if h_speed_bps > self.speed_threshold:
-                    data["speed_flags"] += 1
-                    if data["speed_flags"] >= 3:  # 3 consecutive = flag
-                        speed_dev = self.record_baseline(
-                            player, "fly.speed_deviation", h_speed_bps
-                        )
-                        severity = 3
-                        evidence = {
-                            "speed": f"{h_speed_bps:.1f}",
-                            "max": f"{self.speed_threshold:.1f}",
-                            "type": "speed_hack",
-                        }
-                        if speed_dev and speed_dev.is_deviation:
-                            severity = 4
-                            evidence["baseline_deviation"] = speed_dev.z_score
-                        self.emit(player, severity, evidence, action_hint="setback")
-                        data["speed_flags"] = 0
+                    # During warmup, just learn — don't flag
+                    if speed_bl and speed_bl.warming_up:
+                        pass
+                    else:
+                        data["speed_flags"] += 1
+                        if data["speed_flags"] >= 3:
+                            # Only emit if baseline confirms deviation
+                            if speed_bl and speed_bl.is_deviation:
+                                severity = 4
+                                evidence = {
+                                    "speed": f"{h_speed_bps:.1f}",
+                                    "max": f"{self.speed_threshold:.1f}",
+                                    "type": "speed_hack",
+                                    "baseline_avg": f"{speed_bl.avg:.1f}",
+                                    "z_score": speed_bl.z_score,
+                                }
+                                self.emit(player, severity, evidence, action_hint="setback")
+                            data["speed_flags"] = 0
                 else:
                     data["speed_flags"] = max(0, data["speed_flags"] - 1)
 
@@ -166,30 +168,31 @@ class FlyModule(BaseModule):
             (vel.y >= self.v_threshold or h_speed >= self.h_threshold)
         )
 
-        # Record baseline metrics (always, even when not suspicious)
-        self.record_baseline(player, "fly.h_speed", h_speed)
+        # Record baseline metrics (always, even when not suspicious — to learn)
+        h_bl = self.record_baseline(player, "fly.h_speed", h_speed)
 
         if is_suspicious and not player.is_on_ground:
             data["hover_time"] += 1
 
             if data["hover_time"] >= self.hover_threshold:
-                # Record hover time baseline sample
-                hover_dev = self.record_baseline(
+                hover_bl = self.record_baseline(
                     player, "fly.hover_time", float(data["hover_time"])
                 )
 
-                # Escalate severity if baseline deviation detected
-                severity = 3
-                evidence = {
-                    "hover": data["hover_time"],
-                    "threshold": self.hover_threshold,
-                }
-                if hover_dev and hover_dev.is_deviation:
-                    severity = 4
-                    evidence["baseline_deviation"] = hover_dev.z_score
-
-                self.emit(player, severity, evidence, action_hint="setback")
-                data["hover_time"] = 0
+                # Only emit if baseline is past warmup
+                if hover_bl and hover_bl.warming_up:
+                    data["hover_time"] = 0  # reset but don't flag
+                elif hover_bl and hover_bl.is_deviation:
+                    self.emit(player, 4, {
+                        "hover": data["hover_time"],
+                        "threshold": self.hover_threshold,
+                        "baseline_avg": f"{hover_bl.avg:.1f}",
+                        "z_score": hover_bl.z_score,
+                    }, action_hint="setback")
+                    data["hover_time"] = 0
+                else:
+                    # Past warmup but not a deviation — normal hover, reset
+                    data["hover_time"] = 0
         else:
             data["hover_time"] = max(0, data["hover_time"] - 1)
 

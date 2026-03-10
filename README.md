@@ -78,6 +78,8 @@ A full Python port of the original [Paradox AntiCheat](https://github.com/Visual
 | Session Fingerprinting | Device/IP/XUID composite hash, alt detection, ban evasion tracking | ✅ |
 | Adaptive Check Frequency | Risk-tier-based intervals — clean players checked less, flagged players every tick | ✅ |
 | Global Intelligence Network | Crowd-sourced fingerprints, telemetry, reputation scores — smarter with every server | ✅ |
+| **Baseline Learning System** | Per-module EMA behavioral profiling — learns normal patterns before flagging (60-sample warmup) | ✅ |
+| **Violations Management** | Clear player/all violations via web UI, configurable enforcement mode (Log Only/Soft/Hard) | ✅ |
 
 </details>
 
