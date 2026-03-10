@@ -223,6 +223,9 @@ class ParadoxPlugin(Plugin):
         from endstone_paradox.core.analytics_collector import AnalyticsCollector
         self.analytics_collector = AnalyticsCollector(self.db, self.logger)
 
+        # Hook Discord, Evidence Replay, and Analytics into the violation engine
+        self._hook_violation_engine()
+
         # Periodic flush task (every 30s = 600 ticks)
         def _flush_violations():
             if self.violation_engine:

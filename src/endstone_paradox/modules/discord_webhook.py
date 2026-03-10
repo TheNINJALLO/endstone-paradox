@@ -43,9 +43,9 @@ class DiscordWebhookModule(BaseModule):
         self._send_kicks = self.db.get("config", "discord_send_kicks", True)
         self._footer_text = self.db.get("config", "discord_footer_text", "Paradox AntiCheat")
 
-        # Also check config.toml values (non-Mapping access)
+        # Also check config.toml values
         try:
-            pc = self.plugin._paradox_config
+            pc = getattr(self.plugin, 'paradox_config', None) or getattr(self.plugin, '_paradox_config', None)
             if pc:
                 if not self._webhook_url:
                     self._webhook_url = pc.get("discord", "webhook_url", default="") or ""
@@ -56,8 +56,13 @@ class DiscordWebhookModule(BaseModule):
                 send_kicks = pc.get("discord", "send_kicks", default=True)
                 if send_kicks is not None:
                     self._send_kicks = send_kicks
-        except Exception:
-            pass
+        except Exception as e:
+            self.logger.warning(f"§2[§7Paradox§2]§e Discord config load error: {e}")
+
+        if self._webhook_url:
+            self.logger.info(f"§2[§7Paradox§2]§a Discord webhook configured")
+        else:
+            self.logger.warning(f"§2[§7Paradox§2]§e Discord module enabled but no webhook URL set")
 
         # Rate limiting: max 5 messages per 5 seconds
         self._send_times = deque(maxlen=5)
@@ -179,5 +184,6 @@ class DiscordWebhookModule(BaseModule):
                     )
                     urllib.request.urlopen(req, context=self._ctx, timeout=10)
                     self._send_times.append(time.time())
-                except Exception:
-                    pass  # silently drop failed sends
+                except Exception as e:
+                    if hasattr(self, 'logger') and self.logger:
+                        self.logger.warning(f"§2[§7Paradox§2]§e Discord webhook send failed: {e}")
