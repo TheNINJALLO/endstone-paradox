@@ -64,13 +64,18 @@ class BlinkModule(BaseModule):
                 if now - data["last_teleport"] < self.TELEPORT_GRACE:
                     continue
 
-                # Calculate 3D distance
+                # Calculate horizontal distance (blink is about lateral teleporting)
                 dx = cur[0] - prev[0]
                 dy = cur[1] - prev[1]
                 dz = cur[2] - prev[2]
-                dist = math.sqrt(dx*dx + dy*dy + dz*dz)
+                h_dist = math.sqrt(dx*dx + dz*dz)
 
-                if dist > self.BLINK_DISTANCE:
+                # Skip if mostly vertical movement (falling/jumping)
+                if abs(dy) > h_dist:
+                    data["blink_flags"] = max(0, data["blink_flags"] - 1)
+                    continue
+
+                if h_dist > self.BLINK_DISTANCE:
                     # Skip if player is gliding (elytra can cover distance fast)
                     if player.is_gliding:
                         continue
@@ -79,7 +84,7 @@ class BlinkModule(BaseModule):
                     if data["blink_flags"] >= self.FLAGS_REQUIRED:
                         self.emit(player, 4, {
                             "type": "blink",
-                            "distance": f"{dist:.1f}",
+                            "distance": f"{h_dist:.1f}",
                         }, action_hint="setback")
                         data["blink_flags"] = 0
                 else:

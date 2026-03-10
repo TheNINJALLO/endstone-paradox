@@ -67,6 +67,11 @@ class FlyModule(BaseModule):
         if self.plugin.is_player_climbing(player):
             return
 
+        # Falling exemption — significant downward velocity = gravity, not flying
+        vel = player.velocity
+        if vel.y < -0.5:
+            return
+
         # Knockback exemption — 2s after taking damage
         import time as _t
         last_dmg = self._recent_damage.get(uuid_str, 0)
@@ -151,9 +156,14 @@ class FlyModule(BaseModule):
         vel = player.velocity
         h_speed = math.sqrt(vel.x ** 2 + vel.z ** 2)
 
+        # Skip if falling (negative Y velocity = gravity, not hover)
+        if vel.y < -0.3:
+            data["hover_time"] = 0
+            return
+
         is_suspicious = (
             (player.is_flying and not player.is_on_ground) or
-            (abs(vel.y) >= self.v_threshold or h_speed >= self.h_threshold)
+            (vel.y >= self.v_threshold or h_speed >= self.h_threshold)
         )
 
         # Record baseline metrics (always, even when not suspicious)

@@ -60,17 +60,28 @@ class StepHackModule(BaseModule):
                     data["step_flags"] = 0
                     continue
 
-                # On slime/honey blocks, bouncing is legit
+                # On slime/honey/scaffolding/ladder/vine, vertical movement is legit
+                on_climbable = False
                 try:
                     dim = player.dimension
-                    below = dim.get_block_at(int(loc.x), int(loc.y) - 1, int(loc.z))
-                    if below:
-                        bt = str(below.type).lower()
-                        if "slime" in bt or "honey" in bt:
-                            data["step_flags"] = 0
-                            continue
+                    ix, iy, iz = int(loc.x), int(loc.y), int(loc.z)
+                    for check_y in (iy, iy - 1):
+                        bl = dim.get_block_at(ix, check_y, iz)
+                        if bl:
+                            bt = str(bl.type).lower()
+                            if any(s in bt for s in (
+                                "slime", "honey", "scaffolding", "scaffold",
+                                "ladder", "vine", "cave_vine", "twisting_vine",
+                                "weeping_vine",
+                            )):
+                                on_climbable = True
+                                break
                 except Exception:
                     pass
+
+                if on_climbable:
+                    data["step_flags"] = 0
+                    continue
 
                 # On stairs/slabs, half-block step-ups are normal
                 if y_delta < 0.55:

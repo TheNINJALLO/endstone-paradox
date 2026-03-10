@@ -374,6 +374,10 @@ def _register_routes(app):
                         _db_set("config", key, int(val))
                     else:
                         _db_set("config", key, val)
+            # Handle max enchant level
+            max_ench = request.form.get("max_enchant_level")
+            if max_ench is not None and max_ench.isdigit():
+                _db_set("config", "max_enchant_level", max(1, int(max_ench)))
             return redirect(url_for("config_page"))
         all_config = _db_get_all("config")
         paradox_config = app.config["PARADOX_CONFIG"].raw
@@ -583,6 +587,95 @@ def _register_routes(app):
                 report["resolution"] = resolution
                 _db_set("reports", report_id, report)
         return redirect(url_for("reports_page"))
+
+    # ── Violations (Intelligence) ──
+
+    @app.route("/violations")
+    @login_required
+    def violations_page():
+        """List all players with violations, sorted by count."""
+        import time as _time
+        from collections import defaultdict as _dd
+        all_violations = _db_get_all("violations")
+        players = _dd(lambda: {
+            "name": "?", "count": 0, "modules": set(),
+            "last_time": 0, "last_module": "?", "last_action": "?",
+            "severity_max": 0,
+        })
+        for item in all_violations:
+            # all_violations returns list of (key, value) or list of dicts
+            if isinstance(item, (list, tuple)) and len(item) == 2:
+                uuid_str, entries = item
+            elif isinstance(item, dict):
+                uuid_str = item.get("key", "?")
+                entries = item.get("value", [])
+            else:
+                continue
+            if not isinstance(entries, list):
+                continue
+            p = players[uuid_str]
+            p["count"] = len(entries)
+            for entry in entries:
+                if not isinstance(entry, dict):
+                    continue
+                name = entry.get("name", "?")
+                if name != "?":
+                    p["name"] = name
+                p["modules"].add(entry.get("module", "?"))
+                t = entry.get("time", 0)
+                if t > p["last_time"]:
+                    p["last_time"] = t
+                    p["last_module"] = entry.get("module", "?")
+                    p["last_action"] = entry.get("action", "?")
+                sev = entry.get("severity", 0)
+                if sev > p["severity_max"]:
+                    p["severity_max"] = sev
+        # Convert sets to lists for Jinja
+        player_list = []
+        for uuid_str, data in players.items():
+            data["uuid"] = uuid_str
+            data["modules"] = list(data["modules"])
+            data["last_time_str"] = _time.strftime(
+                "%Y-%m-%d %H:%M", _time.gmtime(data["last_time"])
+            ) if data["last_time"] else "Never"
+            player_list.append(data)
+        # Sort by count descending
+        player_list.sort(key=lambda x: x["count"], reverse=True)
+        return render_template_string(VIOLATIONS_HTML, players=player_list)
+
+    @app.route("/violations/<uuid_str>")
+    @login_required
+    def violations_detail(uuid_str):
+        """Show full violation history for a specific player."""
+        import time as _time
+        entries = _db_get("violations", uuid_str, [])
+        if not isinstance(entries, list):
+            entries = []
+        player_name = "?"
+        for e in entries:
+            if isinstance(e, dict) and e.get("name", "?") != "?":
+                player_name = e["name"]
+        # Add formatted time and format evidence for display
+        for e in entries:
+            if isinstance(e, dict):
+                t = e.get("time", 0)
+                e["time_str"] = _time.strftime(
+                    "%Y-%m-%d %H:%M:%S", _time.gmtime(t)
+                ) if t else "?"
+                # Format evidence dict into readable pairs
+                ev = e.get("evidence", {})
+                if isinstance(ev, dict):
+                    e["evidence_items"] = list(ev.items())
+                else:
+                    e["evidence_items"] = []
+        entries.reverse()  # newest first
+        return render_template_string(
+            VIOLATIONS_DETAIL_HTML,
+            player_name=player_name,
+            player_uuid=uuid_str,
+            violations=entries,
+            total=len(entries),
+        )
 
 
 # ══════════════════════════════════════════════════════════
@@ -922,6 +1015,7 @@ SIDEBAR_HTML = """
     <div class="nav-section">Intelligence</div>
     <a class="nav-item" href="/analytics"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Analytics</a>
     <a class="nav-item" href="/reports"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Reports</a>
+    <a class="nav-item" href="/violations"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Violations</a>
     <div class="nav-section">Settings</div>
     <a class="nav-item" href="/config"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Config</a>
     <a class="nav-item" href="/lists"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Allow/Whitelist</a>
@@ -1402,6 +1496,18 @@ CONFIG_HTML = """<!DOCTYPE html>
         </tr>
         {% endfor %}
     </table>
+    </div>
+
+    <h3 style="margin:24px 0 12px;font-size:16px;color:#f3f4f6;">⚔️ Illegal Items Config</h3>
+    <div class="card" style="margin-bottom:24px;">
+        <form method="POST" action="/config" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div class="form-group" style="margin-bottom:0;">
+                <label style="margin-bottom:4px;">Max Enchantment Level</label>
+                <input type="number" name="max_enchant_level" value="{% for c in db_config %}{% if c.key == 'max_enchant_level' %}{{ c.value }}{% endif %}{% endfor %}{% set found = [] %}{% for c in db_config %}{% if c.key == 'max_enchant_level' %}{% if found.append(1) %}{% endif %}{% endif %}{% endfor %}{% if not found %}10{% endif %}" min="1" max="255" style="width:100px;">
+            </div>
+            <button type="submit" class="btn btn-sm btn-primary" style="margin-top:18px;">Save</button>
+            <span style="font-size:12px;color:#6b7280;margin-top:18px;">Any enchantment above this level will be flagged and removed.</span>
+        </form>
     </div>
 
     <h3 style="margin:24px 0 12px;font-size:16px;color:#f3f4f6;">📁 File Config (config.yml)</h3>
@@ -2099,6 +2205,273 @@ function filterReports(status) {
     event.target.classList.add('active');
     document.querySelectorAll('.report-card').forEach(card => {
         if (status === 'all' || card.dataset.status === status) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+</script>
+</body></html>"""
+
+# ── Violations List Page ──
+
+VIOLATIONS_HTML = """<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Paradox — Violations</title>
+""" + BASE_CSS + """
+<style>
+.player-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto auto;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.15s;
+}
+.player-row:hover { background: rgba(34,197,94,0.05); cursor: pointer; }
+.player-name { font-weight: 600; font-size: 15px; color: #f3f4f6; }
+.player-uuid { font-size: 11px; color: #6b7280; font-family: monospace; }
+.viol-count {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 36px; height: 28px;
+    border-radius: 14px;
+    font-size: 13px; font-weight: 700;
+    padding: 0 10px;
+}
+.viol-low { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.viol-medium { background: rgba(245,158,11,0.15); color: #fbbf24; }
+.viol-high { background: rgba(239,68,68,0.15); color: #f87171; }
+.viol-critical { background: rgba(220,38,38,0.25); color: #ef4444; }
+.module-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.module-tag {
+    font-size: 10px; padding: 2px 8px; border-radius: 10px;
+    background: rgba(34,197,94,0.1); color: #22c55e;
+    font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.meta-text { font-size: 12px; color: #9ca3af; }
+.search-box {
+    margin-bottom: 16px;
+}
+.search-box input {
+    max-width: 400px;
+}
+</style>
+</head><body>
+<div class="layout">
+""" + SIDEBAR_HTML + """
+<div class="main">
+<h2>⚠️ Violations</h2>
+<p style="color:#9ca3af;margin-bottom:20px;font-size:14px;">All players flagged by detection modules. Click a player to view full violation history.</p>
+
+<div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search by player name..." oninput="filterPlayers()">
+</div>
+
+<div class="table-wrap">
+    <div style="padding:12px 20px;background:rgba(34,197,94,0.08);display:grid;grid-template-columns:1fr auto auto auto auto;gap:16px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;font-weight:600;">
+        <div>Player</div>
+        <div>Violations</div>
+        <div>Max Severity</div>
+        <div>Modules</div>
+        <div>Last Seen</div>
+    </div>
+    <div id="playerList">
+    {% if players %}
+    {% for p in players %}
+    <a class="player-row" href="/violations/{{ p.uuid }}" data-name="{{ p.name|lower }}">
+        <div>
+            <div class="player-name">{{ p.name }}</div>
+            <div class="player-uuid">{{ p.uuid }}</div>
+        </div>
+        <div>
+            <span class="viol-count {% if p.count >= 20 %}viol-critical{% elif p.count >= 10 %}viol-high{% elif p.count >= 5 %}viol-medium{% else %}viol-low{% endif %}">{{ p.count }}</span>
+        </div>
+        <div>
+            <span class="badge {% if p.severity_max >= 4 %}badge-off{% elif p.severity_max >= 3 %}badge-warn{% else %}badge-on{% endif %}">{{ {1:'Info',2:'Low',3:'Medium',4:'High',5:'Critical'}.get(p.severity_max, 'Unknown') }}</span>
+        </div>
+        <div class="module-tags">
+            {% for m in p.modules[:4] %}<span class="module-tag">{{ m }}</span>{% endfor %}
+            {% if p.modules|length > 4 %}<span class="module-tag" style="background:rgba(107,114,128,0.2);color:#9ca3af;">+{{ p.modules|length - 4 }}</span>{% endif %}
+        </div>
+        <div class="meta-text">{{ p.last_time_str }}</div>
+    </a>
+    {% endfor %}
+    {% else %}
+    <div style="padding:48px;text-align:center;color:#6b7280;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:12px;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div style="font-size:16px;font-weight:600;margin-bottom:4px;">No Violations Recorded</div>
+        <div>Violations from detection modules will appear here as players are flagged.</div>
+    </div>
+    {% endif %}
+    </div>
+</div>
+</div>
+</div>
+<script>
+function filterPlayers() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    document.querySelectorAll('.player-row').forEach(row => {
+        row.style.display = row.dataset.name.includes(q) ? '' : 'none';
+    });
+}
+</script>
+</body></html>"""
+
+# ── Violations Detail Page ──
+
+VIOLATIONS_DETAIL_HTML = """<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Paradox — {{ player_name }} Violations</title>
+""" + BASE_CSS + """
+<style>
+.back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: #22c55e; text-decoration: none; font-size: 13px;
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+.back-link:hover { text-decoration: underline; }
+.player-header {
+    background: rgba(15,21,32,0.8);
+    border: 1px solid rgba(34,197,94,0.1);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.player-header h3 { font-size: 20px; font-weight: 700; color: #f3f4f6; }
+.player-header .uuid { font-size: 12px; color: #6b7280; font-family: monospace; margin-top: 4px; }
+.violation-card {
+    background: rgba(15,21,32,0.8);
+    border: 1px solid rgba(34,197,94,0.08);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    transition: border-color 0.15s;
+}
+.violation-card:hover { border-color: rgba(34,197,94,0.25); }
+.violation-card.sev-5 { border-left: 3px solid #ef4444; }
+.violation-card.sev-4 { border-left: 3px solid #f97316; }
+.violation-card.sev-3 { border-left: 3px solid #f59e0b; }
+.violation-card.sev-2 { border-left: 3px solid #3b82f6; }
+.violation-card.sev-1 { border-left: 3px solid #6b7280; }
+.violation-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.violation-module {
+    font-weight: 600; font-size: 14px; color: #f3f4f6;
+    text-transform: uppercase; letter-spacing: 0.5px;
+}
+.violation-time { font-size: 12px; color: #6b7280; }
+.violation-meta {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+.violation-meta span {
+    font-size: 12px; padding: 3px 10px;
+    border-radius: 6px; background: rgba(255,255,255,0.04);
+    color: #9ca3af;
+}
+.evidence-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+    margin-top: 8px;
+}
+.evidence-item {
+    background: rgba(0,0,0,0.3);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+}
+.evidence-key { color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; font-size: 10px; }
+.evidence-val { color: #e0e0e0; font-family: monospace; margin-top: 2px; word-break: break-all; }
+.filter-bar {
+    display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.filter-btn {
+    padding: 6px 14px; border-radius: 20px; font-size: 12px;
+    font-weight: 600; border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(15,21,32,0.8); color: #9ca3af;
+    cursor: pointer; transition: all 0.15s;
+}
+.filter-btn:hover, .filter-btn.active {
+    background: rgba(34,197,94,0.15); color: #22c55e;
+    border-color: rgba(34,197,94,0.3);
+}
+</style>
+</head><body>
+<div class="layout">
+""" + SIDEBAR_HTML + """
+<div class="main">
+<a class="back-link" href="/violations">&larr; Back to Violations</a>
+<div class="player-header">
+    <div>
+        <h3>{{ player_name }}</h3>
+        <div class="uuid">{{ player_uuid }}</div>
+    </div>
+    <div style="text-align:right;">
+        <div style="font-size:28px;font-weight:700;color:#ef4444;">{{ total }}</div>
+        <div style="font-size:12px;color:#6b7280;text-transform:uppercase;">Total Violations</div>
+    </div>
+</div>
+
+<div class="filter-bar">
+    <button class="filter-btn active" onclick="filterViolations('all')">All</button>
+    <button class="filter-btn" onclick="filterViolations('5')">🔴 Critical</button>
+    <button class="filter-btn" onclick="filterViolations('4')">🟠 High</button>
+    <button class="filter-btn" onclick="filterViolations('3')">🟡 Medium</button>
+    <button class="filter-btn" onclick="filterViolations('2')">🔵 Low</button>
+    <button class="filter-btn" onclick="filterViolations('1')">⚪ Info</button>
+</div>
+
+{% if violations %}
+{% for v in violations %}
+<div class="violation-card sev-{{ v.severity|default(1) }}" data-severity="{{ v.severity|default(1) }}">
+    <div class="violation-top">
+        <span class="violation-module">{{ v.module|default('?') }}</span>
+        <span class="violation-time">{{ v.time_str }}</span>
+    </div>
+    <div class="violation-meta">
+        <span>Severity: <strong>{{ {1:'Info',2:'Low',3:'Medium',4:'High',5:'Critical'}.get(v.severity|default(1), '?') }}</strong></span>
+        <span>Action: <strong>{{ v.action|default('?') }}</strong></span>
+    </div>
+    {% if v.evidence_items %}
+    <div class="evidence-grid">
+        {% for key, val in v.evidence_items %}
+        <div class="evidence-item">
+            <div class="evidence-key">{{ key }}</div>
+            <div class="evidence-val">{{ val }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+{% else %}
+<div style="padding:48px;text-align:center;color:#6b7280;">
+    <div style="font-size:16px;font-weight:600;">No violation data found for this player.</div>
+</div>
+{% endif %}
+</div>
+</div>
+<script>
+function filterViolations(sev) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    document.querySelectorAll('.violation-card').forEach(card => {
+        if (sev === 'all' || card.dataset.severity === sev) {
             card.style.display = '';
         } else {
             card.style.display = 'none';
