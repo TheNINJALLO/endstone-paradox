@@ -24,6 +24,7 @@ class SessionFingerprintModule(BaseModule):
 
     def on_start(self):
         self.db._ensure_table("fingerprints")
+        self.db._ensure_table("trusted_links")
 
     def on_player_join(self, player):
         uuid_str = str(player.unique_id)
@@ -145,6 +146,10 @@ class SessionFingerprintModule(BaseModule):
             if not isinstance(stored_data, dict):
                 continue
 
+            # Skip trusted pairs (family/household exemptions)
+            if self.is_trusted_pair(uuid_str, stored_uuid):
+                continue
+
             # Check fingerprint hash match
             if stored_data.get("fingerprint") == fingerprint:
                 matches.append(stored_data)
@@ -198,6 +203,9 @@ class SessionFingerprintModule(BaseModule):
             return
 
         for linked_uuid in linked:
+            # Skip trusted pairs (family/household exemptions)
+            if self.is_trusted_pair(uuid_str, linked_uuid):
+                continue
             ban_data = self.db.get("bans", linked_uuid)
             if ban_data is None:
                 # Also check by name in the linked fingerprint
@@ -239,6 +247,38 @@ class SessionFingerprintModule(BaseModule):
     def get_all_fingerprints(self) -> dict:
         """Public API: Get all fingerprint records."""
         return self.db.get_all("fingerprints")
+
+    # ── Trusted Links (Family / Household Exemptions) ─────
+
+    @staticmethod
+    def _make_pair_key(uuid_a: str, uuid_b: str) -> str:
+        """Create a deterministic key for a pair of UUIDs."""
+        return "|".join(sorted([uuid_a, uuid_b]))
+
+    def is_trusted_pair(self, uuid_a: str, uuid_b: str) -> bool:
+        """Check if two players are in a trusted pair."""
+        key = self._make_pair_key(uuid_a, uuid_b)
+        return self.db.has("trusted_links", key)
+
+    def add_trusted_link(self, uuid_a: str, uuid_b: str, name_a: str = "", name_b: str = ""):
+        """Add a trusted link between two players."""
+        key = self._make_pair_key(uuid_a, uuid_b)
+        self.db.set("trusted_links", key, {
+            "uuid_a": uuid_a,
+            "uuid_b": uuid_b,
+            "name_a": name_a,
+            "name_b": name_b,
+            "created_at": time.time(),
+        })
+
+    def remove_trusted_link(self, uuid_a: str, uuid_b: str):
+        """Remove a trusted link between two players."""
+        key = self._make_pair_key(uuid_a, uuid_b)
+        self.db.delete("trusted_links", key)
+
+    def get_all_trusted_links(self) -> dict:
+        """Public API: Get all trusted link records."""
+        return self.db.get_all("trusted_links")
 
     # ── Global Intelligence Network Integration ──────────────
 

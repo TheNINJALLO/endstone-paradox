@@ -40,6 +40,11 @@ COMMAND_MODULE_MAP = {
     "ac-chatprotection": "chatprotection",
     "ac-antigrief": "antigrief",
     "ac-evidencereplay": "evidencereplay",
+    # Tier 3
+    "ac-adaptivecheck": "adaptivecheck",
+    "ac-botdetection": "botdetection",
+    "ac-reportsystem": "reportsystem",
+    "ac-fingerprint": "fingerprint",
 }
 
 
@@ -134,6 +139,20 @@ def _handle_module_config(plugin, sender, module_name, args):
         except (ValueError, IndexError):
             sender.send_message("§2[§7Paradox§2]§c Usage: /ac-worldborder <radius> [centerX] [centerZ]")
 
+    elif module_name == "fingerprint" and args:
+        sub = args[0].lower()
+        if sub == "trust" and len(args) >= 3:
+            _handle_fingerprint_trust(plugin, sender, args[1], args[2])
+        elif sub == "untrust" and len(args) >= 3:
+            _handle_fingerprint_untrust(plugin, sender, args[1], args[2])
+        elif sub == "list":
+            _handle_fingerprint_list(plugin, sender)
+        else:
+            sender.send_message(
+                "§2[§7Paradox§2]§e Usage: /ac-fingerprint trust <A> <B> | untrust <A> <B> | list"
+            )
+        return
+
     elif module_name == "lagclear" and args:
         try:
             interval = int(args[0])
@@ -155,3 +174,84 @@ def _handle_module_config(plugin, sender, module_name, args):
                 sender.send_message("§2[§7Paradox§2]§c Sensitivity must be 1-10.")
         except ValueError:
             sender.send_message(f"§2[§7Paradox§2]§c Unknown argument: {args[0]}")
+
+
+# ── Fingerprint trust helpers ─────────────────────────────
+
+def _resolve_player(plugin, name: str):
+    """Find an online player by name, return (uuid_str, display_name) or None."""
+    for p in plugin.server.online_players:
+        if p.name.lower() == name.lower():
+            return str(p.unique_id), p.name
+    return None
+
+
+def _handle_fingerprint_trust(plugin, sender, name_a: str, name_b: str):
+    fp_module = plugin.get_module("fingerprint")
+    if fp_module is None:
+        sender.send_message("§2[§7Paradox§2]§c Fingerprint module not loaded.")
+        return
+
+    result_a = _resolve_player(plugin, name_a)
+    result_b = _resolve_player(plugin, name_b)
+    if result_a is None:
+        sender.send_message(f"§2[§7Paradox§2]§c Player '{name_a}' not found online.")
+        return
+    if result_b is None:
+        sender.send_message(f"§2[§7Paradox§2]§c Player '{name_b}' not found online.")
+        return
+    uuid_a, disp_a = result_a
+    uuid_b, disp_b = result_b
+    if uuid_a == uuid_b:
+        sender.send_message("§2[§7Paradox§2]§c Cannot trust a player with themselves.")
+        return
+
+    fp_module.add_trusted_link(uuid_a, uuid_b, disp_a, disp_b)
+    sender.send_message(
+        f"§2[§7Paradox§2]§a Trusted link created: §f{disp_a} §a↔ §f{disp_b}"
+    )
+
+
+def _handle_fingerprint_untrust(plugin, sender, name_a: str, name_b: str):
+    fp_module = plugin.get_module("fingerprint")
+    if fp_module is None:
+        sender.send_message("§2[§7Paradox§2]§c Fingerprint module not loaded.")
+        return
+
+    result_a = _resolve_player(plugin, name_a)
+    result_b = _resolve_player(plugin, name_b)
+    if result_a is None:
+        sender.send_message(f"§2[§7Paradox§2]§c Player '{name_a}' not found online.")
+        return
+    if result_b is None:
+        sender.send_message(f"§2[§7Paradox§2]§c Player '{name_b}' not found online.")
+        return
+    uuid_a, disp_a = result_a
+    uuid_b, disp_b = result_b
+
+    fp_module.remove_trusted_link(uuid_a, uuid_b)
+    sender.send_message(
+        f"§2[§7Paradox§2]§a Trusted link removed: §f{disp_a} §a↔ §f{disp_b}"
+    )
+
+
+def _handle_fingerprint_list(plugin, sender):
+    fp_module = plugin.get_module("fingerprint")
+    if fp_module is None:
+        sender.send_message("§2[§7Paradox§2]§c Fingerprint module not loaded.")
+        return
+
+    links = fp_module.get_all_trusted_links()
+    if not links:
+        sender.send_message("§2[§7Paradox§2]§7 No trusted links configured.")
+        return
+
+    sender.send_message(f"§2[§7Paradox§2]§a Trusted Links ({len(links)}):")
+    for key, data in links.items():
+        if isinstance(data, dict):
+            a = data.get("name_a", "?") or "?"
+            b = data.get("name_b", "?") or "?"
+        else:
+            parts = key.split("|")
+            a, b = parts[0][:8], parts[1][:8] if len(parts) > 1 else "?"
+        sender.send_message(f"  §f{a} §7↔ §f{b}")

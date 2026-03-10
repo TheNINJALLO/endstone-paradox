@@ -745,6 +745,94 @@ def _register_routes(app):
             pass
         return redirect(url_for("violations_page"))
 
+    # ── Trusted Links (Fingerprint Exemptions) ─────────────
+
+    @app.route("/trusted-links")
+    @login_required
+    def trusted_links_page():
+        """Manage trusted player pairs (family/household)."""
+        import time as _time
+        # Ensure table exists
+        db = _get_db()
+        db.execute("""CREATE TABLE IF NOT EXISTS [trusted_links] (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL,
+            updated_at REAL DEFAULT (julianday('now'))
+        )""")
+        db.commit()
+
+        links = _db_get_all("trusted_links")
+        # Also get all known players for dropdowns
+        players = _db_get_all("players")
+        player_list = []
+        for item in players:
+            if isinstance(item, dict):
+                val = item.get("value", {})
+                key = item.get("key", "")
+                name = val.get("name", key[:8]) if isinstance(val, dict) else key[:8]
+                player_list.append({"uuid": key, "name": name})
+        player_list.sort(key=lambda p: p["name"].lower())
+
+        # Format links for display
+        link_list = []
+        for item in links:
+            if isinstance(item, dict):
+                val = item.get("value", {})
+                key = item.get("key", "")
+            else:
+                continue
+            if isinstance(val, dict):
+                link_list.append({
+                    "key": key,
+                    "name_a": val.get("name_a", key.split("|")[0][:8] if "|" in key else "?"),
+                    "name_b": val.get("name_b", key.split("|")[1][:8] if "|" in key else "?"),
+                    "uuid_a": val.get("uuid_a", ""),
+                    "uuid_b": val.get("uuid_b", ""),
+                    "created_at": _time.strftime(
+                        "%Y-%m-%d %H:%M", _time.gmtime(val.get("created_at", 0))
+                    ) if val.get("created_at") else "?",
+                })
+
+        return render_template_string(
+            TRUSTED_LINKS_HTML,
+            links=link_list,
+            players=player_list,
+            total=len(link_list),
+        )
+
+    @app.route("/trusted-links/add", methods=["POST"])
+    @login_required
+    def add_trusted_link():
+        import time as _time
+        uuid_a = request.form.get("uuid_a", "").strip()
+        uuid_b = request.form.get("uuid_b", "").strip()
+        if not uuid_a or not uuid_b or uuid_a == uuid_b:
+            flash("Please select two different players.", "error")
+            return redirect(url_for("trusted_links_page"))
+        # Resolve names
+        data_a = _db_get("players", uuid_a, {})
+        data_b = _db_get("players", uuid_b, {})
+        name_a = data_a.get("name", uuid_a[:8]) if isinstance(data_a, dict) else uuid_a[:8]
+        name_b = data_b.get("name", uuid_b[:8]) if isinstance(data_b, dict) else uuid_b[:8]
+        # Build deterministic key
+        key = "|".join(sorted([uuid_a, uuid_b]))
+        _db_set("trusted_links", key, {
+            "uuid_a": uuid_a,
+            "uuid_b": uuid_b,
+            "name_a": name_a,
+            "name_b": name_b,
+            "created_at": _time.time(),
+        })
+        return redirect(url_for("trusted_links_page"))
+
+    @app.route("/trusted-links/remove", methods=["POST"])
+    @login_required
+    def remove_trusted_link():
+        key = request.form.get("key", "").strip()
+        if key:
+            _db_delete("trusted_links", key)
+        return redirect(url_for("trusted_links_page"))
+
 # ══════════════════════════════════════════════════════════
 #  HTML TEMPLATES
 # ══════════════════════════════════════════════════════════
@@ -1083,6 +1171,7 @@ SIDEBAR_HTML = """
     <a class="nav-item" href="/analytics"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Analytics</a>
     <a class="nav-item" href="/reports"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Reports</a>
     <a class="nav-item" href="/violations"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Violations</a>
+    <a class="nav-item" href="/trusted-links"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg> Trusted Links</a>
     <div class="nav-section">Settings</div>
     <a class="nav-item" href="/config"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Config</a>
     <a class="nav-item" href="/lists"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Allow/Whitelist</a>
@@ -2583,4 +2672,80 @@ function filterViolations(sev) {
     });
 }
 </script>
+</body></html>"""
+
+# ── Trusted Links Page ──
+
+TRUSTED_LINKS_HTML = """<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Paradox — Trusted Links</title>
+""" + BASE_CSS + """</head><body>
+<div class="layout">
+""" + SIDEBAR_HTML + """
+<div class="main">
+<h2>🤝 Trusted Links</h2>
+<p style="color:#9ca3af;margin-bottom:24px;">Trusted links exempt pairs of players (family, spouses, roommates) from alt-account detection and ban-evasion enforcement. Players sharing the same IP or device will not be flagged if linked here.</p>
+
+<!-- Add form -->
+<div class="card" style="margin-bottom:24px;">
+<h3 style="font-size:16px;color:#f3f4f6;margin-bottom:16px;">➕ Add Trusted Pair</h3>
+<form method="POST" action="/trusted-links/add">
+<div class="form-row">
+<div class="form-group" style="flex:1;">
+    <label>Player A</label>
+    <select name="uuid_a" required>
+        <option value="">Select player...</option>
+        {% for p in players %}
+        <option value="{{ p.uuid }}">{{ p.name }}</option>
+        {% endfor %}
+    </select>
+</div>
+<div style="padding-bottom:16px;color:#6b7280;font-size:20px;">↔</div>
+<div class="form-group" style="flex:1;">
+    <label>Player B</label>
+    <select name="uuid_b" required>
+        <option value="">Select player...</option>
+        {% for p in players %}
+        <option value="{{ p.uuid }}">{{ p.name }}</option>
+        {% endfor %}
+    </select>
+</div>
+<div style="padding-bottom:16px;"><button type="submit" class="btn">Link</button></div>
+</div>
+</form>
+</div>
+
+<!-- Existing links -->
+{% if links %}
+<div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+{% for link in links %}
+<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+            <span style="color:#22c55e;font-weight:600;">{{ link.name_a }}</span>
+            <span style="color:#6b7280;"> ↔ </span>
+            <span style="color:#22c55e;font-weight:600;">{{ link.name_b }}</span>
+        </div>
+        <form method="POST" action="/trusted-links/remove" style="margin:0;">
+            <input type="hidden" name="key" value="{{ link.key }}">
+            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Remove this trusted link?')">✕</button>
+        </form>
+    </div>
+    <div style="margin-top:8px;font-size:12px;color:#6b7280;">Created: {{ link.created_at }}</div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="placeholder-card">
+    <p>No trusted links configured yet.</p>
+    <p style="font-size:13px;margin-top:8px;">Use the form above or <code>/ac-fingerprint trust &lt;A&gt; &lt;B&gt;</code> in-game.</p>
+</div>
+{% endif %}
+
+<div style="margin-top:24px;font-size:13px;color:#6b7280;">
+    <strong>Total pairs:</strong> {{ total }}
+</div>
+</div>
+</div>
 </body></html>"""
