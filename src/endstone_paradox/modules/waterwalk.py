@@ -58,6 +58,35 @@ class WaterWalkModule(BaseModule):
 
                 # Check block at feet and below feet
                 feet_y = int(loc.y) - 1
+
+                # --- Footprint support check ---
+                # Player hitbox is ~0.6 wide. Sample the 4 corners of
+                # the foot rectangle so edge-of-block positions near
+                # water don't false-positive.
+                HALF_WIDTH = 0.3
+                foot_positions = [
+                    (int(loc.x - HALF_WIDTH), int(loc.z - HALF_WIDTH)),
+                    (int(loc.x - HALF_WIDTH), int(loc.z + HALF_WIDTH)),
+                    (int(loc.x + HALF_WIDTH), int(loc.z - HALF_WIDTH)),
+                    (int(loc.x + HALF_WIDTH), int(loc.z + HALF_WIDTH)),
+                ]
+                supported = False
+                for fx, fz in foot_positions:
+                    try:
+                        fb = dim.get_block_at(fx, feet_y, fz)
+                        if fb:
+                            ft = str(fb.type).lower().replace("minecraft:", "")
+                            if ("water" not in ft
+                                    and "flowing_water" not in ft
+                                    and "air" not in ft):
+                                supported = True
+                                break
+                    except Exception:
+                        pass
+                if supported:
+                    data["flags"] = max(0, data["flags"] - 1)
+                    continue
+
                 try:
                     block_below = dim.get_block_at(int(loc.x), feet_y, int(loc.z))
                     if block_below is None:

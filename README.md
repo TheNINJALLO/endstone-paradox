@@ -115,7 +115,7 @@ Drop the `.whl` file into your Endstone server's `plugins/` folder:
 your-server/
 ├── endstone.toml
 ├── plugins/
-│   └── endstone_paradox-1.7.1-py3-none-any.whl   ← drop it here
+│   └── endstone_paradox-1.8.1-py3-none-any.whl   ← drop it here
 └── ...
 ```
 
@@ -124,7 +124,7 @@ your-server/
 Start (or restart) your Endstone server. You'll see Paradox load in the console:
 
 ```
-[ParadoxAC] Paradox AntiCheat v1.7.1 loaded!
+[ParadoxAC] Paradox AntiCheat v1.8.1 loaded!
 [ParadoxAC] Database initialized at plugins/ParadoxAC/paradox.db
 [ParadoxAC] 39 detection modules registered.
 ```
