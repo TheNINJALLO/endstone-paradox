@@ -93,6 +93,7 @@ class BlinkModule(BaseModule):
                         if bl and bl.is_deviation:
                             self.emit(player, 4, {
                                 "type": "blink",
+                                "desc": f"Teleported {h_dist:.1f} blocks instantly (no server TP)",
                                 "distance": f"{h_dist:.1f}",
                                 "baseline_avg": f"{bl.avg:.1f}",
                                 "z_score": bl.z_score,

@@ -89,13 +89,36 @@ All violations are automatically saved to the `violations` SQLite table with:
 - Player UUID and name
 - Module name
 - Severity level
+- **Human-readable description** (`desc`) explaining what triggered the detection
 - Evidence details (distances, CPS, angles, etc.)
 - Enforcement action taken
 - Timestamp
 
 Evidence is flushed to disk every 30 seconds (write-behind buffering for performance).
 
-View evidence with `/ac-case <player>`.
+View evidence with `/ac-case <player>`. Each entry shows the description prominently, followed by raw evidence details.
+
+## Violation Descriptions
+
+Every violation includes a `desc` field — a plain-English explanation of what the player was doing when the detection triggered. Examples:
+
+| Module | Example Description |
+|--------|--------------------|
+| Fly | "Moving at 15.3 blocks/s (limit 8.5)" |
+| KillAura | "Hit 4 different entities within 0.5s" |
+| Reach | "Hit entity from 6.23 blocks away (limit 3.5)" |
+| Scaffold | "Placed 8 blocks over air in 1.0s while facing backwards" |
+| WaterWalk | "Standing on water with no solid or safe blocks nearby" |
+| NoClip | "Moved 3.5 blocks through solid blocks" |
+| AutoClicker | "Clicking at 22 CPS (max 14 for windows)" |
+| Anti-KB | "Didn't move after being hit 3 times (displacement 0.001b)" |
+| Illegal Items | "Had creative-only item 'command_block' in slot 3" |
+
+Descriptions appear in:
+- Staff alerts (in-game chat)
+- `/ac-watch` live feed
+- `/ac-case` evidence output
+- Web UI violation detail pages
 
 ## Temporary Exemptions
 

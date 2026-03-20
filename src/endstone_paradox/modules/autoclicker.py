@@ -169,6 +169,7 @@ class AutoClickerModule(BaseModule):
             severity = 3
             evidence = {
                 "type": "cps",
+                "desc": f"Clicking at {cps} CPS (max {max_cps} for {platform})",
                 "cps": cps,
                 "max": max_cps,
                 "platform": platform,
@@ -196,6 +197,7 @@ class AutoClickerModule(BaseModule):
                         effective_cps = round(1.0 / mean_interval, 1) if mean_interval > 0 else 0
                         self.emit(actor, 4, {
                             "type": "consistency",
+                            "desc": f"Click timing too consistent (CV={cv:.3f}, min={min_cv:.3f}) at ~{effective_cps} CPS",
                             "cv": f"{cv:.3f}",
                             "min_cv": f"{min_cv:.3f}",
                             "cps": effective_cps,

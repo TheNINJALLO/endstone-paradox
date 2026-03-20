@@ -114,6 +114,7 @@ class AntiKBModule(BaseModule):
                 if count >= self.FLAGS_REQUIRED:
                     self.emit(player, 4, {
                         "type": "antikb",
+                        "desc": f"Didn't move after being hit {count} times (displacement {displacement:.3f}b)",
                         "displacement": f"{displacement:.3f}",
                         "expected_min": f"{self.MIN_KB_DISTANCE}",
                         "hits": count,

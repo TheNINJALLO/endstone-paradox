@@ -287,6 +287,7 @@ class XrayModule(BaseModule):
         notifs[level] = now
 
         self.emit(player, 2 if level == "§e[Alert]" else 3, {
+            "desc": f"Suspicious mining: {reason}",
             "score": score,
             "reason": reason,
             "level": level,
@@ -314,6 +315,7 @@ class XrayModule(BaseModule):
             pass
 
         self.emit(player, 5, {
+            "desc": f"X-Ray mining frozen: {reason}",
             "score": profile['suspicion'],
             "reason": reason,
             "action": "freeze",

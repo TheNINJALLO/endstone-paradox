@@ -113,6 +113,7 @@ class ReachModule(BaseModule):
 
                 severity = 3
                 evidence = {
+                    "desc": f"Hit entity from {distance:.2f} blocks away (limit {self.MAX_ATTACK_DISTANCE:.1f})",
                     "dist": f"{distance:.2f}",
                     "max": f"{self.MAX_ATTACK_DISTANCE:.1f}",
                 }

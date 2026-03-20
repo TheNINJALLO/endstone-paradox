@@ -111,6 +111,7 @@ class IllegalItemsModule(BaseModule):
                         if creative_item in item_type:
                             self.emit(player, 5, {
                                 "type": "illegal_item",
+                                "desc": f"Had creative-only item '{item_type}' in slot {slot_idx}",
                                 "item": item_type,
                                 "reason": "creative_only",
                                 "slot": slot_idx,
@@ -125,6 +126,7 @@ class IllegalItemsModule(BaseModule):
                     if item_type in self.BANNED_SPAWN_EGGS:
                         self.emit(player, 5, {
                             "type": "illegal_item",
+                            "desc": f"Had banned spawn egg '{item_type}' in slot {slot_idx}",
                             "item": item_type,
                             "reason": "banned_spawn_egg",
                             "slot": slot_idx,
@@ -153,6 +155,7 @@ class IllegalItemsModule(BaseModule):
                                 if ench_level > self._max_enchant:
                                     self.emit(player, 4, {
                                         "type": "illegal_enchant",
+                                        "desc": f"Item '{item_type}' has {ench_name} level {ench_level} (max {self._max_enchant})",
                                         "item": item_type,
                                         "enchant": ench_name,
                                         "level": ench_level,

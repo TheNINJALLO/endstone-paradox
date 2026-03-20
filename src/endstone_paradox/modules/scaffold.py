@@ -146,7 +146,9 @@ class ScaffoldModule(BaseModule):
             rate_dev = self.record_baseline(player, "build.placement_rate", rate)
 
             severity = 3
+            backwards_str = " while facing backwards" if backwards else ""
             evidence = {
+                "desc": f"Placed {self.MAX_PLACEMENTS} blocks over air in {self.TIME_WINDOW:.1f}s{backwards_str}",
                 "blocks": self.MAX_PLACEMENTS,
                 "window": f"{self.TIME_WINDOW:.1f}s",
             }

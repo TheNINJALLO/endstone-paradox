@@ -236,6 +236,7 @@ class NoClipModule(BaseModule):
                         if bl and bl.is_deviation:
                             self.emit(player, 4, {
                                 "type": "noclip",
+                                "desc": f"Moved {dist:.1f} blocks through solid blocks",
                                 "distance": f"{dist:.1f}",
                                 "z_score": bl.z_score,
                             }, action_hint="setback")

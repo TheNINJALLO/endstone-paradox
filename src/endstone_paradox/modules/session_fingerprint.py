@@ -193,7 +193,7 @@ class SessionFingerprintModule(BaseModule):
                 "type": "alt_detection",
                 "linked_accounts": match_names,
                 "fingerprint": fingerprint[:8],
-                "detail": f"Matching fingerprint with {len(matches)} other account(s)",
+                "desc": f"Matching fingerprint with {len(matches)} other account(s)",
             })
 
     def _check_ban_evasion(self, player, uuid_str: str, fingerprint_record: dict):
@@ -223,7 +223,7 @@ class SessionFingerprintModule(BaseModule):
                     "type": "ban_evasion",
                     "banned_account": banned_name,
                     "banned_uuid": linked_uuid,
-                    "detail": f"Alt of banned player: {banned_name}",
+                    "desc": f"Alt of banned player: {banned_name}",
                 }, action_hint="ban")
 
                 self.alert_admins(
@@ -342,7 +342,7 @@ class SessionFingerprintModule(BaseModule):
             self.emit(player, severity=3, evidence={
                 "type": "global_flag",
                 "fingerprint": fingerprint_hash[:8],
-                "detail": "Fingerprint flagged by multiple Paradox servers",
+                "desc": "Fingerprint flagged by multiple Paradox servers",
             })
 
         # Also check linked fingerprints
@@ -368,7 +368,7 @@ class SessionFingerprintModule(BaseModule):
                     "type": "low_reputation",
                     "reputation": rep_score,
                     "fingerprint": fingerprint_hash[:8],
-                    "detail": f"Global reputation score: {rep_score}/100",
+                    "desc": f"Global reputation score: {rep_score}/100",
                 })
         except Exception:
             pass

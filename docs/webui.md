@@ -32,7 +32,7 @@ Overview of your server including:
 - Module status summary
 
 ### Modules
-Toggle all 21 modules on/off and adjust sensitivity (1-10) per module.
+Toggle all 39 modules on/off and adjust sensitivity (1-10) per module.
 
 ### Bans
 - View all server bans
@@ -68,3 +68,11 @@ Manage server allowlist and whitelist entries.
 
 ### Global DB
 View and manage global ban database entries.
+
+### Violations
+Per-player violation history and evidence browser:
+- **Violation list**: All players with violations sorted by count, showing severity badge, modules flagged, and last violation time
+- **Player detail**: Full violation timeline with severity filters (Critical/High/Medium/Low/Info)
+- **Descriptions**: Each violation shows a human-readable description explaining what triggered the detection
+- **Evidence grid**: Raw evidence key-value pairs for each violation
+- **Clear**: Clear violations per-player or globally

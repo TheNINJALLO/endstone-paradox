@@ -125,9 +125,10 @@ class FlyModule(BaseModule):
                             if speed_bl and speed_bl.is_deviation:
                                 severity = 4
                                 evidence = {
+                                    "type": "speed_hack",
+                                    "desc": f"Moving at {h_speed_bps:.1f} blocks/s (limit {self.speed_threshold:.1f})",
                                     "speed": f"{h_speed_bps:.1f}",
                                     "max": f"{self.speed_threshold:.1f}",
-                                    "type": "speed_hack",
                                     "baseline_avg": f"{speed_bl.avg:.1f}",
                                     "z_score": speed_bl.z_score,
                                 }
@@ -184,6 +185,8 @@ class FlyModule(BaseModule):
                     data["hover_time"] = 0  # reset but don't flag
                 elif hover_bl and hover_bl.is_deviation:
                     self.emit(player, 4, {
+                        "type": "hover",
+                        "desc": f"Hovering in mid-air for {data['hover_time']} ticks (no solid ground)",
                         "hover": data["hover_time"],
                         "threshold": self.hover_threshold,
                         "baseline_avg": f"{hover_bl.avg:.1f}",

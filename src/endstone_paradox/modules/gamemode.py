@@ -26,5 +26,6 @@ class GameModeModule(BaseModule):
         if new_mode not in self.ALLOWED_MODES:
             event.is_cancelled = True
             self.emit(player, 4, {
+                "desc": f"Tried to switch to {new_mode.name} (not allowed)",
                 "mode": new_mode.name,
             }, action_hint="cancel")

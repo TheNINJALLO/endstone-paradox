@@ -100,6 +100,7 @@ class KillAuraModule(BaseModule):
             if unique_targets > 2:
                 self.emit(attacker, 4, {
                     "type": "multi_aura",
+                    "desc": f"Hit {unique_targets} different entities within 0.5s",
                     "targets": unique_targets,
                     "window": "0.5s",
                 }, action_hint="cancel")
@@ -149,6 +150,7 @@ class KillAuraModule(BaseModule):
             # Escalate if baseline deviation detected
             severity = 3
             evidence = {
+                "desc": f"Suspicious attack pattern: {', '.join(reasons)}",
                 "reasons": ", ".join(reasons),
                 "attacks": len(recent),
             }

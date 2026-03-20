@@ -80,6 +80,7 @@ class TimerModule(BaseModule):
             if data["fast_flags"] >= self.FLAGS_REQUIRED:
                 self.emit(player, 4, {
                     "type": "timer_fast",
+                    "desc": f"Sending packets at {pps:.1f}/s (max {self.MAX_PACKETS_PER_SEC}) — game speed likely modified",
                     "pps": f"{pps:.1f}",
                     "max": self.MAX_PACKETS_PER_SEC,
                 }, action_hint="kick")
@@ -94,6 +95,7 @@ class TimerModule(BaseModule):
             if data["slow_flags"] >= self.FLAGS_REQUIRED:
                 self.emit(player, 3, {
                     "type": "timer_slow",
+                    "desc": f"Sending packets at {pps:.1f}/s (min {self.MIN_PACKETS_PER_SEC}) — possible slow timer",
                     "pps": f"{pps:.1f}",
                     "min": self.MIN_PACKETS_PER_SEC,
                 })

@@ -62,9 +62,18 @@ def handle_case(plugin, sender, args):
         severity = entry.get("severity", 0)
         action = entry.get("action", "?")
         evidence = entry.get("evidence", {})
-        ev_str = ", ".join(f"{k}={v}" for k, v in evidence.items())
-        sender.send_message(
-            f"  §7{ago}s ago §e{module} §7[sev={severity}] §f{ev_str} §7→ {action}"
-        )
+        desc = evidence.get("desc", "") or entry.get("desc", "")
+        ev_str = ", ".join(f"{k}={v}" for k, v in evidence.items()
+                          if k != "desc")
+        if desc:
+            sender.send_message(
+                f"  §7{ago}s ago §e{module} §7[sev={severity}] §f{desc}"
+            )
+            if ev_str:
+                sender.send_message(f"    §7{ev_str} → {action}")
+        else:
+            sender.send_message(
+                f"  §7{ago}s ago §e{module} §7[sev={severity}] §f{ev_str} §7→ {action}"
+            )
 
     return True

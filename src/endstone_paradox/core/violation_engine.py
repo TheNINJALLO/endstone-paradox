@@ -391,11 +391,16 @@ class ViolationEngine:
         self._alert_cooldowns[key] = now
 
         name = player.name if hasattr(player, 'name') else "?"
-        # Build concise alert
+        desc = evidence.get("desc", "")
+        # Build concise alert — lead with desc if available
         ev_str = ", ".join(f"{k}={v}" for k, v in evidence.items()
-                          if k not in ("module",))
-        msg = (f"§2[§7Paradox§2]§e §c{name}§e {module} "
-               f"[{Severity(severity).name}] ({ev_str}) → {action}")
+                          if k not in ("module", "desc"))
+        if desc:
+            msg = (f"§2[§7Paradox§2]§e §c{name}§e {module} "
+                   f"[{Severity(severity).name}] §f{desc} §7({ev_str}) → {action}")
+        else:
+            msg = (f"§2[§7Paradox§2]§e §c{name}§e {module} "
+                   f"[{Severity(severity).name}] ({ev_str}) → {action}")
         self.plugin.send_to_level4(msg)
 
     def _notify_watchers(self, uuid_str: str, player, module: str,
@@ -411,11 +416,19 @@ class ViolationEngine:
             for online in self.plugin.server.online_players:
                 if str(online.unique_id) == w_uuid:
                     name = player.name if hasattr(player, 'name') else "?"
-                    ev_str = ", ".join(f"{k}={v}" for k, v in evidence.items())
-                    online.send_message(
-                        f"§2[§7Watch§2]§e §c{name}§e {module} "
-                        f"[{Severity(severity).name}] ({ev_str}) → {action}"
-                    )
+                    desc = evidence.get("desc", "")
+                    ev_str = ", ".join(f"{k}={v}" for k, v in evidence.items()
+                                      if k != "desc")
+                    if desc:
+                        online.send_message(
+                            f"§2[§7Watch§2]§e §c{name}§e {module} "
+                            f"[{Severity(severity).name}] §f{desc} §7({ev_str}) → {action}"
+                        )
+                    else:
+                        online.send_message(
+                            f"§2[§7Watch§2]§e §c{name}§e {module} "
+                            f"[{Severity(severity).name}] ({ev_str}) → {action}"
+                        )
                     break
         for w in expired:
             self._watchers.pop(w, None)

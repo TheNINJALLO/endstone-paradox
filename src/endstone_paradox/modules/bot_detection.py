@@ -152,7 +152,7 @@ class BotDetectionModule(BaseModule):
                 "type": "honeypot",
                 "block_pos": f"{pos[1]},{pos[2]},{pos[3]}",
                 "dimension": pos[0],
-                "detail": "Player broke a hidden honeypot block",
+                "desc": "Player broke a hidden honeypot block",
             }, action_hint="kick")
 
             self.alert_admins(
@@ -187,7 +187,7 @@ class BotDetectionModule(BaseModule):
                     "entropy": round(entropy, 3),
                     "threshold": round(scaled_min, 3),
                     "samples": len(history),
-                    "detail": "Movement patterns too uniform — possible bot",
+                    "desc": "Movement patterns too uniform — possible bot",
                 })
                 # Reset window to avoid re-flagging immediately
                 self._movement_history[uuid_str].clear()
@@ -198,7 +198,7 @@ class BotDetectionModule(BaseModule):
                     "entropy": round(entropy, 3),
                     "threshold": round(scaled_max, 3),
                     "samples": len(history),
-                    "detail": "Movement patterns artificially random — possible randomized bot",
+                    "desc": "Movement patterns artificially random — possible randomized bot",
                 })
                 self._movement_history[uuid_str].clear()
 
@@ -224,7 +224,7 @@ class BotDetectionModule(BaseModule):
                 "short_sessions": short_count,
                 "threshold": threshold,
                 "window_s": int(REJOIN_WINDOW),
-                "detail": "Rapid join/leave cycling detected — possible bot",
+                "desc": "Rapid join/leave cycling detected — possible bot",
             })
 
         # Prune old sessions (keep last 20)

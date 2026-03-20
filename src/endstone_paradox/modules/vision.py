@@ -79,6 +79,7 @@ class VisionModule(BaseModule):
                     if data["accel_flags"] >= 4:  # 4 snap-from-still events
                         self.emit(player, 3, {
                             "type": "aimbot_accel",
+                            "desc": f"Snapped camera from standstill to target {data['accel_flags']} times",
                             "accel": f"{rotation_accel:.0f}",
                             "flags": data["accel_flags"],
                         })
@@ -93,6 +94,8 @@ class VisionModule(BaseModule):
                 # Flag if too many snaps
                 if len(data["snaps"]) >= self.SNAP_COUNT_LIMIT:
                     self.emit(player, 3, {
+                        "type": "snap_count",
+                        "desc": f"Made {len(data['snaps'])} sudden camera snaps in {self.WINDOW_SIZE:.1f}s",
                         "snaps": len(data['snaps']),
                         "window": f"{self.WINDOW_SIZE:.1f}s",
                     })
@@ -121,6 +124,7 @@ class VisionModule(BaseModule):
         if 0 < time_since_snap < 0.3:
             self.emit(attacker, 4, {
                 "type": "snap_attack",
+                "desc": f"Attacked within {time_since_snap:.2f}s of snapping camera to target",
                 "snap_delay": f"{time_since_snap:.2f}s",
             })
             data["last_snap_time"] = 0  # prevent double-flagging

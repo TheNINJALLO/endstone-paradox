@@ -90,6 +90,7 @@ class SkinGuardModule(BaseModule):
         if violations:
             reasons = ", ".join(violations)
             self.emit(player, 4, {
+                "desc": f"Invalid skin detected: {reasons}",
                 "reasons": reasons,
                 "skin_id": getattr(skin, 'skin_id', 'unknown'),
             }, action_hint="kick")

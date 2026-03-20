@@ -104,6 +104,7 @@ class TriggerBotModule(BaseModule):
                 avg_timing = sum(data["attack_timings"]) / len(data["attack_timings"])
                 self.emit(attacker, 4, {
                     "type": "triggerbot",
+                    "desc": f"Attacked within {avg_timing*1000:.0f}ms of aiming at target {fast_attacks} times",
                     "fast_attacks": fast_attacks,
                     "avg_reaction": f"{avg_timing*1000:.0f}ms",
                     "threshold": f"{self.REACTION_THRESHOLD*1000:.0f}ms",

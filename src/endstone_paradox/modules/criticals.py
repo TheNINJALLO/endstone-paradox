@@ -94,6 +94,7 @@ class CriticalsModule(BaseModule):
             if data["crit_flags"] >= self.FLAGS_REQUIRED:
                 self.emit(attacker, 3, {
                     "type": "criticals",
+                    "desc": f"Dealt critical hits while on ground with no Y movement (\u0394y={y_change:.3f})",
                     "y_change": f"{y_change:.3f}",
                     "flags": data["crit_flags"],
                 })

@@ -702,8 +702,12 @@ def _register_routes(app):
                 # Format evidence dict into readable pairs
                 ev = e.get("evidence", {})
                 if isinstance(ev, dict):
-                    e["evidence_items"] = list(ev.items())
+                    e["desc"] = ev.get("desc", "")
+                    e["evidence_items"] = [
+                        (k, v) for k, v in ev.items() if k != "desc"
+                    ]
                 else:
+                    e["desc"] = ""
                     e["evidence_items"] = []
         entries.reverse()  # newest first
         return render_template_string(
@@ -2640,6 +2644,11 @@ VIOLATIONS_DETAIL_HTML = """<!DOCTYPE html>
         <span>Severity: <strong>{{ {1:'Info',2:'Low',3:'Medium',4:'High',5:'Critical'}.get(v.severity|default(1), '?') }}</strong></span>
         <span>Action: <strong>{{ v.action|default('?') }}</strong></span>
     </div>
+    {% if v.desc %}
+    <div style="padding:8px 14px;background:rgba(99,102,241,0.10);border-left:3px solid #6366f1;border-radius:6px;margin:8px 0;font-size:13px;color:#c7d2fe;">
+        {{ v.desc }}
+    </div>
+    {% endif %}
     {% if v.evidence_items %}
     <div class="evidence-grid">
         {% for key, val in v.evidence_items %}

@@ -64,6 +64,7 @@ class PacketMonitorModule(BaseModule):
         if len(timestamps) >= self.SPAM_THRESHOLD:
             self.emit(player, 3, {
                 "type": "packet_spam",
+                "desc": f"Sent {len(timestamps)} {packet_type} packets in {self.WINDOW_SIZE}s — possible packet spam",
                 "packet": packet_type,
                 "count": len(timestamps),
                 "window": f"{self.WINDOW_SIZE}s",

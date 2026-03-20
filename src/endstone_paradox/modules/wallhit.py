@@ -118,6 +118,7 @@ class WallHitModule(BaseModule):
                 if count >= self.FLAGS_REQUIRED:
                     self.emit(attacker, 4, {
                         "type": "wall_hit",
+                        "desc": f"Hit entity through solid blocks {count} times at {dist:.1f}b range",
                         "distance": f"{dist:.1f}",
                         "hits": count,
                     }, action_hint="cancel")

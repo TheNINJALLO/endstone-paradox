@@ -115,7 +115,7 @@ Drop the `.whl` file into your Endstone server's `plugins/` folder:
 your-server/
 ├── endstone.toml
 ├── plugins/
-│   └── endstone_paradox-1.8.1-py3-none-any.whl   ← drop it here
+│   └── endstone_paradox-1.8.3-py3-none-any.whl   ← drop it here
 └── ...
 ```
 
@@ -124,7 +124,7 @@ your-server/
 Start (or restart) your Endstone server. You'll see Paradox load in the console:
 
 ```
-[ParadoxAC] Paradox AntiCheat v1.8.1 loaded!
+[ParadoxAC] Paradox AntiCheat v1.8.3 loaded!
 [ParadoxAC] Database initialized at plugins/ParadoxAC/paradox.db
 [ParadoxAC] 39 detection modules registered.
 ```
@@ -222,6 +222,7 @@ All detection modules feed into a **centralized violation engine** instead of pu
 | **3 modes** | `logonly` (monitor only), `soft` (default — cancel + setback), `hard` (faster escalation) |
 | **Rate-limited alerts** | Staff get max 1 alert per player per module every 10 seconds |
 | **Evidence logging** | All violations persisted to SQLite with timestamps, severity, and module |
+| **Violation descriptions** | Every violation includes a plain-English `desc` explaining what triggered the detection |
 | **Cross-module correlation** | Multi-module flags increase escalation speed |
 | **Temporary exemptions** | Exempt specific players from specific modules for testing |
 | **Live watching** | Admins can stream a player's violations in real-time |
@@ -452,6 +453,7 @@ Paradox includes a built-in web admin panel accessible from any browser.
 | **Permissions** | View and set player clearance levels (1-4) |
 | **Logs** | Namespoof detection log, detection events |
 | **Analytics** | Violation time-series chart, module breakdown, enforcement doughnut, summary stats |
+| **Violations** | Per-player violation history with human-readable descriptions, severity filters, evidence details |
 | **Reports** | Player report queue with claim/resolve, status filters, priority badges |
 | **Config** | Edit all DB settings, view config.toml, database mode info |
 | **Allow/Whitelist** | Add/remove players from allowlist and whitelist |

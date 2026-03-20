@@ -46,6 +46,7 @@ class SelfInflictionModule(BaseModule):
 
                 if count >= 5:
                     self.emit(actor, 2, {
+                        "desc": f"Dealt damage to self {count} times",
                         "count": count,
                     }, action_hint="cancel")
                     self._flags[uuid_str] = 0

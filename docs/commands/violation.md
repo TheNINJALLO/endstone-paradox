@@ -22,7 +22,7 @@ These commands control the centralized violation processing engine.
 /ac-case PlayerName 20
 ```
 
-Shows timestamps, module names, severity, evidence details, and what action was taken.
+Shows timestamps, module names, severity, **human-readable descriptions** of what triggered the detection, evidence details, and what action was taken.
 
 ### Watch a player in real-time
 

@@ -100,6 +100,7 @@ class StepHackModule(BaseModule):
                     if bl and bl.is_deviation:
                         self.emit(player, 3, {
                             "type": "step_hack",
+                            "desc": f"Stepped up {y_delta:.2f} blocks without jumping",
                             "y_delta": f"{y_delta:.2f}",
                             "flags": data["step_flags"],
                             "z_score": bl.z_score,
