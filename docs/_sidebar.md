@@ -3,6 +3,7 @@
 - **Modules**
   - [Overview](modules/overview.md)
   - **Detection — Movement**
+  - [Pathing Monitor](modules/pathingmonitor.md)
   - [Fly Detection](modules/fly.md)
   - [NoClip / Phase](modules/noclip.md)
   - [WaterWalk / Jesus](modules/waterwalk.md)
@@ -10,6 +11,8 @@
   - [Timer Hack](modules/timer.md)
   - [Blink / Teleport](modules/blink.md)
   - **Detection — Combat**
+  - [AutoTotem](modules/autototem.md)
+  - [Aimbot Monitor](modules/aimbotmonitor.md)
   - [KillAura Detection](modules/killaura.md)
   - [Reach Detection](modules/reach.md)
   - [AutoClicker Detection](modules/autoclicker.md)
@@ -37,10 +40,14 @@
   - [Session Fingerprinting](modules/fingerprint.md)
   - [Adaptive Check](modules/adaptivecheck.md)
   - **Prevention**
+  - [Anti-Crash](modules/anticrash.md)
   - [Anti-Dupe](modules/antidupe.md)
   - [Crash-Drop](modules/crashdrop.md)
   - [Inventory Sync](modules/invsync.md)
   - **Admin & Utility**
+  - [Container Lock](modules/containerlock.md)
+  - [Death Coords](modules/deathcoords.md)
+  - [Dimension Lock](modules/dimensionlock.md)
   - [AFK Detection](modules/afk.md)
   - [World Border](modules/worldborder.md)
   - [Rate Limiter](modules/ratelimit.md)

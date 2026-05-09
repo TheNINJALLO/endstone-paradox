@@ -126,7 +126,7 @@ Start (or restart) your Endstone server. You'll see Paradox load in the console:
 ```
 [ParadoxAC] Paradox AntiCheat v1.8.3 loaded!
 [ParadoxAC] Database initialized at plugins/ParadoxAC/paradox.db
-[ParadoxAC] 39 detection modules registered.
+[ParadoxAC] 46 detection modules registered.
 ```
 
 ### Step 4 — Set Your Admin Password
@@ -153,7 +153,7 @@ This opens the full admin panel where you can manage **everything** — modules,
 
 ## ✨ Features
 
-### 🛡️ 39 Detection, Community & Admin Modules
+### 📊 46 Detection, Community & Admin Modules
 
 | Module | What It Detects |
 |--------|-----------------|
@@ -196,6 +196,13 @@ This opens the full admin panel where you can manage **everything** — modules,
 | **Report System** | Player reports — `/ac-report` command, web queue with claim/resolve, auto-escalation, rate limiting |
 | **Session Fingerprint** | Device fingerprinting — composite IP/OS/XUID hash, alt account detection, ban evasion tracking |
 | **Adaptive Check** | Smart scheduling — risk-tier-based check intervals, clean players checked less, flagged players every tick |
+| **Aimbot Monitor** | Rotation smoothing variance detection |
+| **AntiCrash** | SubChunkRequest packet exploit blocking |
+| **AutoTotem** | Inhuman totem replenishment detection |
+| **Container Lock** | Storage block ownership locking |
+| **Death Coords** | Death coordinate notification |
+| **Dimension Lock** | Restricted dimension access control |
+| **Pathing Monitor** | Auto-navigation and speed exploit detection |
 
 Every module can be toggled individually via commands **or** the GUI. Advanced modules (anti-dupe, discord, etc.) are **off by default** and should be configured per-server.
 
@@ -355,7 +362,7 @@ Type `/ac-gui` to open the complete admin panel. **Every feature is accessible f
 
 | Section | What You Can Do |
 |---------|-----------------|
-| **Modules** | Toggle all 39 detection/admin modules on/off, adjust sensitivity for detection modules with a slider (1-10) |
+| **Modules** | Toggle all 46 detection/admin modules on/off, adjust sensitivity for detection modules with a slider (1-10) |
 | **Moderation** | Vanish, lockdown, lockdown level selector (L4 only / L4+L3), kick, ban, unban, freeze, punish, despawn entities, manage allow/white lists, view spoof logs, change prefix |
 | **Players** | Select any online player → kick, ban, freeze, warn, teleport to/from them, set rank, view inventory — all from one screen |
 | **Utilities** | Homes (set, delete, update, teleport), random TP, PvP toggle (personal + global), chat channels (create, join, leave, send), TPA, ranks |
@@ -538,8 +545,15 @@ endstone-paradox/
     ├── core/                   # Centralized systems
     │   ├── violation_engine.py #   Violation processing pipeline (290 lines)
     │   └── player_baseline.py  #   EMA behavioral profiling per player
-    ├── modules/                # 39 detection, community & admin modules
+    ├── modules/                # 46 detection, community & admin modules
     │   ├── base.py             #   Abstract base class + sensitivity + emit()
+    │   ├── aimbot_monitor.py   #   Rotation smoothing variance detection
+    │   ├── anticrash.py        #   SubChunkRequest packet exploit blocking
+    │   ├── autototem.py        #   Inhuman totem replenishment detection
+    │   ├── container_lock.py   #   Storage block ownership locking
+    │   ├── death_coords.py     #   Death coordinate notification
+    │   ├── dimension_lock.py   #   Restricted dimension access control
+    │   ├── pathing_monitor.py  #   Auto-navigation and speed exploit detection
     │   ├── fly.py              #   Flight/hover (surrounding-block check, knockback/slime exemptions)
     │   ├── noclip.py           #   Phase through solid blocks (ray-trace)
     │   ├── waterwalk.py        #   Jesus hack (Frost Walker/ice/lily exemptions)

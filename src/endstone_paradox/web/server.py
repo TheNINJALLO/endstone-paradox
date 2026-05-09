@@ -34,6 +34,10 @@ ALL_MODULES = {
     # Tier 3
     "adaptivecheck": False, "botdetection": False,
     "reportsystem": False, "fingerprint": False,
+    # New V6 Modules
+    "aimbotmonitor": True, "anticrash": True, "autototem": True,
+    "containerlock": False, "deathcoords": True, "dimensionlock": False,
+    "pathingmonitor": True,
 }
 
 # Modules that DON'T use sensitivity (utility/feature modules)
@@ -41,6 +45,7 @@ NO_SENSITIVITY = {
     "containersee", "afk", "lagclear", "worldborder", "gamemode",
     "pvp", "invsync", "discord", "evidencereplay", "crashdrop",
     "reportsystem", "adaptivecheck",
+    "anticrash", "containerlock", "deathcoords", "dimensionlock",
 }
 
 
