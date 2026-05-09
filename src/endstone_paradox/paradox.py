@@ -16,6 +16,9 @@ from endstone.event import (
     BlockBreakEvent,
     BlockPlaceEvent,
     PacketReceiveEvent,
+    PlayerTeleportEvent,
+    PlayerDeathEvent,
+    PlayerInteractEvent,
 )
 
 from endstone_paradox.database import ParadoxDatabase
@@ -187,7 +190,7 @@ class ParadoxPlugin(Plugin):
         self.logger.info("  §f§l ██      ██   ██ ██   ██ ██   ██ ██   ██ ██    ██  ██ ██")
         self.logger.info("  §f§l ██      ██   ██ ██   ██ ██   ██ ██████   ██████  ██   ██")
         self.logger.info("")
-        self.logger.info("  §7AntiCheat §ev1.6.0")
+        self.logger.info("  §7AntiCheat §ev1.9.0")
         self.logger.info("  §7Designed by §fVisual1mpact")
         self.logger.info("  §7Ported to Endstone by §a§lTheN1NJ4LL0")
         self.logger.info("")
@@ -341,6 +344,15 @@ class ParadoxPlugin(Plugin):
         from endstone_paradox.modules.bot_detection import BotDetectionModule
         from endstone_paradox.modules.report_system import ReportSystemModule
         from endstone_paradox.modules.session_fingerprint import SessionFingerprintModule
+        
+        # Ported V6 Modules
+        from endstone_paradox.modules.aimbot_monitor import AimbotMonitorModule
+        from endstone_paradox.modules.anticrash import AntiCrashModule
+        from endstone_paradox.modules.autototem import AutoTotemModule
+        from endstone_paradox.modules.container_lock import ContainerLockModule
+        from endstone_paradox.modules.death_coords import DeathCoordsModule
+        from endstone_paradox.modules.dimension_lock import DimensionLockModule
+        from endstone_paradox.modules.pathing_monitor import PathingMonitorModule
 
         module_classes = {
             "fly": FlyModule,
@@ -383,12 +395,20 @@ class ParadoxPlugin(Plugin):
             "botdetection": BotDetectionModule,
             "reportsystem": ReportSystemModule,
             "fingerprint": SessionFingerprintModule,
+            "aimbotmonitor": AimbotMonitorModule,
+            "anticrash": AntiCrashModule,
+            "autototem": AutoTotemModule,
+            "containerlock": ContainerLockModule,
+            "deathcoords": DeathCoordsModule,
+            "dimensionlock": DimensionLockModule,
+            "pathingmonitor": PathingMonitorModule,
         }
 
         # these are off by default since they need tuning per-server
         default_off = {"ratelimit", "packetmonitor", "containersee", "antidupe", "crashdrop", "invsync",
                         "discord", "chatprotection", "antigrief", "evidencereplay",
-                        "adaptivecheck", "botdetection", "reportsystem", "fingerprint"}
+                        "adaptivecheck", "botdetection", "reportsystem", "fingerprint",
+                        "containerlock", "dimensionlock"}
 
         for name, cls in module_classes.items():
             try:
@@ -506,6 +526,9 @@ class ParadoxPlugin(Plugin):
             "ac-discord", "ac-chatprotection", "ac-antigrief", "ac-evidencereplay",
             # Tier 3
             "ac-adaptivecheck", "ac-botdetection", "ac-reportsystem", "ac-fingerprint",
+            # New V6 Modules
+            "ac-aimbotmonitor", "ac-anticrash", "ac-autototem", "ac-containerlock",
+            "ac-deathcoords", "ac-dimensionlock", "ac-pathingmonitor",
         ]:
             self._command_handlers[cmd] = handle_toggle
 
@@ -707,9 +730,16 @@ class ParadoxPlugin(Plugin):
             event.is_cancelled = True
             return
 
+        module = self._modules.get("pathingmonitor")
+        if module and module.running:
+            try:
+                module.on_player_move(event)
+            except Exception as e:
+                self.logger.error(f"PathingMonitor error: {e}")
+
     @event_handler
     def on_actor_damage(self, event: ActorDamageEvent):
-        for module_name in ("killaura", "reach", "autoclicker", "pvp", "selfinfliction", "vision", "antikb", "criticals", "wallhit", "triggerbot", "botdetection"):
+        for module_name in ("killaura", "reach", "autoclicker", "pvp", "selfinfliction", "vision", "antikb", "criticals", "wallhit", "triggerbot", "botdetection", "aimbotmonitor"):
             module = self._modules.get(module_name)
             if module and module.running:
                 try:
@@ -728,13 +758,40 @@ class ParadoxPlugin(Plugin):
 
     @event_handler
     def on_block_place(self, event: BlockPlaceEvent):
-        for module_name in ("scaffold", "antidupe"):
+        for module_name in ("scaffold", "antidupe", "containerlock"):
             module = self._modules.get(module_name)
             if module and module.running:
                 try:
                     module.on_block_place(event)
                 except Exception as e:
                     self.logger.error(f"{module_name} module block place error: {e}")
+
+    @event_handler
+    def on_player_interact(self, event: PlayerInteractEvent):
+        module = self._modules.get("containerlock")
+        if module and module.running:
+            try:
+                module.on_player_interact(event)
+            except Exception as e:
+                self.logger.error(f"ContainerLock module error: {e}")
+
+    @event_handler
+    def on_player_death(self, event: PlayerDeathEvent):
+        module = self._modules.get("deathcoords")
+        if module and module.running:
+            try:
+                module.on_player_death(event)
+            except Exception as e:
+                self.logger.error(f"DeathCoords module error: {e}")
+
+    @event_handler
+    def on_player_teleport(self, event: PlayerTeleportEvent):
+        module = self._modules.get("dimensionlock")
+        if module and module.running:
+            try:
+                module.on_player_teleport(event)
+            except Exception as e:
+                self.logger.error(f"DimensionLock module error: {e}")
 
     @event_handler
     def on_gamemode_change(self, event: PlayerGameModeChangeEvent):
@@ -747,7 +804,7 @@ class ParadoxPlugin(Plugin):
 
     @event_handler
     def on_packet_receive(self, event: PacketReceiveEvent):
-        for module_name in ("ratelimit", "packetmonitor", "antidupe", "autoclicker", "timer"):
+        for module_name in ("ratelimit", "packetmonitor", "antidupe", "autoclicker", "timer", "anticrash"):
             module = self._modules.get(module_name)
             if module and module.running:
                 try:

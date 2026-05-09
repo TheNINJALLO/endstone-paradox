@@ -4,12 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "endstone-paradox"
-version = "1.8.3"
+version = "1.9.0"
 description = "Paradox AntiCheat - A comprehensive anti-cheat system for Endstone Bedrock servers"
 requires-python = ">=3.9"
 dependencies = [
     "endstone>=0.11",
     "bedrock-protocol-packets",
+    "rapidnbt>=1.0.0",
     "flask>=3.0",
 ]
 
@@ -17,7 +18,7 @@ dependencies = [
 paradox = "endstone_paradox:ParadoxPlugin"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/endstone_paradox"]
+packages = ["src/endstone_paradox", "src/chest_form_api_endstone"]
 
 [tool.endstone]
 name = "ParadoxAC"
@@ -63,8 +64,15 @@ load = "POSTWORLD"
 "ac-worldborder" = { description = "Configure world border", usages = ["/ac-worldborder [radius: int] [x: int] [z: int]"], permissions = ["paradox.settings"] }
 "ac-lagclear" = { description = "Toggle/configure lag clear", usages = ["/ac-lagclear [interval: int]"], permissions = ["paradox.settings"] }
 "ac-ratelimit" = { description = "Toggle rate limiting", usages = ["/ac-ratelimit"], permissions = ["paradox.settings"] }
-"ac-namespoof" = { description = "Toggle namespoof detection", usages = ["/ac-namespoof"], permissions = ["paradox.settings"] }
-"ac-packetmonitor" = { description = "Toggle packet monitor", usages = ["/ac-packetmonitor"], permissions = ["paradox.settings"] }
+"ac-namespoof" = { description = "Toggle name spoofing detection on or off", usages = ["/ac-namespoof"], permissions = ["paradox.settings"] }
+"ac-packetmonitor" = { description = "Toggle packet spam monitoring on or off", usages = ["/ac-packetmonitor"], permissions = ["paradox.settings"] }
+"ac-aimbotmonitor" = { description = "Toggle aimbot detection on or off", usages = ["/ac-aimbotmonitor"], permissions = ["paradox.settings"] }
+"ac-anticrash" = { description = "Toggle anti-crash exploit protection on or off", usages = ["/ac-anticrash"], permissions = ["paradox.settings"] }
+"ac-autototem" = { description = "Toggle auto-totem detection on or off", usages = ["/ac-autototem"], permissions = ["paradox.settings"] }
+"ac-containerlock" = { description = "Toggle container locking feature on or off", usages = ["/ac-containerlock"], permissions = ["paradox.settings"] }
+"ac-deathcoords" = { description = "Toggle death coordinates feature on or off", usages = ["/ac-deathcoords"], permissions = ["paradox.settings"] }
+"ac-dimensionlock" = { description = "Toggle dimension locking feature on or off", usages = ["/ac-dimensionlock"], permissions = ["paradox.settings"] }
+"ac-pathingmonitor" = { description = "Toggle pathing/navigator detection on or off", usages = ["/ac-pathingmonitor"], permissions = ["paradox.settings"] }
 
 # === Utility Commands ===
 "ac-home" = { description = "Set/teleport to home locations", usages = ["/ac-home [set|delete|list] [name: str]"], permissions = ["paradox.home"] }
