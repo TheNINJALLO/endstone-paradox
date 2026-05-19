@@ -12,4 +12,5 @@ Utility commands are available to players at various clearance levels.
 | `/ac-rank <player> <rank>` | Set a player's display rank | L3 |
 | `/ac-debug-db [table]` | Debug database contents (admin diagnostic) | L4 |
 | `/ac-gui` | Open the in-game GUI menu | L2 |
+| `/ac-guiitem [item]` | Configure an item to open the GUI | L4 |
 | `/ac-about` | Show plugin version and info | Anyone |
