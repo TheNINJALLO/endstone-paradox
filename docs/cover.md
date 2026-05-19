@@ -4,7 +4,7 @@
 
 > The most advanced anti-cheat plugin for Minecraft Bedrock Edition via Endstone
 
-- 🛡️ 39 Detection & Admin Modules
+- 🛡️ 46 Detection & Admin Modules
 - ⚖️ Centralized Violation Engine
 - 🌐 Built-in Web Admin Panel
 - 🔐 4-Level Security Clearance

@@ -33,10 +33,10 @@ class AutoClickerModule(BaseModule):
 
     # --- Default CPS caps per platform ---
     # These are the BASE values at sensitivity 5; sensitivity scaling adjusts them.
-    CPS_PC = 22          # butterfly / jitter clicking caps out ~20
-    CPS_MOBILE = 16      # multi-finger tapping
-    CPS_CONSOLE = 12     # controller trigger
-    CPS_DEFAULT = 22     # fallback
+    CPS_PC = 5
+    CPS_MOBILE = 5
+    CPS_CONSOLE = 5
+    CPS_DEFAULT = 5
 
     # Consistency: coefficient of variation threshold (stddev / mean).
     # Human clicks have high variance (CV > 0.15).  Bots are very regular (CV < 0.08).

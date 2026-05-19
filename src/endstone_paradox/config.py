@@ -94,6 +94,14 @@ DEFAULT_CONFIG = {
         "botdetection": {"enabled": False, "sensitivity": 5},
         "reportsystem": {"enabled": False, "sensitivity": 5},
         "fingerprint": {"enabled": False, "sensitivity": 5},
+        # Ported V6 Modules
+        "aimbotmonitor": {"enabled": True, "sensitivity": 5},
+        "anticrash": {"enabled": True, "sensitivity": 5},
+        "autototem": {"enabled": True, "sensitivity": 5},
+        "containerlock": {"enabled": False, "sensitivity": 5},
+        "deathcoords": {"enabled": True, "sensitivity": 5},
+        "dimensionlock": {"enabled": False, "sensitivity": 5},
+        "pathingmonitor": {"enabled": True, "sensitivity": 5},
     },
     "discord": {
         "webhook_url": "",

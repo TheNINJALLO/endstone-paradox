@@ -102,6 +102,7 @@ class ParadoxPlugin(Plugin):
         "ac-gui": {"description": "Open the Paradox admin GUI menu", "usages": ["/ac-gui"], "permissions": ["paradox.gui"]},
         "ac-report": {"description": "Report a player for suspicious behavior", "usages": ["/ac-report <player: player> [reason: message]"], "permissions": ["paradox.report"]},
         "ac-about": {"description": "View Paradox AntiCheat version and info", "usages": ["/ac-about"], "permissions": ["paradox.about"]},
+        "ac-guiitem": {"description": "Configure GUI trigger item", "usages": ["/ac-guiitem [item: message]"], "permissions": ["paradox.guiitem"]},
         # --- Violation Engine ---
         "ac-case": {"description": "View violation evidence for a player", "usages": ["/ac-case <player: player> [count: int]"], "permissions": ["paradox.case"]},
         "ac-watch": {"description": "Stream violations for a player in real-time", "usages": ["/ac-watch <player: player> [minutes: int]"], "permissions": ["paradox.watch"]},
@@ -138,6 +139,7 @@ class ParadoxPlugin(Plugin):
         "paradox.debugdb": {"description": "Use /ac-debug-db command", "default": "op"},
         "paradox.gui": {"description": "Use /ac-gui command", "default": "op"},
         "paradox.about": {"description": "Use /ac-about command", "default": True},
+        "paradox.guiitem": {"description": "Use /ac-guiitem command", "default": "op"},
         "paradox.report": {"description": "Use /ac-report command", "default": True},
         "paradox.case": {"description": "Use /ac-case command", "default": "op"},
         "paradox.watch": {"description": "Use /ac-watch command", "default": "op"},
@@ -483,6 +485,7 @@ class ParadoxPlugin(Plugin):
         from endstone_paradox.commands.utility.rank_cmd import handle_rank
         from endstone_paradox.commands.utility.debug_db_cmd import handle_debug_db
         from endstone_paradox.commands.utility.gui_cmd import handle_gui
+        from endstone_paradox.commands.utility.guiitem_cmd import handle_guiitem
         from endstone_paradox.commands.utility.about_cmd import handle_about
 
         from endstone_paradox.commands.violation.case_cmd import handle_case
@@ -541,6 +544,7 @@ class ParadoxPlugin(Plugin):
         self._command_handlers["ac-rank"] = handle_rank
         self._command_handlers["ac-debug-db"] = handle_debug_db
         self._command_handlers["ac-gui"] = handle_gui
+        self._command_handlers["ac-guiitem"] = handle_guiitem
         self._command_handlers["ac-about"] = handle_about
 
         # Tier 3 - report command
@@ -768,6 +772,14 @@ class ParadoxPlugin(Plugin):
 
     @event_handler
     def on_player_interact(self, event: PlayerInteractEvent):
+        if event.item and event.player:
+            gui_item = self.db.get("config", "gui_item", "")
+            if gui_item and str(event.item.type).lower() == gui_item.lower():
+                if self.security.is_level4(event.player):
+                    from endstone_paradox.commands.utility.gui_cmd import handle_gui
+                    # run task to avoid UI bugs when opened directly from event
+                    self.server.scheduler.run_task(self, lambda: handle_gui(self, event.player, []))
+
         module = self._modules.get("containerlock")
         if module and module.running:
             try:

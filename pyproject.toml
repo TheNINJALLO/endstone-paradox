@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "endstone-paradox"
-version = "1.9.0"
+version = "1.9.1"
 description = "Paradox AntiCheat - A comprehensive anti-cheat system for Endstone Bedrock servers"
 requires-python = ">=3.9"
 dependencies = [
@@ -22,7 +22,7 @@ packages = ["src/endstone_paradox", "src/chest_form_api_endstone"]
 
 [tool.endstone]
 name = "ParadoxAC"
-version = "1.8.3"
+version = "1.9.1"
 api = "0.11"
 description = "Paradox AntiCheat - Comprehensive anti-cheat and moderation system"
 authors = ["Paradox Team"]
@@ -84,6 +84,7 @@ load = "POSTWORLD"
 "ac-debug-db" = { description = "Inspect/modify SQLite database", usages = ["/ac-debug-db <table: str> [key: str] [value: str]"], permissions = ["paradox.debugdb"] }
 "ac-gui" = { description = "Open Paradox GUI menu", usages = ["/ac-gui"], permissions = ["paradox.gui"] }
 "ac-about" = { description = "About Paradox AntiCheat", usages = ["/ac-about"], permissions = ["paradox.about"] }
+"ac-guiitem" = { description = "Configure GUI trigger item", usages = ["/ac-guiitem [item: str]"], permissions = ["paradox.guiitem"] }
 
 [tool.endstone.permissions]
 "paradox.op" = { description = "Use /ac-op command", default = true }
@@ -114,3 +115,4 @@ load = "POSTWORLD"
 "paradox.debugdb" = { description = "Use /ac-debug-db command", default = "op" }
 "paradox.gui" = { description = "Use /ac-gui command", default = "op" }
 "paradox.about" = { description = "Use /ac-about command", default = true }
+"paradox.guiitem" = { description = "Use /ac-guiitem command", default = "op" }

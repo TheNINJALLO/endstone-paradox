@@ -12,7 +12,7 @@ class KillAuraModule(BaseModule):
     name = "killaura"
 
     # Base tuning constants (at sensitivity 5)
-    BASE_MAX_ATTACKS_PER_SEC = 14     # Max attacks in 1 second
+    BASE_MAX_ATTACKS_PER_SEC = 5      # Max attacks in 1 second
     BASE_MAX_ATTACK_DISTANCE = 4.5    # Max legitimate hit distance
     BASE_MAX_ANGLE = 60.0             # Max angle between view and target
     BUFFER_SIZE = 20                   # Attack time buffer
