@@ -20,8 +20,9 @@
 </p>
 
 <p align="center">
-  <a href="#overview">Overview</a> &bull;
-  <a href="#compatibility">Compatibility</a> &bull;
+  <a href="#what-it-does">What it does</a> &bull;
+  <a href="#how-to-use">How to use</a> &bull;
+  <a href="#commands-and-permissions">Commands</a> &bull;
   <a href="#install">Install</a> &bull;
   <a href="https://github.com/TheNINJALLO/endstone-paradox/releases">Releases</a>
 </p>
@@ -30,9 +31,95 @@
 
 Paradox AntiCheat - A comprehensive anti-cheat system for Endstone Bedrock servers. This release is aligned with Endstone 0.11.8 and Minecraft Bedrock Dedicated Server 1.26.40, and is distributed as a Python wheel for direct installation in an Endstone server.
 
-## Capabilities
+## What it does
 
--
+- Combines anti-cheat detections, violation scoring, evidence, reports, cases, and configurable punishments.
+- Provides secured moderation, operator, allowlist, movement, inventory, PvP, and server-protection controls.
+- Persists state in SQLite and offers an in-game GUI plus optional web companion and cross-server intelligence features.
+
+## How to use
+
+1. Start once, set a strong local admin password, and review every module and punishment threshold before enforcement.
+2. Assign the narrow `paradox.*` permissions required by each staff role instead of granting all controls.
+3. Open `/ac-gui`, review detections with `/ac-case` and `/ac-watch`, and use punishment commands only after checking evidence.
+4. Configure Discord or web integrations with environment/local secret values and keep generated databases and configuration out of Git.
+
+## Commands and permissions
+
+| Command / usage | What it does | Access |
+|---|---|---|
+| `/ac-op [password: message]` | Authenticate with password to gain security clearance | `paradox.op` |
+| `/ac-deop [player: player]` | Revoke your or another player's security clearance | `paradox.deop` |
+| `/ac-ban <player: player> [reason: message]` | Ban a player with an optional reason | `paradox.ban` |
+| `/ac-unban <name: message>` | Unban a player by name | `paradox.unban` |
+| `/ac-kick <player: player> [reason: message]` | Kick a player from the server with an optional reason | `paradox.kick` |
+| `/ac-freeze <player: player>` | Freeze or unfreeze a player in place | `paradox.freeze` |
+| `/ac-vanish` | Toggle invisibility - hide from all players | `paradox.vanish` |
+| `/ac-lockdown [level: int]` | Toggle server lockdown, or set lockdown level (1=L4 only, 2=L4+L3) | `paradox.lockdown` |
+| `/ac-punish <player: player> [action: message]` | Punish a player (warn/mute/kick/ban) | `paradox.punish` |
+| `/ac-tpa <player: player>` | Send a teleport request to another player | `paradox.tpa` |
+| `/ac-allowlist [args: message]` | Manage allow list: add/remove/list players | `paradox.allowlist` |
+| `/ac-whitelist [args: message]` | Manage whitelist: add/remove/list players | `paradox.whitelist` |
+| `/ac-opsec` | View security dashboard with admin clearance levels | `paradox.opsec` |
+| `/ac-despawn [args: message]` | Despawn entities by type within radius | `paradox.despawn` |
+| `/ac-modules` | View all detection modules and their on/off status | `paradox.modules` |
+| `/ac-spooflog` | View log of detected name spoofing attempts | `paradox.spooflog` |
+| `/ac-command [args: message]` | Enable or disable a Paradox command | `paradox.command` |
+| `/ac-prefix [prefix: message]` | Change the Paradox chat prefix display | `paradox.prefix` |
+| `/ac-fly` | Toggle fly/hover hack detection on or off | `paradox.settings` |
+| `/ac-killaura` | Toggle kill aura detection on or off | `paradox.settings` |
+| `/ac-reach` | Toggle reach hack detection on or off | `paradox.settings` |
+| `/ac-autoclicker [maxcps: int]` | Toggle autoclicker detection, optionally set max CPS | `paradox.settings` |
+| `/ac-scaffold` | Toggle scaffold/fast-bridge detection on or off | `paradox.settings` |
+| `/ac-xray` | Toggle X-ray mining detection on or off | `paradox.settings` |
+| `/ac-gamemode` | Toggle illegal gamemode change detection on or off | `paradox.settings` |
+| `/ac-afk [timeout: int]` | Toggle AFK detection, optionally set timeout in seconds | `paradox.settings` |
+| `/ac-vision` | Toggle aimbot/snap detection on or off | `paradox.settings` |
+| `/ac-worldborder [args: message]` | Set world border radius and center position | `paradox.settings` |
+| `/ac-lagclear [interval: int]` | Toggle periodic entity clearing, optionally set interval | `paradox.settings` |
+| `/ac-ratelimit` | Toggle packet rate limiting on or off | `paradox.settings` |
+| `/ac-namespoof` | Toggle name spoofing detection on or off | `paradox.settings` |
+| `/ac-packetmonitor` | Toggle packet spam monitoring on or off | `paradox.settings` |
+| `/ac-containersee` | Toggle container vision for admins (see contents by looking) | `paradox.settings` |
+| `/ac-skinguard` | Toggle skin validation (blocks 4D/tiny/invisible skins) | `paradox.settings` |
+| `/ac-noclip` | Toggle noclip hack detection on or off | `paradox.settings` |
+| `/ac-waterwalk` | Toggle water-walk hack detection on or off | `paradox.settings` |
+| `/ac-stephack` | Toggle step-hack detection on or off | `paradox.settings` |
+| `/ac-timer` | Toggle timer hack detection on or off | `paradox.settings` |
+| `/ac-blink` | Toggle blink/teleport hack detection on or off | `paradox.settings` |
+| `/ac-antikb` | Toggle anti-knockback detection on or off | `paradox.settings` |
+| `/ac-criticals` | Toggle criticals hack detection on or off | `paradox.settings` |
+| `/ac-wallhit` | Toggle wall-hit detection on or off | `paradox.settings` |
+| `/ac-triggerbot` | Toggle triggerbot detection on or off | `paradox.settings` |
+| `/ac-illegalitems` | Toggle illegal item detection on or off | `paradox.settings` |
+| `/ac-selfinfliction` | Toggle self-infliction detection on or off | `paradox.settings` |
+| `/ac-pvptoggle` | Toggle PvP module on or off | `paradox.settings` |
+| `/ac-antidupe` | Toggle anti-dupe detection on or off | `paradox.settings` |
+| `/ac-crashdrop` | Toggle crash-drop prevention on or off | `paradox.settings` |
+| `/ac-invsync` | Toggle inventory sync module on or off | `paradox.settings` |
+| `/ac-discord` | Toggle Discord webhook integration on or off | `paradox.settings` |
+| `/ac-chatprotection` | Toggle chat protection (spam/ads/swear filter) on or off | `paradox.settings` |
+| `/ac-antigrief` | Toggle anti-grief (nuke/rapid place detection) on or off | `paradox.settings` |
+| `/ac-evidencereplay` | Toggle evidence replay system on or off | `paradox.settings` |
+| `/ac-adaptivecheck` | Toggle adaptive check frequency on or off | `paradox.settings` |
+| `/ac-botdetection` | Toggle bot detection on or off | `paradox.settings` |
+| `/ac-reportsystem` | Toggle player report system on or off | `paradox.settings` |
+| `/ac-fingerprint` | Toggle session fingerprinting on or off | `paradox.settings` |
+| `/ac-home [args: message]` | Manage homes: set/delete/list or teleport by name | `paradox.home` |
+| `/ac-tpr [radius: int]` | Teleport to a random location, optionally set radius | `paradox.tpr` |
+| `/ac-invsee <player: player>` | View another player's inventory contents | `paradox.invsee` |
+| `/ac-pvp [args: message]` | Toggle PvP: use alone or with global/status/help | `paradox.pvp` |
+| `/ac-channels [args: message]` | Private chat: create/join/leave/list/send channels | `paradox.channels` |
+| `/ac-rank <player: player> [rank: message]` | Set or view a player's display rank | `paradox.rank` |
+| `/ac-debug-db [args: message]` | Inspect or modify the Paradox database directly | `paradox.debugdb` |
+| `/ac-gui` | Open the Paradox admin GUI menu | `paradox.gui` |
+| `/ac-report <player: player> [reason: message]` | Report a player for suspicious behavior | `paradox.report` |
+| `/ac-about` | View Paradox AntiCheat version and info | `paradox.about` |
+| `/ac-guiitem [item: message]` | Configure GUI trigger item | `paradox.guiitem` |
+| `/ac-case <player: player> [count: int]` | View violation evidence for a player | `paradox.case` |
+| `/ac-watch <player: player> [minutes: int]` | Stream violations for a player in real-time | `paradox.watch` |
+| `/ac-mode <mode: message>` | Set enforcement mode: logonly, soft, or hard | `paradox.mode` |
+| `/ac-exempt <player: player> [args: message]` | Temporarily exempt a player from a module | `paradox.exempt` |
 
 ## Compatibility
 
