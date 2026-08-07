@@ -18,7 +18,7 @@ class DimensionLockModule(BaseModule):
         if self.plugin.security.is_level4(player):
             return
 
-        to_loc = event.to
+        to_loc = event.to_location
         if not to_loc:
             return
 

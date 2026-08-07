@@ -835,7 +835,7 @@ class ParadoxPlugin(Plugin):
         """Check block at player pos for climbable blocks (ladders, vines, etc)."""
         try:
             loc = player.location
-            block = player.dimension.get_block(int(loc.x), int(loc.y), int(loc.z))
+            block = player.dimension.get_block_at(int(loc.x), int(loc.y), int(loc.z))
             if block:
                 block_type = str(block.type).lower()
                 climbable = {"ladder", "vine", "twisting_vines", "weeping_vines",

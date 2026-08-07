@@ -40,9 +40,9 @@ class WorldBorderModule(BaseModule):
                     safe_z = self._center_z + dz * ratio
 
                     player.teleport(
-                        player.dimension.get_block(
+                        player.dimension.get_block_at(
                             int(safe_x), int(loc.y), int(safe_z)
-                        ).location if hasattr(player.dimension, 'get_block') else loc
+                        ).location
                     )
 
                     player.send_message(

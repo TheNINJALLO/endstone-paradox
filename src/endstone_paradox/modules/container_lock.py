@@ -45,7 +45,7 @@ class ContainerLockModule(BaseModule):
         lock_data = self.db.get("chestLockDB", key)
         
         # Check if they are trying to lock/unlock with a stick
-        item = player.inventory.item_in_hand if player.inventory else None
+        item = player.inventory.item_in_main_hand if player.inventory else None
         if item and "stick" in str(item.type).lower():
             if not lock_data:
                 # Lock it
