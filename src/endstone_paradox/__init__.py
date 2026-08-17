@@ -3,4 +3,4 @@
 from .paradox import ParadoxPlugin
 
 __all__ = ["ParadoxPlugin"]
-__version__ = "1.9.1"
+__version__ = "1.9.3"
