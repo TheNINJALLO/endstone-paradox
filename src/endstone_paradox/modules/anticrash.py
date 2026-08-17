@@ -3,6 +3,18 @@ from endstone.event import PacketReceiveEvent
 from bedrock_protocol.packets import MinecraftPacketIds
 from endstone_paradox.modules.base import BaseModule
 
+# The SubChunkRequest packet is named differently across bedrock-protocol-packets-ng
+# versions: newer versions (0.0.9+) use MinecraftPacketIds.SubChunkRequestPacket (id 175),
+# while older versions use MinecraftPacketIds.SubChunkRequest.
+# Use getattr to stay compatible with both namings and avoid raising an
+# AttributeError on enums that lack the attribute.
+SUBCHUNK_REQUEST_ID = getattr(
+    MinecraftPacketIds,
+    "SubChunkRequestPacket",
+    getattr(MinecraftPacketIds, "SubChunkRequest", None),
+)
+
+
 class AntiCrashModule(BaseModule):
     """Blocks oversized SubChunkRequestPacket exploits."""
 
@@ -14,7 +26,7 @@ class AntiCrashModule(BaseModule):
             return
 
         # Use bedrock-protocol-packets MinecraftPacketIds to identify SubChunkRequest
-        if event.packet_id == MinecraftPacketIds.SubChunkRequest:
+        if SUBCHUNK_REQUEST_ID is not None and event.packet_id == SUBCHUNK_REQUEST_ID:
             payload_size = len(event.payload)
             if payload_size > self.MAX_PACKET_SIZE:
                 event.is_cancelled = True
