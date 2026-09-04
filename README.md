@@ -129,14 +129,14 @@ Paradox AntiCheat - A comprehensive anti-cheat system for Endstone Bedrock serve
 | Endstone API | `0.11` |
 | Bedrock Dedicated Server | `1.26.44` |
 | Python | `>=3.10` |
-| Plugin release | `v1.9.3` |
+| Plugin release | `v1.9.4` |
 
 ## Install
 
 Download the wheel from the matching GitHub release:
 
 ```bash
-gh release download v1.9.3 --repo TheNINJALLO/endstone-paradox --pattern "*.whl"
+gh release download v1.9.4 --repo TheNINJALLO/endstone-paradox --pattern "*.whl"
 ```
 
 Copy the downloaded wheel into the server's `plugins/` directory, remove any older wheel for the same plugin, and restart Endstone.
