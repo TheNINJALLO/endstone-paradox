@@ -1,0 +1,88 @@
+name: Native build and release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v2.*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            platform: linux
+          - os: windows-2022
+            platform: windows
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build tools
+        run: python -m pip install cmake==3.31.6 ninja conan==2.31.0 uv==0.12.17
+      - uses: actions/cache@v4
+        with:
+          path: |
+            build
+            ~/.conan2
+          key: native-${{ matrix.platform }}-llvm20-${{ hashFiles('CMakeLists.txt', 'native/tools/harden_protocol.py', 'native/tools/build-windows.ps1') }}
+      - name: Linux toolchain
+        if: runner.os == 'Linux'
+        run: |
+          wget -q https://apt.llvm.org/llvm.sh
+          sudo bash llvm.sh 20
+          sudo apt-get install -y libc++-20-dev libc++abi-20-dev libssl-dev
+      - name: Windows toolchain
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Invoke-WebRequest https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.8/LLVM-20.1.8-win64.exe -OutFile "$env:RUNNER_TEMP/llvm.exe"
+          & 7z x "$env:RUNNER_TEMP/llvm.exe" "-o$env:RUNNER_TEMP/llvm" -y | Out-Null
+          if ($LASTEXITCODE) { throw 'LLVM extraction failed' }
+          conan profile detect --name paradox-native
+          conan install --requires=openssl/3.5.2 --output-folder=build/deps -pr:h=paradox-native -pr:b=paradox-native -s build_type=Release -g CMakeDeps --build=missing
+          if ($LASTEXITCODE) { throw 'OpenSSL setup failed' }
+      - name: Build Linux
+        if: runner.os == 'Linux'
+        run: |
+          cmake -S . -B build/linux -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20
+          cmake --build build/linux --parallel 4
+          ctest --test-dir build/linux --output-on-failure
+          python native/tools/package.py build/linux/endstone_paradox.so --platform linux
+      - name: Build Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          ./native/tools/build-windows.ps1 -LlvmRoot "$env:RUNNER_TEMP/llvm" -DependencyDirectory "$PWD/build/deps"
+          python native/tools/package.py build/windows/endstone_paradox.dll --platform windows
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paradox-${{ matrix.platform }}
+          path: dist/native/*
+          if-no-files-found: error
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - name: Publish native artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || gh release create "$GITHUB_REF_NAME" --draft --title "Paradox $GITHUB_REF_NAME" --generate-notes
+          gh release upload "$GITHUB_REF_NAME" artifacts/* --clobber

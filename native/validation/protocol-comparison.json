@@ -1,0 +1,26 @@
+{
+  "PlayerAuthInputPacket": {
+    "sha256": "379a229e9fa8671adb826f7c81664da57123591a290cf9467b51705c949ec145",
+    "matches_protocol_docs": true
+  },
+  "PlayerHotbarPacket": {
+    "sha256": "efde476c7ff228e584785fe8a7d70c4e2a70ea6a18e149693039680a6ef07cea",
+    "matches_protocol_docs": true
+  },
+  "SubChunkRequestPacket": {
+    "sha256": "4cffbf9ee851b6c27cb32b51c6abe402b00c4f051ba0e991033e02ae08410b25",
+    "matches_protocol_docs": true
+  },
+  "MobEffectPacket": {
+    "sha256": "9c49b0737662bbfd3223ce4a110e5963e40d392461e7835226aa7f3b12d34767",
+    "matches_protocol_docs": true
+  },
+  "SetActorMotionPacket": {
+    "sha256": "3655e714089a11c11865e0d98d52a4082376586785133838a415ddf6d37a7396",
+    "matches_protocol_docs": true
+  },
+  "MovePlayerPacket": {
+    "sha256": "5d3e23467859e2cfdad84b39c2880a524f3fc0d408dfad43e1da3b3808bfca73",
+    "matches_protocol_docs": true
+  }
+}

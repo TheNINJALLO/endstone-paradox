@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "anonymous_status_rejected": true,
+  "invalid_token_rejected": true,
+  "authenticated_status": true,
+  "protocol_supported": true,
+  "all_modules_registered": true,
+  "malformed_command_rejected": true,
+  "multiline_command_rejected": true,
+  "oversized_body_rejected": true,
+  "arbitrary_console_rejected": true,
+  "native_command_queued": true,
+  "native_command_executed": true,
+  "exit_zero": true,
+  "only_native_plugin": true,
+  "mode_persisted": true,
+  "module_persisted": true,
+  "no_plugin_runtime_errors": true
+}

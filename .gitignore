@@ -47,3 +47,11 @@ scratch/
 .tox/
 *.whl
 /test_data_folder2/
+
+# Proprietary server archives remain local verification inputs
+/bedrock-server-*.zip
+*.dll
+*.so
+*.pdb
+*.lib
+*.obj

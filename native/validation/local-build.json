@@ -1,0 +1,9 @@
+{
+  "target": "1.26.51.1 / 2193",
+  "endstone": "0.11.11",
+  "toolchain": "Clang 20.1.8",
+  "binaries": {
+    "endstone_paradox.dll": "34b120e5d69d0b38ada7679e02a4f7a01e0921ba0c58d2045cc4a8d2b9486c4f",
+    "endstone_paradox.so": "ed5953091e1f949084b761f372eb00105a1b6b9efc5613e511915754f3f9dc7f"
+  }
+}
