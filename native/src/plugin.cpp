@@ -139,6 +139,9 @@ class ParadoxPlugin : public es::Plugin {
 
   private:
     struct PlayerState {
+        PlayerState() : activity(now()), transition_until(activity + 8) {
+            detector.reset(activity, 8);
+        }
         Detector detector;
         std::optional<es::Location> safe;
         double activity{}, impulse_until{}, effect_until{}, last_chat{}, last_command{}, auth_attempt{}, attack_time{},
@@ -146,7 +149,7 @@ class ParadoxPlugin : public es::Plugin {
         unsigned packets{};
         std::deque<double> chat_times, command_times;
         double transition_until{}, last_report{};
-        bool frozen{}, chunk_borders{}, vanished{};
+        bool joined{}, frozen{}, chunk_borders{}, vanished{};
         unsigned pending_forms{};
         bool inventory_dirty{};
         double combat_until{}, last_pvp_toggle{}, knockback_time{};
@@ -452,6 +455,7 @@ bool ParadoxPlugin::allowed(es::Player &p, const std::string &table) const {
 void ParadoxPlugin::initialize(es::Player &p) {
     auto uid = id(p);
     auto &s = players_[uid];
+    s.joined = true;
     s.activity = now();
     s.transition_until = s.activity + 8;
     s.detector.reset(s.activity, 8);
@@ -533,7 +537,7 @@ Health ParadoxPlugin::health(es::Player &p) {
     h.exempt = clearance(p) >= 4 || p.hasPermission("paradox.bypass") || allowed(p, "allowlist");
     h.special_movement = p.getAllowFlight() || p.isFlying() || p.isGliding() || p.isInWater() || p.isInLava() ||
                          p.isDead() || p.getGameMode() != es::GameMode::Survival;
-    h.transition = now() < s.impulse_until || now() < s.effect_until;
+    h.transition = !s.joined || now() < s.impulse_until || now() < s.effect_until;
     auto exempt = s.exemptions.find("all");
     if (exempt != s.exemptions.end() && exempt->second > now())
         h.exempt = true;
@@ -669,7 +673,7 @@ void ParadoxPlugin::tick() {
         }
         if (p->isOnGround() && loaded(p->getLocation()) && s.detector.lag.ready(time))
             s.safe = p->getLocation();
-        if (enabled("afk") &&
+        if (s.joined && enabled("afk") &&
             time - s.activity >
                 db_->get("config", "afk_timeout", setting<double>("afk", "timeout", 600)).get<double>()) {
             p->sendTip("[Paradox] You are AFK");
@@ -783,7 +787,7 @@ unsigned ParadoxPlugin::clear_entities(std::string_view type, const es::Location
             continue;
         if (!type.empty() && actor_type != type && actor_type != "minecraft:" + std::string(type))
             continue;
-        if (!actor->getNameTag().empty() || dynamic_cast<es::Player *>(actor))
+        if (!actor->getNameTag().empty() || actor->asPlayer())
             continue;
         if (auto *item = actor->asItem(); item && (item->isUnlimitedLifetime() || item->getPickupDelay() > 0))
             continue;
@@ -1107,8 +1111,9 @@ void ParadoxPlugin::gamemode_event(es::PlayerGameModeChangeEvent &e) {
     }
 }
 void ParadoxPlugin::damage_event(es::ActorDamageEvent &e) {
-    auto *victim = dynamic_cast<es::Player *>(&e.getActor());
-    auto *attacker = dynamic_cast<es::Player *>(e.getDamageSource().getDamagingActor());
+    auto *victim = e.getActor().asPlayer();
+    auto *damager = e.getDamageSource().getDamagingActor();
+    auto *attacker = damager ? damager->asPlayer() : nullptr;
     const bool target_ready =
         !victim || (players_[id(*victim)].transition_until <= now() && players_[id(*victim)].detector.lag.ready(now()));
     if (victim) {
@@ -1116,7 +1121,8 @@ void ParadoxPlugin::damage_event(es::ActorDamageEvent &e) {
         s.impulse_until = now() + 4;
         reset(*victim, 4);
     }
-    auto *source_player = dynamic_cast<es::Player *>(e.getDamageSource().getActor());
+    auto *source_actor = e.getDamageSource().getActor();
+    auto *source_player = source_actor ? source_actor->asPlayer() : nullptr;
     if (!attacker)
         attacker = source_player;
     if (!attacker)
@@ -1174,7 +1180,7 @@ void ParadoxPlugin::damage_event(es::ActorDamageEvent &e) {
     s.last_target = std::to_string(e.getActor().getRuntimeId());
 }
 void ParadoxPlugin::knockback_event(es::ActorKnockbackEvent &e) {
-    if (auto *p = dynamic_cast<es::Player *>(&e.getActor())) {
+    if (auto *p = e.getActor().asPlayer()) {
         auto &s = players_[id(*p)];
         s.knockback_origin = vec(p->getLocation());
         s.knockback_time = now();
@@ -1488,9 +1494,9 @@ void ParadoxPlugin::show_gui(es::Player &p) {
 }
 
 bool ParadoxPlugin::command(es::CommandSender &sender, std::string name, const std::vector<std::string> &a) {
-    auto *player = dynamic_cast<es::Player *>(&sender);
+    auto *player = sender.asPlayer();
     auto need = [&](int level, const std::string &permission) {
-        if (player && clearance(*player) < level && !player->hasPermission(permission))
+        if (!sender.asConsole() && (!player || (clearance(*player) < level && !player->hasPermission(permission))))
             throw std::invalid_argument("You do not have permission for this action.");
     };
     auto arg = [&](std::size_t n) -> std::string {

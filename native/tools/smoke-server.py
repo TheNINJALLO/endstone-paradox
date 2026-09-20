@@ -1,6 +1,6 @@
 """Run only against a disposable extracted BDS server. Overwrites its test configuration."""
 
-import json, os, queue, shutil, sqlite3, subprocess, sys, threading, time, urllib.request, urllib.error
+import json, os, queue, re, shutil, sqlite3, subprocess, sys, threading, time, urllib.request, urllib.error
 from pathlib import Path
 
 server, plugin, output = map(Path, sys.argv[1:4])
@@ -143,7 +143,8 @@ try:
     checks["invalid_token_rejected"] = request("/api/status", "invalid")[0] == 401
     status, body = request("/api/status", token)
     data = json.loads(body)
-    checks["authenticated_status"] = status == 200 and data["version"] == "2.0.0"
+    expected_version = re.search(r"project\(paradox VERSION ([\d.]+)", (Path(__file__).resolve().parents[2] / "CMakeLists.txt").read_text())[1]
+    checks["authenticated_status"] = status == 200 and data["version"] == expected_version
     checks["protocol_supported"] = data["protocol_supported"]
     checks["all_modules_registered"] = len(data["modules"]) == 54
     checks["malformed_command_rejected"] = (

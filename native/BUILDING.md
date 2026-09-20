@@ -38,6 +38,18 @@ python native/tools/verify-server.py bedrock-server-windows-1.26.51.1.zip --plat
 
 `native/tools/smoke-server.py` accepts an **isolated extracted server folder**, plugin binary and output directory. It overwrites that disposable server's properties/configuration, uses dedicated ports, disables external Paradox integrations, tests native loading and authenticated HTTP commands, then stops the server. Run it with the Python interpreter from an Endstone 0.11.11 environment. It refuses paths outside a directory named `scratch` or `/runtime/` and must not be pointed at production data. Windows uses a hidden process and Endstone's official DLL-injection bootstrap. No gameplay client is connected by this test.
 
+## Connected-client acceptance tests
+
+The additional harness uses two offline scripted clients built from the pinned Go module in `native/tests/bedrock-client` (Go 1.26.8, gophertunnel v1.62.0, protocol 2193). These clients send real movement, command, inventory, combat and form-response packets to BDS. They are not a replacement for retail controller/touch/physics testing.
+
+1. Use a disposable server directory and an Endstone 0.11.11 Python environment. Run `acceptance-server.py SERVER PLUGIN OUTPUT --seconds 2400` and wait for `OUTPUT/ready.json`. The runner replaces only the disposable server configuration, disables Paradox's external integrations, creates a separate arena world, and enables offline LAN discovery. Keep the test server on an isolated network.
+2. Build the helper with `go build -o /work/scratch/validation/bedrock-client .` from `native/tests/bedrock-client` in a dedicated Linux client container. Mount this checkout at `/work`; install `iproute2`; grant `NET_ADMIN` only to this test container. No host network or production container should be used. The validation run used `golang:1.26.8-bookworm` with digest `sha256:a688600ca24f8a4d3ca77f95b0dd40704a9fc787c826660eb7ba0b641b8b175d`.
+3. Run `python native/tools/network-acceptance.py OUTPUT --server-container SERVER_CONTAINER --server-path /runtime/paradox --client-container CLIENT_CONTAINER --address SERVER_IP:39301`. For a Windows server, use `--server-container=` and its absolute scratch directory as `--server-path`. Windows and Linux runs need separate client containers if run concurrently.
+4. Inspect `network-results.json`, `network-samples.ndjson`, `client.log` and `server.log`. Every required check must pass. The Linux server stall test verifies the executable path before stopping only the owned BDS process for two seconds, then resumes it in a `finally` block.
+5. Create `OUTPUT/stop` to stop BDS gracefully. Stop the dedicated client containers when finished. The runner restores their network delay in cleanup; it does not change host firewall or network settings.
+
+The client targets an explicit unicast discovery address and matches both test server/world names. BDS advertises discovery v7, so the helper matches those labels without using the library's older v6 metadata decoder. A 30 ms client network delay provides measurable RTT: localhost's rounded-zero ping intentionally leaves Paradox's health gate closed and cannot prove active detection.
+
 ## Dependency and ABI notes
 
 Endstone and bedrock-protocol are pinned by full commit. JSON/SQLite archives are pinned by SHA-256; toml++ and cpp-httplib by full commit. OpenSSL uses platform OpenSSL 3 on Linux and the declared Conan package on Windows. All linked third-party license texts ship with the package.

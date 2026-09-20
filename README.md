@@ -1,4 +1,4 @@
-# Paradox Native 2.0.0 (preview)
+# Paradox Native 2.0.1
 
 C++23 anti-cheat monitoring, moderation and administration for **Endstone 0.11.11 / BDS 1.26.51.1 (protocol 2193)**, on Windows and Linux x86-64. Based on [Visual1mpact's Paradox](https://github.com/Visual1mpact/Paradox_AntiCheat), reviewed through v6.9.1.
 
@@ -10,7 +10,7 @@ The plugin runs as a native `.dll` or `.so`. Endstone itself still uses its norm
 2. Remove the old Paradox wheel from `plugins`, or uninstall `endstone-paradox` from the Python environment used by Endstone if installed there.
 3. Copy **one** native binary into `plugins/`: `endstone_paradox.dll` on Windows, or `endstone_paradox.so` on Linux. Linux requires OpenSSL 3 (`libssl3` / `libssl3t64`).
 4. Keep the existing `plugins/paradox/config.toml` and `paradox.db`. The loader creates `paradox.db.pre-native.bak` using SQLite's consistent backup API. Existing tables remain intact.
-5. Start Endstone and check for `Paradox 2.0.0 native enabled; 54 modules`. The server must report supported protocol 2193. `ac-about` and `ac-debug-db` work from the console.
+5. Start Endstone and check for `Paradox 2.0.1 native enabled; 54 modules`. The server must report supported protocol 2193. `ac-about` and `ac-debug-db` work from the console.
 6. Grant staff clearance from the console: `ac-setclearance "Player Name" 4`. Review the [migration notes](native/MIGRATION.md) before enabling server policies.
 
 The supplied BDS ZIPs are verification inputs and are **not redistributed**. [`verify-server.py`](native/tools/verify-server.py) checks both archive and executable against pinned official metadata.
