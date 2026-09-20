@@ -352,12 +352,19 @@ try:
         ),
     )
     require("invalid_slot_did_not_kick", len(status()["players"]) == 2)
-    # Catch up any prior lag deficit, then sustain a deliberately accelerated clock.
-    action(action="rate", rate=30)
+    # Keep transport at 20 packets/s and advance the clock at 30 ticks/s.
+    # Sending 30 packets/s makes BDS process same-tick batches, correctly invoking
+    # the burst guard; that cannot serve as a healthy-clock positive control.
+    action(action="clock", rate=30)
     until = time.monotonic() + 80
     detected = False
     while time.monotonic() < until:
         s = status()
+        with (out / "network-samples.ndjson").open("a") as f:
+            f.write(
+                json.dumps({"phase": "accelerated_clock", "time": time.time(), **s})
+                + "\n"
+            )
         if any(
             e["time"] >= positive_start
             and e["module"] == "timer"
@@ -368,7 +375,7 @@ try:
             break
         time.sleep(1)
     require("accelerated_client_positive_control", detected)
-    action(action="rate", rate=20)
+    action(action="clock", rate=20)
     console("ac-setclearance ParadoxTestA 4")
     time.sleep(2)
     action(action="command", value="/ac-modstate fly off")
@@ -411,6 +418,8 @@ finally:
         "client_library": "gophertunnel v1.62.0 / protocol 2193",
         "plugin_version": candidate["version"],
         "plugin_sha256": plugin_hash,
+        "accelerated_clock_transport_packets_per_second": 20,
+        "accelerated_clock_ticks_per_second": 30,
         "checks": checks,
         "phases": phases,
         "failure": failure,

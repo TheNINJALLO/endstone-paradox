@@ -50,6 +50,29 @@ Native Windows DLL and Linux shared-library smoke tests use the supplied BDS bui
 
 The Windows test environment filters global Python site packages to ensure only the native Paradox plugin is loaded. Linux runs in an isolated Docker server directory. Paradox global reporting and Discord destinations are disabled. These are startup/integration tests, not multiplayer gameplay tests.
 
-## Remaining acceptance testing
+## Connected-client acceptance
 
-No connected retail clients were available for a multi-player gameplay/network-loss soak. Test real latency/jitter/packet loss, controller/touch input, teleports and portals, elytra/riptide/vehicles, knockback, potion effects, slime/honey/pistons, custom items, graves and other plugins before depending on hard enforcement. Optional policy limitations are listed in MIGRATION.md. The implementation avoids automatic heuristic bans, but no finite test suite can establish zero false positives in every live environment.
+The 2.0.1 acceptance harness connects two scripted protocol-2193 clients to each actual Windows/Linux BDS runtime. It completes both initial spawn and the loading-screen-finished handshake. Without the latter, BDS protects the client during loading; a join message alone is not proof of a functioning gameplay client. The client follows server corrections and sends real movement, inventory, command, attack and form-response packets.
+
+The suite requires active detection during ordinary walking and after recovery. During legitimate phases, both players must remain connected, no new enforcement is permitted, and robotic-pathing findings are forbidden. The deliberately invalid-input phases have separate positive assertions so disabling every detector cannot make the suite pass.
+
+Coverage:
+
+- Join/AFK initialization; ordinary-player denial of staff settings; explicitly granted staff clearance; fractional home storage and actual return teleport.
+- Ground walking and valid hotbar slots 0 through 8.
+- Client network delay of 300 ms with 100 ms normally distributed jitter and 3% packet loss, followed by recovery to 30 ms. Linux `netem` affects only each dedicated client container.
+- A three-second total packet outage with buffered recovery on both server platforms.
+- A two-second forced stall of the isolated Linux BDS process, followed by recovery. The Windows process is not forcibly suspended.
+- Teleport and speed-effect grace periods and recovery.
+- Real close-range player melee, verified by server health updates; refusal to disable PvP during combat; delivered and cancelled native GUI forms.
+- Cancellation of hotbar slot 9 without kicking the player, and corroborated timer enforcement against a sustained 30 Hz input clock. The Linux run used 30 packets/second; the Windows fixture separates the accelerated clock from steady 20-packet/second delivery because BDS tick batching can otherwise activate burst protection. That protection intentionally defers timer enforcement during bursts.
+
+Two actual native bugs were found by these tests and corrected: premature AFK state before PlayerJoin, and wrapped CommandSender instances being treated as console senders. The latter permitted unauthorized settings changes in the 2.0.0 preview. Supported `asPlayer()` / `asConsole()` accessors now identify the sender, and unrecognized senders are denied. Actor accessors were corrected for combat and knockback as well.
+
+All 72 Linux and 66 Windows connected-client assertions passed for the local 2.0.1 candidates. These are named checks, including per-phase connection and enforcement assertions; they are not 138 distinct gameplay scenarios.
+
+Machine-readable results are retained as `validation/windows-network.json` and `validation/linux-network.json`, with the exact tested local plugin hashes and version. Build and smoke results are separate records. Release artifacts also receive final binary smoke checks; their provenance is attached to the GitHub release as `release-validation.json`. The Go client dependency versions and checksums are committed under `tests/bedrock-client`; reproduction steps are in BUILDING.md.
+
+## Remaining gameplay coverage
+
+These are scripted clients, not connected retail clients. Controller/touch input, portals, elytra/riptide/vehicles, slime/honey/pistons, custom items, graves and combinations with other plugins still need environment-specific gameplay testing. Optional policy limitations are listed in MIGRATION.md. The implementation avoids automatic heuristic bans, but no finite test suite can establish zero false positives in every live environment.

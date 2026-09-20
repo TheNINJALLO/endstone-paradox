@@ -44,6 +44,8 @@ type Bot struct {
 	yaw               float32
 	walking, teleport bool
 	rate              int
+	clockRate         int
+	clockFraction     float64
 	sent, corrected   uint64
 	done              chan struct{}
 }
@@ -138,7 +140,10 @@ func (b *Bot) input() {
 			yaw := float64(b.yaw) * math.Pi / 180
 			camera := mgl32.Vec3{float32(-math.Sin(yaw)), 0, float32(math.Cos(yaw))}
 			p := &packet.PlayerAuthInput{Position: b.pos, Delta: delta, Yaw: b.yaw, HeadYaw: b.yaw, MoveVector: move, RawMoveVector: move, AnalogueMoveVector: move, CameraOrientation: camera, InputMode: packet.InputModeMouse, PlayMode: packet.PlayModeNormal, InteractionModel: packet.InteractionModelCrosshair, InputData: flags, Tick: b.tick}
-			b.tick++
+			b.clockFraction += float64(b.clockRate) / float64(b.rate)
+			advance := uint64(b.clockFraction)
+			b.tick += advance
+			b.clockFraction -= float64(advance)
 			b.sent++
 			err := b.conn.WritePacket(p)
 			if now.After(nextReport) {
@@ -211,7 +216,7 @@ func main() {
 		}
 		dialCancel()
 		_ = conn.WritePacket(&packet.ServerBoundLoadingScreen{Type: packet.LoadingScreenTypeEnd})
-		b := &Bot{name: name, conn: conn, pos: conn.GameData().PlayerPosition, rate: 20, done: make(chan struct{})}
+		b := &Bot{name: name, conn: conn, pos: conn.GameData().PlayerPosition, rate: 20, clockRate: 20, done: make(chan struct{})}
 		bots[name] = b
 		event(name, "spawn", map[string]any{"position": b.pos, "runtime_id": conn.GameData().EntityRuntimeID, "protocol": protocol.CurrentProtocol})
 		go b.read()
@@ -243,6 +248,9 @@ func main() {
 			b.walking = cmd.Value == "on"
 		case "rate":
 			b.rate = cmd.Rate
+			b.clockRate = cmd.Rate
+		case "clock":
+			b.clockRate = cmd.Rate
 		case "command":
 			_ = b.conn.WritePacket(&packet.CommandRequest{CommandLine: cmd.Value, CommandOrigin: protocol.CommandOrigin{Origin: protocol.CommandOriginPlayer, UUID: uuid.New()}, Version: "latest"})
 		case "hotbar":

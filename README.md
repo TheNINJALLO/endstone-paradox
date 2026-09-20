@@ -23,7 +23,7 @@ Unchanged yaw and straight-line movement never produce a robotic-pathing violati
 
 `soft` is the default enforcement mode; `logonly` records findings without acting; `hard` permits kicks after repeated corroborated evidence. Explicit staff bans, whitelist/lockdown restrictions, AFK configuration and land/container policies are separate administrative actions.
 
-Automated regressions and real BDS startup tests do not establish that every client, custom item, physics interaction or network condition is free of false positives. Live multi-client gameplay, latency and packet-loss testing remains necessary before relying on hard enforcement. See the [module audit](native/MODULE_AUDIT.md) and [validation record](native/VALIDATION.md).
+Release validation includes native regressions, real BDS integration tests, and two scripted clients exercising gameplay, latency, jitter, packet loss, outages and recovery on Windows and Linux. Those checks do not establish that every retail client, custom item, physics interaction or network condition is free of false positives; test your own gameplay environment before relying on hard enforcement. See the [module audit](native/MODULE_AUDIT.md) and [validation record](native/VALIDATION.md).
 
 ## Common commands
 

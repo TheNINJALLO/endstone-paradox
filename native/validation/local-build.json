@@ -1,9 +1,16 @@
 {
+  "version": "2.0.1",
+  "source_commit": "23181a77bb54257d21bc4bd9c994d12eebe7f0fb",
   "target": "1.26.51.1 / 2193",
   "endstone": "0.11.11",
   "toolchain": "Clang 20.1.8",
+  "native_test_executables_per_platform": 1,
+  "assertions_per_platform": 58911,
+  "assertions_are_looped_not_distinct_tests": true,
+  "ctest_windows": "passed",
+  "ctest_linux": "passed",
   "binaries": {
-    "endstone_paradox.dll": "261a00ad5c9e30984fd62c3b5b409130588f48bea517a84835a92852412a06d0",
-    "endstone_paradox.so": "09afc8d30fae350e78775c4ef4dfb8fde90a2f78f35a94dd9ce79f0067ea510d"
+    "endstone_paradox.dll": "801b8cdf746c11cb768ea6c09d7223f993d0c59a96de1be6ae44db531c388294",
+    "endstone_paradox.so": "5be40831e79571bd80b011ef74c85ff7fec2f28f4042c489ccb9fcb1ab2e68cd"
   }
 }

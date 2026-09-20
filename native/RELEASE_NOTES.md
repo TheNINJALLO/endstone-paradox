@@ -8,7 +8,7 @@ Upgrade from the 2.0.0 preview: connected-client testing exposed a command autho
 - Keeps movement/aim/pathing heuristics observational and suspends corroborated detection during lag, unloaded terrain and transitions. No automatic bans.
 - Adds a reproducible two-client BDS acceptance harness with isolated latency, jitter, loss, outage and server-stall fixtures, plus gameplay and enforcement positive controls.
 
-Validation records and exact scope are in `native/VALIDATION.md`. Release checks include Windows/Linux native regressions, actual BDS integration tests, and scripted connected clients sending real movement, commands, inventory, combat and form packets. Scripted clients do not reproduce every retail controller, touch, vehicle or custom-item interaction, and no finite suite establishes zero false positives.
+Validation: the local Windows/Linux native regressions pass, plus 17 BDS integration checks on each platform and all connected-client assertions (72 Linux, 66 Windows). The extra Linux assertions cover forced server-stall recovery. These scripted clients send real movement, commands, inventory, combat and form packets. Exact scope and machine-readable records are in `native/VALIDATION.md`. Scripted clients do not reproduce every retail controller, touch, vehicle or custom-item interaction, and no finite suite establishes zero false positives.
 
 The supplied stripped Linux binary cannot yield full private DWARF ABI headers; this plugin uses Endstone's supported C++ ABI and existing server hooks. Grave protection, container inspection and hopper/piston coverage have documented API limits. Review `native/MIGRATION.md` and `native/MODULE_AUDIT.md` before deployment.
 

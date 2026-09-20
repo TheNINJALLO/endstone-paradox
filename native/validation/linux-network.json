@@ -1,0 +1,225 @@
+{
+  "started": 1789871394.4740462,
+  "finished": 1789871787.438255,
+  "transport": "lan",
+  "server_platform": "linux",
+  "retail_client": false,
+  "network_impairment": true,
+  "client_library": "gophertunnel v1.62.0 / protocol 2193",
+  "plugin_version": "2.0.1",
+  "plugin_sha256": "5be40831e79571bd80b011ef74c85ff7fec2f28f4042c489ccb9fcb1ab2e68cd",
+  "checks": {
+    "two_protocol_2193_clients_spawned": true,
+    "healthy_join_and_idle_no_false_enforcement": true,
+    "healthy_join_and_idle_no_robotic_pathing": true,
+    "healthy_join_and_idle_both_connected": true,
+    "healthy_detection_reached": true,
+    "no_premature_afk": true,
+    "ordinary_player_permissions_no_false_enforcement": true,
+    "ordinary_player_permissions_no_robotic_pathing": true,
+    "ordinary_player_permissions_both_connected": true,
+    "staff_command_denied": true,
+    "home_preserves_fractional_coordinates": true,
+    "normal_walking_no_false_enforcement": true,
+    "normal_walking_no_robotic_pathing": true,
+    "normal_walking_both_connected": true,
+    "walking_detection_active": true,
+    "client_actually_walked": true,
+    "valid_hotbar_slots_no_false_enforcement": true,
+    "valid_hotbar_slots_no_robotic_pathing": true,
+    "valid_hotbar_slots_both_connected": true,
+    "high_latency_jitter_loss_no_false_enforcement": true,
+    "high_latency_jitter_loss_no_robotic_pathing": true,
+    "high_latency_jitter_loss_both_connected": true,
+    "lag_guard_activated": true,
+    "network_recovery_no_false_enforcement": true,
+    "network_recovery_no_robotic_pathing": true,
+    "network_recovery_both_connected": true,
+    "detection_resumed_after_lag": true,
+    "outage_and_buffered_recovery_no_false_enforcement": true,
+    "outage_and_buffered_recovery_no_robotic_pathing": true,
+    "outage_and_buffered_recovery_both_connected": true,
+    "outage_guard_activated": true,
+    "outage_recovered": true,
+    "stall_targets_owned_bds": true,
+    "server_stall_recovery_no_false_enforcement": true,
+    "server_stall_recovery_no_robotic_pathing": true,
+    "server_stall_recovery_both_connected": true,
+    "server_stall_guard_activated": true,
+    "server_stall_recovered": true,
+    "teleport_recovery_no_false_enforcement": true,
+    "teleport_recovery_no_robotic_pathing": true,
+    "teleport_recovery_both_connected": true,
+    "teleport_guard_activated": true,
+    "teleport_recovered": true,
+    "effect_recovery_no_false_enforcement": true,
+    "effect_recovery_no_robotic_pathing": true,
+    "effect_recovery_both_connected": true,
+    "effect_guard_activated": true,
+    "effect_recovered": true,
+    "home_return_no_false_enforcement": true,
+    "home_return_no_robotic_pathing": true,
+    "home_return_both_connected": true,
+    "home_return_reached_saved_position": true,
+    "melee_setup_no_false_enforcement": true,
+    "melee_setup_no_robotic_pathing": true,
+    "melee_setup_both_connected": true,
+    "legitimate_melee_no_false_enforcement": true,
+    "legitimate_melee_no_robotic_pathing": true,
+    "legitimate_melee_both_connected": true,
+    "melee_reached_server": true,
+    "combat_policy_no_false_enforcement": true,
+    "combat_policy_no_robotic_pathing": true,
+    "combat_policy_both_connected": true,
+    "combat_toggle_rejected": true,
+    "native_gui_no_false_enforcement": true,
+    "native_gui_no_robotic_pathing": true,
+    "native_gui_both_connected": true,
+    "native_form_delivered": true,
+    "invalid_hotbar_cancelled": true,
+    "invalid_slot_did_not_kick": true,
+    "accelerated_client_positive_control": true,
+    "explicit_staff_clearance_authorized": true,
+    "no_unexpected_runtime_errors": true
+  },
+  "phases": [
+    {
+      "phase": "healthy_join_and_idle",
+      "samples": 22,
+      "max_ping": 15,
+      "healthy_samples": 12,
+      "guarded_samples": 10
+    },
+    {
+      "phase": "ordinary_player_permissions",
+      "samples": 7,
+      "max_ping": 15,
+      "healthy_samples": 7,
+      "guarded_samples": 0
+    },
+    {
+      "phase": "normal_walking",
+      "samples": 56,
+      "max_ping": 15,
+      "healthy_samples": 56,
+      "guarded_samples": 0
+    },
+    {
+      "phase": "valid_hotbar_slots",
+      "samples": 5,
+      "max_ping": 15,
+      "healthy_samples": 5,
+      "guarded_samples": 0
+    },
+    {
+      "phase": "high_latency_jitter_loss",
+      "samples": 39,
+      "max_ping": 316,
+      "healthy_samples": 1,
+      "guarded_samples": 38
+    },
+    {
+      "phase": "network_recovery",
+      "samples": 26,
+      "max_ping": 210,
+      "healthy_samples": 17,
+      "guarded_samples": 9
+    },
+    {
+      "phase": "outage_and_buffered_recovery",
+      "samples": 26,
+      "max_ping": 15,
+      "healthy_samples": 25,
+      "guarded_samples": 9
+    },
+    {
+      "phase": "server_stall_recovery",
+      "samples": 26,
+      "max_ping": 15,
+      "healthy_samples": 21,
+      "guarded_samples": 5
+    },
+    {
+      "phase": "teleport_recovery",
+      "samples": 20,
+      "max_ping": 15,
+      "healthy_samples": 20,
+      "guarded_samples": 8
+    },
+    {
+      "phase": "effect_recovery",
+      "samples": 22,
+      "max_ping": 15,
+      "healthy_samples": 22,
+      "guarded_samples": 13
+    },
+    {
+      "phase": "home_return",
+      "samples": 16,
+      "max_ping": 15,
+      "healthy_samples": 16,
+      "guarded_samples": 8
+    },
+    {
+      "phase": "melee_setup",
+      "samples": 17,
+      "max_ping": 15,
+      "healthy_samples": 7,
+      "guarded_samples": 10
+    },
+    {
+      "phase": "legitimate_melee",
+      "samples": 2,
+      "max_ping": 15,
+      "healthy_samples": 2,
+      "guarded_samples": 1
+    },
+    {
+      "phase": "legitimate_melee",
+      "samples": 2,
+      "max_ping": 15,
+      "healthy_samples": 2,
+      "guarded_samples": 2
+    },
+    {
+      "phase": "legitimate_melee",
+      "samples": 2,
+      "max_ping": 15,
+      "healthy_samples": 2,
+      "guarded_samples": 2
+    },
+    {
+      "phase": "legitimate_melee",
+      "samples": 2,
+      "max_ping": 15,
+      "healthy_samples": 2,
+      "guarded_samples": 2
+    },
+    {
+      "phase": "combat_policy",
+      "samples": 3,
+      "max_ping": 15,
+      "healthy_samples": 3,
+      "guarded_samples": 3
+    },
+    {
+      "phase": "native_gui",
+      "samples": 3,
+      "max_ping": 15,
+      "healthy_samples": 3,
+      "guarded_samples": 2
+    },
+    {
+      "phase": "invalid_hotbar_positive_control",
+      "samples": 4,
+      "max_ping": 15,
+      "healthy_samples": 4,
+      "guarded_samples": 3
+    }
+  ],
+  "failure": null,
+  "accelerated_clock_transport_packets_per_second": 30,
+  "accelerated_clock_ticks_per_second": 30,
+  "client_source_commit": "23181a77bb54257d21bc4bd9c994d12eebe7f0fb",
+  "client_sha256": "e779c7d953f5cddd3a9024ce48ab52be19befb3663734b3b6d9c8bce16116b8f"
+}

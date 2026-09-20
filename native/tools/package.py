@@ -29,7 +29,10 @@ documents = [
     "native/VALIDATION.md",
     "native/RELEASE_NOTES.md",
     "native/references.lock.json",
-    "native/validation/protocol-comparison.json",
+]
+documents += [
+    p.relative_to(root).as_posix()
+    for p in sorted((root / "native/validation").glob("*.json"))
 ]
 documents += [
     str(p.relative_to(root)).replace("\\", "/")
