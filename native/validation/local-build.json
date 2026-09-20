@@ -3,7 +3,7 @@
   "endstone": "0.11.11",
   "toolchain": "Clang 20.1.8",
   "binaries": {
-    "endstone_paradox.dll": "34b120e5d69d0b38ada7679e02a4f7a01e0921ba0c58d2045cc4a8d2b9486c4f",
-    "endstone_paradox.so": "ed5953091e1f949084b761f372eb00105a1b6b9efc5613e511915754f3f9dc7f"
+    "endstone_paradox.dll": "261a00ad5c9e30984fd62c3b5b409130588f48bea517a84835a92852412a06d0",
+    "endstone_paradox.so": "09afc8d30fae350e78775c4ef4dfb8fde90a2f78f35a94dd9ce79f0067ea510d"
   }
 }

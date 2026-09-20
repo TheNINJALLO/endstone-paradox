@@ -23,7 +23,7 @@ Every observational finding is centrally prevented from escalating, even under h
 | noclip | On | Stone/bedrock overlap observation only; no unloaded-chunk collision verdict. |
 | waterwalk | On | Liquid-surface observation only; swimming and effects suspend movement analysis. |
 | stephack | On | Vertical-step observation only; slabs, moving blocks and reconciliation cannot prove cheating. |
-| timer | On | Three healthy five-second windows of accelerated client time; gaps, bursts, duplicate/reordered ticks reset evidence. Slow input is never flagged. |
+| timer | On | Three healthy five-second windows of accelerated client time; gaps, bursts, duplicate/reordered ticks reset evidence. A retained session clock exempts gradual backlog recovery until caught up. Slow input is never flagged. |
 | blink | On | Position-discontinuity observation only; teleports, joins and chunk availability reset history. |
 | killaura | On | Behind-view hit observation only; interpolation/input devices are not proof. |
 | reach | On | Four excessive melee hits beyond conservative distance plus RTT/speed allowance. Attacker and target must be healthy; indirect/projectile/thorns damage, non-player target geometry and extended/unknown weapons are excluded. |

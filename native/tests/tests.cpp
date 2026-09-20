@@ -219,6 +219,21 @@ void test_protocol() {
     check(supported_runtime("1.26.51.1", 2193), "target refused");
     check(!supported_runtime("1.26.60", 2211), "wrong ABI accepted");
 }
+void test_paced_backlog() {
+    Detector d;
+    d.reset(0);
+    for (unsigned tick = 0; tick < 300; ++tick)
+        d.input(tick * .05, tick, {0, 0, 1}, healthy());
+    // Twenty seconds of queued inputs, released gradually at 30/s while new
+    // legitimate inputs continue to be produced at 20/s. The queue drains in 40s.
+    d.reset(35);
+    for (unsigned i = 0; i < 1200; ++i)
+        for (const auto &f : d.input(35 + i / 30.0, 300 + i, {0, 0, 1}, healthy()))
+            check(f.module != "timer", "paced lag backlog flagged as client acceleration");
+    for (unsigned i = 0; i < 600; ++i)
+        for (const auto &f : d.input(75 + i * .05, 1500 + i, {0, 0, 1}, healthy()))
+            check(f.module != "timer", "backlog recovery retained false timer evidence");
+}
 void test_migration() {
     auto directory = std::filesystem::temp_directory_path() / "paradox-native-tests";
     std::filesystem::create_directories(directory);
@@ -265,6 +280,7 @@ int main() {
         test_positive_controls();
         test_combat_and_recovery();
         test_protocol();
+        test_paced_backlog();
         test_migration();
         std::cout << checks << " checks passed\n";
         return 0;

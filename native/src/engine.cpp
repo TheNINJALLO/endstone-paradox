@@ -81,6 +81,8 @@ void LagGuard::suspend(double now, std::string_view reason, double duration) {
     ++epoch_;
 }
 void LagGuard::reset(double now, double seconds) {
+    // Preserve the session clock anchor: a transition or lag reset must not
+    // turn a slowly draining packet backlog into apparent client acceleration.
     suspend(now, "transition", seconds);
     last_ = -1;
     last_sample_ = -1;
@@ -118,6 +120,13 @@ bool LagGuard::update(double now, const Health &h) {
     return ready(now);
 }
 bool LagGuard::packet(double now, std::uint64_t tick) {
+    if (clock_anchor_time_ < 0 || tick < clock_anchor_tick_) {
+        clock_anchor_time_ = now;
+        clock_anchor_tick_ = tick;
+    }
+    // Allow four ticks of timing noise, but do not evaluate timer evidence
+    // while the client remains behind its nominal 20 Hz session clock.
+    clock_current_ = static_cast<double>(tick - clock_anchor_tick_) + 4 >= (now - clock_anchor_time_) * 20;
     if (last_packet_ >= 0) {
         const double gap = now - last_packet_;
         // Duplicates, reordered inputs and catch-up bursts reset timing evidence.
@@ -278,6 +287,11 @@ std::vector<Finding> Detector::input(double now, std::uint64_t tick, Vec3 vector
     }
     if (!lag.ready(now))
         return out;
+    if (!lag.clock_current()) {
+        timer_start_ = -1;
+        timer_windows_ = 0;
+        return out;
+    }
     if (timer_start_ < 0) {
         timer_start_ = now;
         timer_tick_ = tick;

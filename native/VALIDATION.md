@@ -34,12 +34,15 @@ The deterministic native executable covers:
 - High/unknown/non-finite ping, jitter, low TPS, slow ticks, unloaded terrain, exemptions and recovery.
 - Straight movement without robotic-pathing findings; diagonal input; yaw wrapping.
 - Healthy timer/reach positive controls, slow-client negative controls, lagging target protection and teleport resets.
+- A 20-second input backlog draining at 30 packets/second for 40 seconds, followed by normal input. Timer evidence stays suspended until the retained session clock catches up; a recovery reset cannot discard that clock anchor.
 - Separate evidence by player and module; observations from all 54 registered modules never escalate under hard mode.
 - Valid hotbar boundaries and unused selection fields; valid 8,192-offset subchunk requests larger than the former 16 KiB cutoff.
 - Every truncated prefix of an auth-input fixture and 3,000 deterministic malformed-input samples; bounded decoding with no partial input delivered.
 - SQLite legacy-schema migration, fractional coordinates, backup, 1,000 asynchronous writes, shutdown/reopen persistence and deletion.
 
 CTest runs one native executable containing these scenarios and looped assertions. Its assertion count is not a count of distinct test cases.
+
+The timer guard intentionally favors missed detections over punishing delayed inputs. A client whose clock stays behind after a pause may remain exempt from timer enforcement for the session; other checks retain their normal health gates. Inputs buffered before the first observed packet cannot be distinguished perfectly from an accelerated clock. Use `ac-mode logonly` for initial multiplayer acceptance testing; the default remains `soft` and existing persisted modes are retained.
 
 ## Real server smoke tests
 

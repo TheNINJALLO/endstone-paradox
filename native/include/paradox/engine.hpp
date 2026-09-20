@@ -36,6 +36,9 @@ class LagGuard {
     bool update(double now, const Health &health);
     bool packet(double now, std::uint64_t tick);
     bool ready(double now) const;
+    bool clock_current() const {
+        return clock_current_;
+    }
     std::uint64_t epoch() const {
         return epoch_;
     }
@@ -49,6 +52,9 @@ class LagGuard {
   private:
     double until_{}, last_{-1}, last_sample_{-1}, last_packet_{-1}, ping_{}, jitter_{};
     std::uint64_t tick_{}, epoch_{};
+    double clock_anchor_time_{-1};
+    std::uint64_t clock_anchor_tick_{};
+    bool clock_current_{true};
     unsigned stable_{};
     std::string reason_ = "join warmup";
     void suspend(double now, std::string_view reason, double duration = 5);

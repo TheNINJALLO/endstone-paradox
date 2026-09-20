@@ -3,6 +3,7 @@ Paradox 2.0.0 is the first native C++ preview for Endstone 0.11.11 and BDS 1.26.
 - Replaces the Python plugin runtime with C++ event/packet hooks, SQLite persistence, native forms and an authenticated dashboard.
 - Reviews upstream Visual1mpact Paradox through v6.9.1 and adds the native equivalents/adaptations documented in the module audit.
 - Removes robotic-pathing punishment and combined heuristic escalation. Lag, jitter, server stalls, packet bursts, unloaded terrain and movement transitions reset evidence. No automatic bans.
+- Preserves the client-clock baseline through recovery so a slowly draining input backlog cannot become fresh timer evidence while the client is still catching up.
 - Accepts legitimate large subchunk requests and uses pinned, bounded protocol decoders checked against an actual dump of the supplied BDS build.
 - Preserves existing data with a consistent SQLite migration backup; archives the old Python implementation separately.
 
