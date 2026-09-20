@@ -1,15 +1,17 @@
-# NameSpoof Detection
+# namespoof
 
-## Overview
-Detects name manipulation including invalid characters, excessive length, and duplicate names.
+Paradox Native 2.0.1 | **Validation** | New-install default: **On**
 
-## How It Works
-1. **Length Check**: Flags names that are too short or too long
-2. **Character Validation**: Checks for non-ASCII characters, control characters, and banned symbols
-3. **Duplicate Detection**: Flags players with names that match or closely resemble existing online players
+## Native behavior
 
-## Configuration
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Sensitivity | 5 | Higher = stricter character and length rules |
-| Command | `/ac-namespoof` | Toggle on/off |
+Duplicate online display-name review; identities remain UUID/XUID based.
+
+## Controls
+
+Use `/ac-modstate namespoof on` or `/ac-modstate namespoof off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
+
+## Evidence and limits
+
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

@@ -1,17 +1,15 @@
-![Paradox AntiCheat](Icon.png ':size=200')
+![Paradox](Icon.png ':size=180')
 
-# Paradox AntiCheat
+# Paradox Native 2.0.1
 
-> The most advanced anti-cheat plugin for Minecraft Bedrock Edition via Endstone
+> C++ monitoring, moderation and administration for Endstone Bedrock servers
 
-- 🛡️ 46 Detection & Admin Modules
-- ⚖️ Centralized Violation Engine
-- 🌐 Built-in Web Admin Panel
-- 🔐 4-Level Security Clearance
-- 📊 Sensitivity Scaling (1-10)
-- 🎮 Full In-Game GUI
-- ⚡ Packet-Level Analysis
-- 🌍 Global Ban API (cross-server)
+- Endstone 0.11.11 / BDS 1.26.51.1 / protocol 2193
+- Windows and Linux x86-64 native packages
+- 54 modules with documented defaults and limits
+- Lag recovery guards and review-only heuristics
+- Native forms and authenticated dashboard
 
-[Get Started](gettingstarted)
-[View on GitHub](https://github.com/TheNINJALLO/endstone-paradox/)
+[Get started](gettingstarted.md)
+[Release and downloads](https://github.com/TheNINJALLO/endstone-paradox/releases/tag/v2.0.1)
+[GitHub](https://github.com/TheNINJALLO/endstone-paradox)

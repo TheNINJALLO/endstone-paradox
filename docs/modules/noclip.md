@@ -1,19 +1,17 @@
-# NoClip / Phase Detection
+# noclip
 
-> Detects players walking through solid blocks.
+Paradox Native 2.0.1 | **Movement** | New-install default: **On**
 
-## How It Works
+## Native behavior
 
-The NoClip module ray-traces the player's movement path between ticks. It samples 3 points along the path and checks whether they pass through solid blocks. If the trace hits solid geometry, the module increments a flag counter. After **3 consecutive flags**, the module emits a violation to the violation engine.
+Stone/bedrock overlap observation only; no unloaded-chunk collision verdict.
 
-## Detection Details
+## Controls
 
-| Parameter | Value |
-|-----------|-------|
-| Samples per check | 3 (along movement vector) |
-| Flags required | 3 consecutive |
-| Level 4 exempt | Yes |
+Use `/ac-modstate noclip on` or `/ac-modstate noclip off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-## Default State
+## Evidence and limits
 
-**ON**
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

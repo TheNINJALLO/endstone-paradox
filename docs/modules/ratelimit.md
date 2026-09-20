@@ -1,20 +1,17 @@
-# Rate Limiter
+# ratelimit
 
-## Overview
-Detects and blocks packet flooding, with automatic DoS lockdown.
+Paradox Native 2.0.1 | **Network** | New-install default: **Off**
 
-## How It Works
-1. **Packet Rate Monitoring**: Counts all incoming packets per player per second
-2. **Violation Tracking**: Multiple rate limit violations escalate to a kick
-3. **DoS Detection**: If multiple players trigger rate limits simultaneously, the server enters lockdown mode
-4. **Automatic Lockdown**: Non-admin players are kicked, and lockdown releases after 60 seconds
+## Native behavior
 
-## Configuration
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Max Packets/s | 2000 | Bedrock sends ~500 normally |
-| Violation Threshold | 20 | Violations before kick |
-| DoS Player Threshold | 5 | Simultaneous violators to trigger lockdown |
-| Command | `/ac-ratelimit` | Toggle on/off |
+Traffic observation only; BDS transport limits remain authoritative. Lag recovery prevents burst punishment.
 
-> **Note**: This module is OFF by default. Enable only after tuning thresholds for your server's player count and tick rate.
+## Controls
+
+Use `/ac-modstate ratelimit on` or `/ac-modstate ratelimit off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
+
+## Evidence and limits
+
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

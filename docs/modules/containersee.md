@@ -1,16 +1,17 @@
-# Container See
+# containersee
 
-## Overview
-Admin-only tool that lets Level 4 admins see container contents and player inventories by looking at them.
+Paradox Native 2.0.1 | **Inventory** | New-install default: **Off**
 
-## How It Works
-1. **Container Vision**: Look at a chest, barrel, or other container to see its contents displayed in chat
-2. **Player Inventory**: Look at a player to see their full inventory
-3. **L4 Only**: Only accessible to Clearance Level 4 admins
-4. **Non-Intrusive**: Read-only — does not modify any inventories
+## Native behavior
 
-## Configuration
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Default State | OFF | Must be explicitly enabled |
-| Clearance Required | Level 4 | Only full admins can use it |
+Staff view of looked-at player inventory and container identification through the public API. No raw block-container NBT access.
+
+## Controls
+
+Use `/ac-modstate containersee on` or `/ac-modstate containersee off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
+
+## Evidence and limits
+
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

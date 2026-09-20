@@ -1,20 +1,17 @@
-# Anti-Knockback Detection
+# antikb
 
-> Detects players who don't take knockback after being hit.
+Paradox Native 2.0.1 | **Combat** | New-install default: **On**
 
-## How It Works
+## Native behavior
 
-Tracks player displacement after receiving damage. If a player doesn't move at least 0.1 blocks within 3 ticks of being hit, the module flags it. Requires **3 flags** before emitting a violation.
+Server knockback displacement review only; collision/resistance can explain small movement.
 
-## Detection Details
+## Controls
 
-| Parameter | Value |
-|-----------|-------|
-| Minimum displacement | 0.1 blocks |
-| Check window | 3 ticks after hit |
-| Flags required | 3 |
-| Level 4 exempt | Yes |
+Use `/ac-modstate antikb on` or `/ac-modstate antikb off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-## Default State
+## Evidence and limits
 
-**ON**
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

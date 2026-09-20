@@ -1,24 +1,17 @@
-# X-Ray Detection
+# xray
 
-## Overview
-Detects mining hacks using **weighted suspicion scoring** with multiple detection factors.
+Paradox Native 2.0.1 | **Building** | New-install default: **On**
 
-## How It Works
-1. **Vein-Jumping Detection**: Flags players who mine directly from one ore vein to another without mining stone in between
-2. **Hidden Ore Detection**: Checks if mined ores were visible from any surface — x-ray users mine ores surrounded by stone
-3. **Ore Ratio Analysis**: Compares the player's ore-to-stone ratio against statistical norms
-4. **Suspicion Decay**: Suspicion points decay over time — one lucky find won't trigger a flag
-5. **Graduated Escalation**: Alert → Priority Alert → Freeze + Admin notification
+## Native behavior
 
-## Configuration
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Sensitivity | 5 | Higher = faster suspicion accumulation |
-| Command | `/ac-xray` | Toggle on/off |
+Ore-ratio review only; veins, exposed ore and custom worlds are not punished.
 
-## Scoring
-Each detection factor adds weighted points to a player's suspicion score:
-- Hidden ore mined: +3 points
-- Vein jump detected: +5 points
-- Abnormal ore ratio: +2 points
-- Points decay: -1 per minute
+## Controls
+
+Use `/ac-modstate xray on` or `/ac-modstate xray off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
+
+## Evidence and limits
+
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

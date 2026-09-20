@@ -1,26 +1,17 @@
-# Inventory Sync Module
+# invsync
 
-## Overview
-Prevents rejoin-based duplication by maintaining **DB-persisted inventory snapshots** and comparing against the player's inventory on rejoin.
+Paradox Native 2.0.1 | **Inventory** | New-install default: **Off**
 
-## How It Works
+## Native behavior
 
-### Periodic Snapshots
-Every 5 seconds, the module snapshots each online player's inventory item counts and stores them in the SQLite database. This data survives server restarts (unlike the original JS version which used volatile dynamic properties).
+Current inventory deltas and complete item-NBT hashes, including shulkers. Never compares an old snapshot as proof for removing items.
 
-### Rejoin Comparison
-When a player joins:
-1. Wait 1 second for their inventory to fully load
-2. Compare current inventory counts against the stored snapshot
-3. If any item type has **more** items than the snapshot, flag the excess as potentially duped
+## Controls
 
-### Example
-A player has `64 diamonds` when they disconnect. They exploit a dupe glitch. When they rejoin with `128 diamonds`, InvSync detects the `+64 diamond` anomaly and alerts admins.
+Use `/ac-modstate invsync on` or `/ac-modstate invsync off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-## Configuration
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Default State | OFF | Needs tolerance tuning |
-| Sensitivity | 5 | Higher = stricter item diff tolerance |
-| Snapshot Interval | 5 seconds | How often to capture inventory state |
-| Command | `/ac-modules invsync` | Toggle on/off |
+## Evidence and limits
+
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

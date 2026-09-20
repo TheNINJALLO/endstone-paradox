@@ -1,39 +1,17 @@
-# Evidence Replay
+# evidencereplay
 
-> Ring-buffer player state recording with auto-snapshots on violations.
+Paradox Native 2.0.1 | **Evidence** | New-install default: **On**
 
-## Overview
+## Native behavior
 
-The Evidence Replay module continuously records player state (position, rotation, actions) in a per-player ring buffer. When any detection module emits a violation, the replay buffer is automatically snapshotted and persisted to the database. Staff can then review exactly what happened before and during a violation.
+Bounded player position/ping/health ring; latest replay stored separately from 100-entry history and 50-entry recent list.
 
-## Features
+## Controls
 
-| Feature | Description |
-|---------|-------------|
-| **Continuous Recording** | Captures player position, rotation, health, actions every tick |
-| **Ring Buffer** | Configurable buffer depth (default 200 frames) — only keeps recent history |
-| **Auto-Snapshot** | Automatically snapshots when any violation is emitted |
-| **Action Tracking** | Records breaking, placing, attacking, chatting, moving actions |
-| **Snapshot Summary** | Human-readable summaries showing distance traveled, actions taken, speed, violations |
-| **Frame-by-Frame** | Staff can review individual frames from a snapshot |
-| **Persistent Storage** | Snapshots saved to database (max 50 per player) |
+Use `/ac-modstate evidencereplay on` or `/ac-modstate evidencereplay off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-## Usage
+## Evidence and limits
 
-Snapshots are automatically taken whenever a violation is emitted. Staff can review via:
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
 
-```
-/ac-case <player>              # View recent violations (includes replay data)
-/ac-debug-db logs replays      # View raw replay data
-```
-
-## Configuration
-
-```
-/ac-debug-db config replay_buffer_depth 200    # Frames per player
-/ac-debug-db config replay_max_snapshots 50    # Max stored snapshots per player
-```
-
-## Default State
-
-**ON** — Active by default, recording in the background.
+[All modules](overview.md)

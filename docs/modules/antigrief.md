@@ -1,41 +1,17 @@
-# Anti-Grief / World Protection
+# antigrief
 
-> Anti-nuke, rapid placement detection, and explosion audit logging.
+Paradox Native 2.0.1 | **Building** | New-install default: **On**
 
-## Overview
+## Native behavior
 
-The Anti-Grief module protects the world from mass destruction tactics. It monitors block break and placement rates per player and maintains an explosion audit log.
+High block-action rate review only; enchantments and building tools do not trigger automatic punishment.
 
-## Features
+## Controls
 
-| Feature | Description |
-|---------|-------------|
-| **Anti-Nuke** | Flags players who break too many blocks in a short window (configurable threshold) |
-| **Rapid Placement** | Flags high-speed block placement (grief-style rapid builds) |
-| **Explosion Logging** | Tracks TNT, creeper, and other explosions with coordinates, timestamps, and source type |
-| **Sensitivity Scaling** | Thresholds scale with module sensitivity (1-10) |
-| **Auto-Cancel** | Cancels block break/place events when flagged |
+Use `/ac-modstate antigrief on` or `/ac-modstate antigrief off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-## Configuration
+## Evidence and limits
 
-```
-/ac-debug-db config antigrief_break_limit 45       # Max breaks per window
-/ac-debug-db config antigrief_break_window 3.0     # Window in seconds
-/ac-debug-db config antigrief_place_limit 40       # Max placements per window
-/ac-debug-db config antigrief_place_window 3.0     # Window in seconds
-/ac-debug-db config antigrief_log_explosions true   # Enable explosion audit trail
-```
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
 
-## Explosion Log
-
-The last 500 explosions are stored in the database with:
-- Source type (TNT, creeper, etc.)
-- X, Y, Z coordinates
-- Dimension
-- Timestamp
-
-View via `/ac-debug-db logs explosions`.
-
-## Default State
-
-**ON** — Active by default with generous thresholds.
+[All modules](overview.md)

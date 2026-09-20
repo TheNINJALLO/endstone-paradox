@@ -1,46 +1,17 @@
-# Chat Protection
+# chatprotection
 
-> Spam detection, advertising filter, profanity filter, caps limiter, and mute system.
+Paradox Native 2.0.1 | **Chat** | New-install default: **On**
 
-## Overview
+## Native behavior
 
-The Chat Protection module provides a comprehensive chat moderation suite. It processes all chat messages before they reach other players.
+Rolling one-second chat/command windows, duplicate-message control and legacy mutes. Rate control pauses during recovery; no anti-cheat escalation.
 
-## Features
+## Controls
 
-| Feature | Description |
-|---------|-------------|
-| **Spam Detection** | Detects repeated messages (similarity check) and message flooding (rate limiting) |
-| **Advertising Filter** | Blocks IP addresses, URLs, and domain names in chat using regex patterns |
-| **Swear/Profanity Filter** | Configurable word list with whole-word matching |
-| **Caps Limiter** | Flags messages with excessive capitalization |
-| **Mute System** | Timed or permanent mutes, persisted to database |
-| **Violation Integration** | Emits violations to the violation engine for enforcement escalation |
+Use `/ac-modstate chatprotection on` or `/ac-modstate chatprotection off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-## Mute Commands
+## Evidence and limits
 
-```
-# Mute a player (permanent)
-/ac-punish <player> mute
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
 
-# Unmute
-/ac-punish <player> unmute
-```
-
-## Configuration
-
-Set thresholds via database:
-```
-/ac-debug-db config chatprotection_spam_window 5.0
-/ac-debug-db config chatprotection_spam_max 5
-/ac-debug-db config chatprotection_caps_ratio 0.7
-```
-
-Add/remove swear words:
-```
-/ac-debug-db config chatprotection_swear_words ["word1", "word2"]
-```
-
-## Default State
-
-**ON** — Active by default with sensible thresholds.
+[All modules](overview.md)

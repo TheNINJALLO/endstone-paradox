@@ -1,20 +1,17 @@
-# Step Hack Detection
+# stephack
 
-> Detects players stepping up full blocks without jumping.
+Paradox Native 2.0.1 | **Movement** | New-install default: **On**
 
-## How It Works
+## Native behavior
 
-Monitors player position changes for ascending full blocks (0.6+ block threshold) without a corresponding jump action in the PlayerAuthInputPacket. Exempts stairs, slabs, slime blocks, and other legitimate step-up sources. Requires **3 consecutive flags**.
+Vertical-step observation only; slabs, moving blocks and reconciliation cannot prove cheating.
 
-## Detection Details
+## Controls
 
-| Parameter | Value |
-|-----------|-------|
-| Height threshold | 0.6 blocks |
-| Flags required | 3 consecutive |
-| Exemptions | Stairs, slabs, slime blocks |
-| Level 4 exempt | Yes |
+Use `/ac-modstate stephack on` or `/ac-modstate stephack off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-## Default State
+## Evidence and limits
 
-**ON**
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

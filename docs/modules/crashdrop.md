@@ -1,27 +1,17 @@
-# Crash-Drop Module
+# crashdrop
 
-## Overview
-Prevents crash/disconnect duplication exploits by tracking player locations and removing suspicious item entities near disconnect points.
+Paradox Native 2.0.1 | **Inventory** | New-install default: **Off**
 
-## How It Works
+## Native behavior
 
-### Location Tracking
-Every few ticks, the module records each player's current position and dimension. This provides a reliable "last known location" when the player disconnects.
+Negative server item quantity may cancel a drop. No huge-stack or custom-NBT ban heuristic.
 
-### Disconnect Item Removal
-When a player disconnects (crash, kick, or leave):
-1. Their last known position is recorded with a timestamp
-2. Any item entities that spawn near that position within the configurable time window are flagged as suspected dupe items
-3. Flagged items are logged and can be automatically removed
+## Controls
 
-### Rapid Disconnect Detection
-Monitors disconnect frequency per player. If a player disconnects 3+ times in 60 seconds, it's flagged as a **crash-dupe pattern** — admins are alerted.
+Use `/ac-modstate crashdrop on` or `/ac-modstate crashdrop off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-## Configuration
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Default State | OFF | Needs radius/timing tuning |
-| Sensitivity | 5 | Higher = wider removal radius, longer time window |
-| Removal Radius | 3 blocks (at sens 5) | Area around disconnect point |
-| Time Window | 3 seconds (at sens 5) | How long after disconnect to monitor |
-| Command | `/ac-modules crashdrop` | Toggle on/off |
+## Evidence and limits
+
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

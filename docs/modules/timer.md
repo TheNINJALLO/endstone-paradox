@@ -1,21 +1,17 @@
-# Timer Hack Detection
+# timer
 
-> Detects game speed manipulation via packet frequency analysis.
+Paradox Native 2.0.1 | **Movement** | New-install default: **On**
 
-## How It Works
+## Native behavior
 
-Tracks the frequency of PlayerAuthInputPacket per second. Normal Bedrock clients send ~20 packets/second. Fast-timer hacks send >23 pps, slow-timer sends <15 pps. Uses a sliding window of 4 samples for accuracy.
+Three healthy five-second windows of accelerated client time; gaps, bursts, duplicate/reordered ticks reset evidence. A retained session clock exempts gradual backlog recovery until caught up. Slow input is never flagged.
 
-## Detection Details
+## Controls
 
-| Parameter | Value |
-|-----------|-------|
-| Normal frequency | ~20 pps |
-| Fast-timer threshold | >23 pps |
-| Slow-timer threshold | <15 pps |
-| Windows analyzed | 4 |
-| Level 4 exempt | Yes |
+Use `/ac-modstate timer on` or `/ac-modstate timer off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-## Default State
+## Evidence and limits
 
-**ON**
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

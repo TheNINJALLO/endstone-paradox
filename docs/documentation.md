@@ -1,38 +1,31 @@
-# Introduction
+# Paradox Native 2.0.1
 
-## About Paradox AntiCheat for Endstone
+Paradox is a C++23 plugin for anti-cheat monitoring, moderation and server administration. The supported release targets **Endstone 0.11.11**, **BDS 1.26.51.1 / protocol 2193**, and **Windows or Linux x86-64**. It adapts [Visual1mpact's Paradox](https://github.com/Visual1mpact/Paradox_AntiCheat), reviewed through v6.9.1.
 
-Paradox AntiCheat is a comprehensive anti-cheat plugin for **Minecraft Bedrock Edition** servers running on the **Endstone** framework. Originally created by **Visual1mpact** as a Script API behavior pack, this version has been **fully ported to Python** by **TheN1NJ4LL0** and rebuilt from the ground up to take advantage of Endstone's server-side capabilities.
+[Download stable v2.0.1](https://github.com/TheNINJALLO/endstone-paradox/releases/tag/v2.0.1) and follow [installation](gettingstarted.md) or [migration](migration.md). The older v2.0.0 preview has a command authorization defect and is superseded; upgrade it.
 
-### Why Endstone?
+## What the native release provides
 
-Unlike the original Script API version, the Endstone port runs **server-side** with full access to:
+- **54 modules** covering monitoring, input validation, server policies and utilities. [Every module's behavior and default](modules/overview.md) is documented.
+- Connection health gates that suspend detection during lag, packet recovery, unloaded terrain and gameplay transitions. Straight movement and constant yaw are normal.
+- SQLite persistence, consistent migration backups, fractional home coordinates and staff clearance.
+- Native in-game forms and a bearer-token dashboard. Administrative actions check authorization in the native handlers.
+- Windows/Linux native regressions and real BDS integration and scripted multiplayer acceptance checks. See the [validation record](validation.md).
 
-- **Packet-level interception** — inspect and cancel raw Bedrock protocol packets
-- **Direct block/entity manipulation** — no script API limitations
-- **SQLite persistence** — data survives pack changes, world copies, and server restarts
-- **Python ecosystem** — Flask web servers, advanced algorithms, and more
-- **True server authority** — clients can't tamper with detection logic
+Heuristic findings are review observations and never accumulate into automatic punishment. Corroborated timer/reach evidence and malformed inspected inputs follow the [enforcement rules](violation-engine.md). Detection never creates automatic bans. Explicit staff bans and server access policies are separate.
 
-### Key Features
+## Find the right guide
 
-| Feature | Description |
-|---------|-------------|
-| **35 Modules** | Detection, prevention, community moderation, and admin utilities — all individually toggleable |
-| **4-Level Security** | Clearance system with SHA-256 authentication (no operator abuse) |
-| **Violation Engine** | Centralized enforcement pipeline with rolling buffers, escalation ladder, and evidence logging |
-| **Web Admin Panel** | Full-featured web UI with dashboard, module management (two-section layout), bans, players, permissions, and more |
-| **In-Game GUI** | 8-section form-based GUI accessible via `/ac-gui` |
-| **35+ Commands** | 18 moderation + 9 utility + module toggles + violation engine |
-| **Sensitivity Scaling** | Every detection module has a 1-10 sensitivity scale |
-| **Global Ban List** | 509 known cheaters from the original Paradox, checked on join |
-| **Global Ban API** | Separate standalone API for cross-server ban/flag/report sharing |
-| **TOML Configuration** | Clean, human-readable config file |
+| Task | Guide |
+| --- | --- |
+| Install or upgrade | [Getting started](gettingstarted.md), [migration and API limits](migration.md) |
+| Configure modules and server policies | [Configuration](configuration.md), [module overview](modules/overview.md) |
+| Assign staff and review evidence | [Security](security.md), [moderation commands](commands/moderation.md), [evidence commands](commands/violation.md) |
+| Use homes, teleports, claims and PvP | [Utility commands](commands/utility.md) |
+| Connect the dashboard | [Web interface](webui.md) |
+| Understand lag protection and testing | [Enforcement](violation-engine.md), [validation](validation.md), [module audit](module-audit.md) |
+| Build or contribute | [Build instructions](building.md), [architecture](architecture.md), [documentation maintenance](maintenance.md) |
 
-### Credits
+The Python 1.9.4 implementation is [archived for reference](https://github.com/TheNINJALLO/endstone-paradox/tree/main/legacy/python). Do not load it alongside the native binary. Endstone still uses its normal runtime/bootstrap; converting this plugin does not remove Endstone's own requirements.
 
-- **Original Paradox AntiCheat** — [Visual1mpact](https://github.com/Visual1mpact/Paradox_AntiCheat)
-- **Endstone Port** — [TheN1NJ4LL0](https://github.com/TheNINJALLO/endstone-paradox)
-- **Endstone Framework** — [Endstone](https://github.com/EndstoneMC/endstone)
-
-For setup instructions, proceed to [Getting Started](gettingstarted.md).
+GPL-3.0-or-later. Original Paradox by Visual1mpact; Endstone port by TheNINJALLO. [Third-party notices](https://github.com/TheNINJALLO/endstone-paradox/blob/main/native/licenses/README.md).

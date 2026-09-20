@@ -1,123 +1,27 @@
-# Global Ban Database
+# Optional global database integration
 
-Paradox AntiCheat includes a built-in **cross-server ban system** that automatically shares bans, flags, and violation reports between all servers running the plugin. **No configuration required** — it works out of the box.
+Global synchronization is **disabled on new installations**. Configure an explicit HTTPS endpoint only if you intend to use that service. The plugin does not silently contact a default public API or restore the archived Python name-ban list.
 
-## How It Works
-
-```
-Server A bans a player
-        ↓
-    Push to Global Ban API
-        ↓
-    API stores the ban
-        ↓
-Server B, C, D... pull the ban on next sync
-        ↓
-    Player kicked on join attempt
-```
-
-### Zero-Config Setup
-
-Every Paradox install automatically:
-1. **Connects** to the official Global Ban API on first startup
-2. **Self-registers** and receives a unique API key (stored permanently in `config.toml`)
-3. **Syncs** bans and flags every 5 minutes
-4. **Pushes** local bans and violation reports to the API
-
-Server owners don't need to configure anything — just install the plugin and it joins the global network.
-
-## Player Categories
-
-| Category | What Happens | Example |
-|----------|-------------|---------|
-| **ban** | Player is kicked on every join attempt across ALL servers | Confirmed cheater |
-| **high_risk** | Staff alerted when player joins — player NOT kicked | Known exploiter from another server |
-| **flagged** | Staff alerted when player joins — player NOT kicked | Suspicious behavior on another server |
-
-## What Gets Shared
-
-### Bans (auto-push)
-When an admin runs `/ac-ban` on any server, the ban is automatically pushed to the global API. **All connected servers will block that player** on their next join attempt.
-
-### Auto-Bans (auto-push)
-When the violation engine escalates a player to a ban (e.g., repeated fly/killaura detections), it's also pushed globally.
-
-### Violation Reports (auto-push)
-Every violation detected by any module (fly, killaura, reach, xray, etc.) is reported to the API with:
-- Player name and XUID
-- Module that detected it
-- Severity level (1-5)
-- Evidence details
-
-This builds a cross-server intelligence profile for each player.
-
-## Join Checks
-
-When a player joins your server, Paradox checks (in order):
-1. **Global API bans** — synced entries from the shared database → **kick**
-2. **Hardcoded ban list** — 509 known cheaters from original Paradox → **kick**
-3. **Local server bans** — your server's ban list → **kick**
-4. **Global flags/high-risk** — staff alerted, player NOT kicked
-
-## Configuration
-
-The default `config.toml` is pre-configured to work automatically:
-
-```toml
-[global_database]
-enabled = true           # On by default
-api_url = ""             # Auto-resolved to official API
-api_key = ""             # Auto-populated on first connect
-server_name = ""         # Defaults to your server's hostname
-sync_interval = 300      # Sync every 5 minutes
-share_fingerprints = true   # Push fingerprint hashes to the Intelligence Network
-share_telemetry = true      # Push violation/behavioral stats to the network
-auto_tune = false           # Auto-apply crowd-sourced detection thresholds
-```
-
-### Disabling
-
-To opt out of the global ban network:
 ```toml
 [global_database]
 enabled = false
+api_url = ""
+api_key = ""
+sync_interval = 300
 ```
 
-### Self-Hosted
+When enabled with an endpoint, the native worker uses `/api/servers/self-register` if a key is absent, then `/api/sync?since=...` with `X-API-Key`. A returned registration key and synchronization timestamp are persisted locally. The polling interval is at least 60 seconds. An enabled setting with no URL logs a warning and retains local bans.
 
-To run your own Global Ban API for a private server network:
-```toml
-[global_database]
-api_url = "http://your-api-server:8090"
-```
+## Identity and enforcement
 
-The plugin will auto-register with your private API instead.
+Remote records with a valid numeric XUID can be cached by authenticated identity. Records categorized as bans can deny a matching player's join; revocation/removal records remove the cached ban. Name-only records are retained as review flags and cannot ban a player. Local operator-created legacy bans remain in place during migration.
 
-## Intelligence Network
+This integration enforces an explicitly selected external ban policy; it does not make native observational checks create automatic bans. A player name alone, shared device or behavior report is not sufficient native proof.
 
-Beyond bans, the Global API powers a **crowd-sourced intelligence network**. See [Intelligence Network](intelligence-network.md) for full details.
+Disabling synchronization does not delete cached XUID bans; those records still apply at join. Review retained policy when migrating or disconnecting from a service. See [migration](migration.md).
 
-## API Endpoints (for developers)
+## Information sent
 
-The Global Ban API is a standalone FastAPI service. Key endpoints:
+With an endpoint and key configured, healthy corroborated findings may be sent to `/api/report/batch` with player name, XUID, module, severity and evidence. Review the service's operation and data handling before enabling it. The release acceptance tests disabled external destinations and sent no live reports.
 
-| Endpoint | Method | Auth | Description |
-|----------|--------|------|-------------|
-| `/api/servers/self-register` | POST | None | Auto-registration (rate-limited) |
-| `/api/bans` | POST | API Key | Submit a ban |
-| `/api/bans/check/{player}` | GET | API Key | Check if a player is banned |
-| `/api/report` | POST | API Key | Submit a violation report |
-| `/api/report/batch` | POST | API Key | Batch submit violation reports |
-| `/api/sync?since={timestamp}` | GET | API Key | Pull updates since timestamp |
-| `/api/flags` | POST | API Key | Flag/high-risk a player |
-| `/api/fingerprints/batch` | POST | API Key | Batch push fingerprint hashes |
-| `/api/telemetry` | POST | API Key | Push behavioral telemetry |
-| `/api/intelligence` | GET | API Key | Pull crowd-sourced insights |
-
-## Security
-
-- API keys are **SHA-256 hashed** server-side
-- Self-registration is **rate-limited** (5 per IP per hour)
-- The official API endpoint is **obfuscated** in the plugin source code
-- All communication uses standard HTTPS/HTTP
-- **No PII transmitted** — only hashed identifiers and aggregated metrics
+Discord is a separate optional HTTPS webhook configured under `[discord] webhook_url`. With its module enabled and a destination configured, it receives notifications for non-observational findings through the bounded integration worker. See [configuration](configuration.md).

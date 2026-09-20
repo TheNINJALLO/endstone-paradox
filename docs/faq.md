@@ -1,65 +1,45 @@
-# FAQ
+# Frequently asked questions
 
-## General
+## Which file do I install?
 
-### How do I install the plugin?
-Place the `.whl` file in your Endstone server's `plugins/` directory and restart. See [Getting Started](gettingstarted.md).
+Extract the [v2.0.1 platform ZIP](https://github.com/TheNINJALLO/endstone-paradox/releases/tag/v2.0.1) and install exactly one `endstone_paradox.dll` or `endstone_paradox.so` into `plugins/`. Remove the old Paradox wheel. [Installation guide](gettingstarted.md).
 
-### What version of Endstone is required?
-Paradox is built against the latest Endstone API. Check `pyproject.toml` for the exact version requirement.
+## Does C++ mean Endstone no longer needs Python?
 
-### Does it work on Realms?
-No — Paradox requires an **Endstone server** (similar to BDS with Endstone installed). It does not work on Realms.
+The Paradox plugin is native. Endstone still uses its normal bootstrap/runtime. The archived Python Paradox package must not also be loaded.
 
-## Modules
+## Will this punish straight movement or lag?
 
-### Why are some modules OFF by default?
-The anti-dupe modules (`antidupe`, `crashdrop`, `invsync`), rate limiter, packet monitor, and container see are OFF by default because they need per-server tuning. Enable them gradually and adjust sensitivity.
+Robotic pathing is retired as a cheating verdict. Relevant checks suspend during lag, unloaded terrain, transitions and recovery. Review-only heuristics never escalate into punishment. Scripted lag acceptance passed, but that cannot establish zero false positives for every retail client or custom mechanic. [Enforcement](violation-engine.md) and [validation](validation.md).
 
-### How do I adjust sensitivity?
-```
-/ac-modules <module> sensitivity <1-10>
-```
-Or use the Web UI's Modules page.
+## Why does detection say it is suspended?
 
-### Will the anti-dupe module break hopper clocks?
-No! The hopper cluster monitoring tracks **total item counts** — hopper clocks move items back and forth without increasing the total, so they're completely safe.
+Use `/ac-ping` to see the reason and `/ac-tps` to check server load. Unknown/rounded-zero ping, packet recovery, effects or a recent teleport can keep the health gate closed. Timer clock deficits deliberately favor avoiding lag punishment over detecting every acceleration.
 
-### What's the difference between the Anti-Dupe module and Crash-Drop?
-- **Anti-Dupe** detects item multiplication (bundles in containers, piston dupes, packet exploits)
-- **Crash-Drop** prevents items from being duplicated when a player crashes/disconnects
+## Why do old sensitivity commands fail?
 
-## Security
+The native engine does not use the Python 1-10 sensitivity scale. Use `/ac-modstate <module> on|off` and `/ac-mode soft|hard|logonly`; read [module behavior](modules/overview.md).
 
-### I forgot my admin password. What do I do?
-Delete the `admin_hash` entry from `config.toml` and restart the server. Then run `/ac-op` to set a new password.
+## Why did my TOML module change not take effect?
 
-### Can operators bypass the clearance system?
-Server operators are not automatically given clearance. They must authenticate via `/ac-op` like everyone else.
+Persisted module state in SQLite wins over TOML defaults. Use the runtime module command, GUI or dashboard. See [configuration precedence](configuration.md).
 
-## Web UI
+## How do I become an administrator?
 
-### How do I change the web UI port?
-Edit `config.toml`:
-```toml
-[web_ui]
-port = 8080
-```
+Join the server and have its console run `ac-setclearance "Player Name" 4`. The old first-run password form does not exist in the native release. Operators receive staff permissions by default. [Security guide](security.md).
 
-### Is the web UI secure?
-The web UI uses a secret key for authentication. For production use, we recommend running it behind a reverse proxy with HTTPS.
+## Why can I not access the dashboard from another machine?
 
-## Troubleshooting
+New installs bind to localhost. Use an SSH tunnel or HTTPS reverse proxy and the generated bearer token. Existing host/port configuration is preserved. [Web setup](webui.md).
 
-### Module X shows "disabled" but I toggled it on
-Module states are stored in the database. Try:
-```
-/ac-debug-db modules
-```
-to verify the stored state. If there's a mismatch, toggle it off and on again.
+## Are graves, containers and land claims complete replacements for protection plugins?
 
-### The web UI won't start
-Check that port 8080 is not in use by another process. Also verify Flask is installed:
-```
-pip install flask
-```
+Read the [API limits](migration.md): no public block-container inventory API, no hopper-transfer callback and no complete piston moved-block list are available in the targeted API. Grave safeguarding is optional and requires gameplay testing; it is not guaranteed item reconstruction.
+
+## Can I stay on the 2.0.0 preview?
+
+Upgrade to 2.0.1. Live acceptance found a command-sender authorization defect and premature AFK initialization in that preview. Both are fixed in the stable release. [Release notes](release-notes.md).
+
+## How do I report a problem?
+
+Open a [repository issue](https://github.com/TheNINJALLO/endstone-paradox/issues) with plugin/Endstone/BDS versions, platform, reproduction steps, module/mode, relevant ping/TPS and sanitized evidence. Include whether it reproduces with other plugins disabled in a disposable server. Never attach the web token, webhook URL, API key or private database.

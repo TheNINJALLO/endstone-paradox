@@ -1,20 +1,17 @@
-# Wall Hit / Line of Sight Detection
+# wallhit
 
-> Detects players hitting through solid blocks.
+Paradox Native 2.0.1 | **Combat** | New-install default: **On**
 
-## How It Works
+## Native behavior
 
-When damage occurs, the module raycasts from the attacker's eye position to the victim's position. If any solid block lies along the line of sight, the hit is flagged as hitting through walls. Requires **3 flags** before emitting a violation.
+Bounded loaded-terrain line-of-sight review, limited to known full solid blocks. Observation only.
 
-## Detection Details
+## Controls
 
-| Parameter | Value |
-|-----------|-------|
-| Ray origin | Attacker eye position |
-| Ray target | Victim position |
-| Flags required | 3 |
-| Level 4 exempt | Yes |
+Use `/ac-modstate wallhit on` or `/ac-modstate wallhit off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-## Default State
+## Evidence and limits
 
-**ON**
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

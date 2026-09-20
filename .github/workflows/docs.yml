@@ -1,0 +1,43 @@
+name: Documentation checks
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'README.md'
+      - 'native/*.md'
+      - 'native/src/engine.cpp'
+      - 'native/src/plugin.cpp'
+      - 'native/tools/sync-docs.py'
+      - 'CMakeLists.txt'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'README.md'
+      - 'native/*.md'
+      - 'native/src/engine.cpp'
+      - 'native/src/plugin.cpp'
+      - 'native/tools/sync-docs.py'
+      - 'CMakeLists.txt'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check native documentation and prepare wiki pages
+        run: python native/tools/sync-docs.py --check --wiki-output "${{ runner.temp }}/paradox-wiki"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paradox-wiki
+          path: ${{ runner.temp }}/paradox-wiki/*.md

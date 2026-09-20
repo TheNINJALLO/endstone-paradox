@@ -1,20 +1,17 @@
-# Blink / Teleport Detection
+# blink
 
-> Detects instant position jumps without server teleport events.
+Paradox Native 2.0.1 | **Movement** | New-install default: **On**
 
-## How It Works
+## Native behavior
 
-Monitors player position between ticks. If a player moves more than 10 blocks in a single tick without a corresponding server teleport event, the module flags it. Includes a 3-second grace period after legitimate teleports. Requires **2 flags** before emitting a violation.
+Position-discontinuity observation only; teleports, joins and chunk availability reset history.
 
-## Detection Details
+## Controls
 
-| Parameter | Value |
-|-----------|-------|
-| Distance threshold | >10 blocks per tick |
-| Grace period | 3 seconds after server teleport |
-| Flags required | 2 |
-| Level 4 exempt | Yes |
+Use `/ac-modstate blink on` or `/ac-modstate blink off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-## Default State
+## Evidence and limits
 
-**ON**
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

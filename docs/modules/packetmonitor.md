@@ -1,17 +1,17 @@
-# Packet Monitor
+# packetmonitor
 
-## Overview
-Diagnostic tool that monitors packet frequency by type per player.
+Paradox Native 2.0.1 | **Network** | New-install default: **Off**
 
-## How It Works
-1. **Per-Type Tracking**: Counts each packet type separately per player
-2. **Spam Detection**: Flags players sending excessive amounts of a specific packet type
-3. **Noise Filtering**: Common high-frequency packets (MovePlayer, PlayerAuthInput, LevelChunk) are ignored
+## Native behavior
 
-## Configuration
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Spam Threshold | 1000 | Packets per type per 5 seconds |
-| Command | `/ac-packetmonitor` | Toggle on/off |
+Traffic counts and review evidence; no packet-size/count auto-ban.
 
-> **Note**: This is a diagnostic tool, OFF by default. Useful for identifying unfamiliar exploit packets.
+## Controls
+
+Use `/ac-modstate packetmonitor on` or `/ac-modstate packetmonitor off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
+
+## Evidence and limits
+
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

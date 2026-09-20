@@ -1,53 +1,13 @@
-# Violation Engine Commands
+# Evidence and enforcement commands
 
-These commands control the centralized violation processing engine.
+| Command | Behavior | Authorization |
+| --- | --- | --- |
+| `/ac-case <player>`, `/ac-history <player>` | Up to 100 persisted findings; resolves online players or stored name history | Clearance 3 or `paradox.case` |
+| `/ac-evidencereplay <player>` | Latest bounded replay if recorded; not all historical replays | Clearance 3 or `paradox.case` |
+| `/ac-watch <player> [seconds]` | Receive target alerts for 1-3600 seconds; default 300; target online and sender in game | Clearance 3 or `paradox.watch` |
+| `/ac-exempt <player> <module\|all> [seconds]` | Temporary detection exemption for 1-3600 seconds; default 300; target online | Clearance 3 or `paradox.exempt` |
+| `/ac-mode [soft\|hard\|logonly]` | Inspect/change mode; changing resets detection history | Clearance 4 or `paradox.settings` |
 
-## Commands
+Intervals are in **seconds**. The historical `/ac-watch stop` and optional case-count syntax are not native command forms. Watches expire automatically. For permanent identity exemptions, authorized staff can use the [allowlist](moderation.md).
 
-| Command | Description | Min. Clearance |
-|---------|-------------|----------------|
-| `/ac-case <player> [count]` | View last N violation entries for a player (default: 5) | L3 |
-| `/ac-watch <player> [minutes]` | Stream a player's violations to your chat in real-time | L3 |
-| `/ac-watch stop` | Stop watching | L3 |
-| `/ac-mode <logonly\|soft\|hard>` | Set enforcement mode | L4 |
-| `/ac-mode` | View current enforcement mode | L4 |
-| `/ac-exempt <player> <module\|all> [min]` | Temporarily exempt a player from detection (default: 10 min) | L4 |
-
-## Examples
-
-### View a suspicious player's evidence
-
-```
-/ac-case PlayerName
-/ac-case PlayerName 20
-```
-
-Shows timestamps, module names, severity, **human-readable descriptions** of what triggered the detection, evidence details, and what action was taken.
-
-### Watch a player in real-time
-
-```
-/ac-watch PlayerName 10
-```
-
-Streams all violations for PlayerName to your chat for the next 10 minutes. You'll see every flag as it happens.
-
-### Switch to monitoring-only mode
-
-```
-/ac-mode logonly
-```
-
-All detection continues but no enforcement actions are taken — useful during server events or when testing.
-
-### Exempt a player from fly detection
-
-```
-/ac-exempt PlayerName fly 30
-```
-
-Exempts PlayerName from fly detection for 30 minutes. Use `all` instead of a module name to exempt from everything.
-
-## Enforcement Modes
-
-See [Violation Engine](violation-engine.md) for full details on modes and the enforcement ladder.
+Use `/ac-evidencereplay on|off` to configure recording with clearance 4 or `paradox.settings`. Findings store their action, reason, value/limit, ping and health context; observed behavior is not a confirmed cheat. See [enforcement and lag recovery](../violation-engine.md) before acting on it.

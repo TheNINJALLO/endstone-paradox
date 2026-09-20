@@ -1,23 +1,17 @@
-# Bot Detection
+# botdetection
 
-> **Module name:** `botdetection` | **Command:** `/ac-botdetection` | **Default:** OFF
+Paradox Native 2.0.1 | **Evidence** | New-install default: **Off**
 
-3-layer bot detection system that identifies automated players through behavioral analysis.
+## Native behavior
 
-## Detection Layers
+Explicit configured honeypot interaction observation only; no automatic bot ban.
 
-### 1. Behavioral Entropy
-Analyzes movement patterns using Shannon entropy. Bots tend to produce either perfectly uniform or artificially random movement — both distinguishable from human play.
+## Controls
 
-### 2. Connection Patterns
-Detects rapid join/leave cycling — a common pattern for bot swarms that join, perform an action, then disconnect.
+Use `/ac-modstate botdetection on` or `/ac-modstate botdetection off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-### 3. Honeypot Blocks
-Admin-placed invisible trap blocks. When a player interacts with a honeypot block, it's a strong signal they're using an automated client (no human would know the block exists).
+## Evidence and limits
 
-## Configuration
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Enabled | `false` | Toggle with `/ac-botdetection` |
-| Sensitivity | 5 | 1-10 scale — higher catches more bots but may flag edge cases |
+[All modules](overview.md)

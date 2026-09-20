@@ -1,39 +1,17 @@
-# Anti-Dupe Module
+# antidupe
 
-## Overview
-4-layer duplication prevention system that detects and prevents item duplication exploits.
+Paradox Native 2.0.1 | **Inventory** | New-install default: **Off**
 
-## Detection Layers
+## Native behavior
 
-### Layer 1: Bundle Blocking
-Prevents bundles from being placed inside hoppers, dispensers, droppers, and crafters — a known duplication vector.
+Inventory delta/NBT-hash audit. No snapshot rollback, item purge or automatic duplication accusation.
 
-### Layer 2: Hopper Cluster Monitoring
-- Tracks hopper placements near other hoppers
-- Monitors item counts in hopper clusters periodically
-- If items **increase** without a player adding them → dupe detected
-- **Allows hopper clocks** — total item count in a clock stays constant (items just transfer back and forth)
+## Controls
 
-### Layer 3: Piston Entity Monitoring
-- Monitors entity spawn rates near active pistons
-- Detects TNT, carpet, rail, and gravity block duplication
-- Rapid entity spawning in a small area triggers an alert
+Use `/ac-modstate antidupe on` or `/ac-modstate antidupe off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-### Layer 4: Packet Analysis
-- Monitors `InventoryTransactionPacket` and `ContainerOpenPacket` packets
-- Flags rapid-fire inventory transactions (dupe exploit signature)
-- Detects suspicious container open/close cycling
+## Evidence and limits
 
-## Web UI Integration
-All detection events are logged to the **Anti-Dupe Monitor** page in the web UI, including:
-- Event type and timestamp
-- Player name and UUID
-- Coordinates and dimension
-- Detailed detection context
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
 
-## Configuration
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Default State | OFF | Needs per-server tuning |
-| Sensitivity | 5 | Higher = more frequent scans, tighter thresholds |
-| Command | `/ac-modules antidupe` | Toggle on/off |
+[All modules](overview.md)

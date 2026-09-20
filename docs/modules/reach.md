@@ -1,28 +1,17 @@
-# Reach Detection
+# reach
 
-## Overview
-Detects extended reach hacks using **Catmull-Rom cubic interpolation** for accurate distance measurement, with proper attacker/victim event mapping and latency tolerance.
+Paradox Native 2.0.1 | **Combat** | New-install default: **On**
 
-## How It Works
-1. **Correct Combat Mapping**: Uses `event.damager` as the attacker and `event.actor` as the victim for accurate distance measurement
-2. **Position Interpolation**: Uses Catmull-Rom splines to estimate where the attacker was at the exact moment of the hit, not just the tick-boundary position
-3. **Distance Calculation**: Compares the interpolated distance against the maximum reach (4.5 blocks base + 0.5 latency tolerance)
-4. **Latency Tolerance**: Adds a configurable extra distance (default +0.5 blocks) to account for network latency
+## Native behavior
 
-## Configuration
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Sensitivity | 5 | Higher = tighter reach threshold tolerance |
-| Latency Tolerance | 0.5 blocks | Extra distance allowance for laggy players |
-| Command | `/ac-reach` | Toggle on/off |
+Four excessive melee hits beyond conservative distance plus RTT/speed allowance. Attacker and target must be healthy; indirect/projectile/thorns damage, non-player target geometry and extended/unknown weapons are excluded.
 
-Latency tolerance can be adjusted globally via the database: `config.latency_tolerance`
+## Controls
 
-## Actions
-All detections are routed through the [Violation Engine](violation-engine.md):
-- **Severity 3** (MEDIUM) — flags with measured distance vs maximum
-- Illegal hits are cancelled
-- Evidence logged for `/ac-case` review
+Use `/ac-modstate reach on` or `/ac-modstate reach off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-## Technical Details
-The Catmull-Rom interpolation uses 4 position samples to create a smooth curve, providing sub-tick accuracy for reach measurements. This is significantly more accurate than simple tick-to-tick distance checks. Falls back to linear interpolation when fewer than 4 samples are available.
+## Evidence and limits
+
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

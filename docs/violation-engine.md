@@ -1,132 +1,34 @@
-# Violation Engine
+# Enforcement, lag and false positives
 
-Paradox uses a **centralized violation engine** — all detection modules emit violations to a single processing pipeline instead of punishing players directly.
+Native detection separates observations from corroborated evidence and invalid inspected inputs. **No detection module automatically bans players.** A repeated review observation stays an observation, including in hard mode.
 
-## How It Works
+## Enforcement modes
 
-```
-Module detects cheat → emit_violation() → Engine scores severity
-                                           ↓
-                                    Rolling buffer (5 min decay)
-                                           ↓
-                                    Cross-module correlation
-                                           ↓
-                                    Enforcement ladder
-                                           ↓
-                                    Rate-limited staff alert
-                                           ↓
-                                    Evidence → SQLite
-```
+| Mode | Behavior |
+| --- | --- |
+| `logonly` | Records findings without detection enforcement |
+| `soft` | Default; permits validated input cancellation and conservative responses to repeated corroborated evidence |
+| `hard` | Adds kicks after repeated corroborated evidence; never turns observational heuristics into punishment |
 
-## Enforcement Modes
+Use `/ac-mode logonly` for initial acceptance testing on your own server. A mode change resets detection history. Existing stored modes survive migration. Explicit staff moderation and configured server policies still apply independently of this mode.
 
-| Mode | Behavior | Use Case |
-|------|----------|----------|
-| `logonly` | Log violations and alert staff, but take no action | Testing / monitoring |
-| `soft` | Cancel illegal actions, setback when repeated, escalate slowly | **Default — recommended** |
-| `hard` | Faster escalation, shorter ladder, quicker bans | High-risk servers |
+Movement/aim/clicking/mining/inventory heuristics are for review. Straight movement and unchanged yaw never cause a robotic-pathing violation. [Timer](modules/timer.md) and [reach](modules/reach.md) need repeated, healthy evidence; slow input and a lagging target do not prove cheating. Malformed inspected packets or impossible selected hotbar slots can be cancelled without a ban.
 
-Set with `/ac-mode <logonly|soft|hard>` (requires Level 4).
+## Connection health and recovery
 
-## Enforcement Ladder
+Checks pause during high, unknown or non-finite ping; jitter; slow server ticks; scheduling gaps; packet gaps, bursts or reordered input; unloaded terrain; and join, respawn, teleport or dimension transitions. Effects, knockback and special movement also reset relevant evidence. Recovery requires stable updates before detection resumes.
 
-When violations accumulate, the engine escalates actions automatically:
+The timer guard retains a session clock anchor across resets. A delayed backlog must catch up before it can be treated as client-clock acceleration. This deliberately trades detection coverage for avoiding punishment during recovery. A zero-millisecond rounded ping is treated as unknown, so a localhost session alone cannot prove active detection.
 
-### Soft Mode
-| Score | Action |
-|-------|--------|
-| 0+ | Warn (alert staff only) |
-| 5+ | Cancel (block the illegal action) |
-| 15+ | Setback (teleport to last safe position) |
-| 40+ | Kick |
-| 80+ | Ban |
+Check `/ac-ping [player]` or the dashboard for readiness and its suspension reason, and `/ac-tps` for server health. Do not interpret a suspended detector as an accusation or a client disconnect timeout.
 
-### Hard Mode
-| Score | Action |
-|-------|--------|
-| 0+ | Cancel |
-| 5+ | Setback |
-| 15+ | Kick |
-| 30+ | Ban |
+## Reviewing a report
 
-Scores decay over a **5-minute rolling window** — if a player stops cheating, their score drops back to 0.
+1. Inspect `/ac-case <player>` or `/ac-history <player>` for the action, evidence, ping and health.
+2. Review `/ac-evidencereplay <player>` when recording is enabled. It contains the latest bounded replay, not a complete session recording.
+3. Check server load, network recovery, custom movement/items and other plugins before deciding on moderation.
+4. Use `/ac-watch <player> [seconds]` or `/ac-exempt <player> <module|all> [seconds]` while investigating. Both intervals default to 300 seconds and accept 1 through 3600 seconds.
 
-## Severity Levels
+History is bounded to 100 entries per player; the recent dashboard list holds 50 entries. Observational findings must not be presented as confirmed cheating or a guaranteed reason to ban.
 
-Each module assigns a severity to its violations:
-
-| Level | Name | Weight | Example |
-|-------|------|--------|---------|
-| 1 | INFO | 1 | AFK timeout |
-| 2 | LOW | 2 | Self-infliction, X-Ray alert |
-| 3 | MEDIUM | 3 | KillAura, Fly, Reach, Scaffold |
-| 4 | HIGH | 4 | AutoClicker consistency, Gamemode exploit |
-| 5 | CRITICAL | 5 | NameSpoof, X-Ray freeze |
-
-### Baseline Escalation
-
-When a module detects a violation **AND** the player's [Player Baseline](architecture.md#player-baseline-ema-profiling) shows a statistical deviation (z-score > 2.5σ), severity is automatically escalated from 3 → 4. This means behavior that deviates from the player's own established norm is treated more seriously:
-
-| Module | Normal Flag | Baseline Deviation Flag |
-|--------|------------|------------------------|
-| Fly | Severity 3 (hover) | Severity 4 (hover + abnormal for this player) |
-| Fly (Speed) | Severity 3 (speed hack) | Severity 4 (speed + deviation from ground speed baseline) |
-| KillAura | Severity 3 (rate/dist/angle) | Severity 4 (plus attack rate deviation) |
-| KillAura (Multi) | Severity 4 (multi-target) | N/A (always severity 4) |
-| Reach | Severity 3 (distance) | Severity 4 (plus reach distance deviation) |
-| AutoClicker | Severity 3 (CPS) | Severity 4 (plus click rate deviation) |
-| Scaffold | Severity 3 (pattern) | Severity 4 (backwards placement or rate deviation) |
-| Vision | Severity 3 (snap count) | Severity 4 (pre-attack snap: snap within 0.3s of hit) |
-| X-Ray | Normal suspicion | +2 extra suspicion (vein jump deviation) |
-
-## Rate-Limited Alerts
-
-Staff receive at most **1 alert per player per module every 10 seconds** to prevent console/chat spam. Evidence is still logged regardless of alert cooldowns.
-
-## Evidence Persistence
-
-All violations are automatically saved to the `violations` SQLite table with:
-- Player UUID and name
-- Module name
-- Severity level
-- **Human-readable description** (`desc`) explaining what triggered the detection
-- Evidence details (distances, CPS, angles, etc.)
-- Enforcement action taken
-- Timestamp
-
-Evidence is flushed to disk every 30 seconds (write-behind buffering for performance).
-
-View evidence with `/ac-case <player>`. Each entry shows the description prominently, followed by raw evidence details.
-
-## Violation Descriptions
-
-Every violation includes a `desc` field — a plain-English explanation of what the player was doing when the detection triggered. Examples:
-
-| Module | Example Description |
-|--------|--------------------|
-| Fly | "Moving at 15.3 blocks/s (limit 8.5)" |
-| KillAura | "Hit 4 different entities within 0.5s" |
-| Reach | "Hit entity from 6.23 blocks away (limit 3.5)" |
-| Scaffold | "Placed 8 blocks over air in 1.0s while facing backwards" |
-| WaterWalk | "Standing on water with no solid or safe blocks nearby" |
-| NoClip | "Moved 3.5 blocks through solid blocks" |
-| AutoClicker | "Clicking at 22 CPS (max 14 for windows)" |
-| Anti-KB | "Didn't move after being hit 3 times (displacement 0.001b)" |
-| Illegal Items | "Had creative-only item 'command_block' in slot 3" |
-
-Descriptions appear in:
-- Staff alerts (in-game chat)
-- `/ac-watch` live feed
-- `/ac-case` evidence output
-- Web UI violation detail pages
-
-## Temporary Exemptions
-
-Use `/ac-exempt <player> <module|all> <minutes>` to temporarily disable detection for a player. Useful when:
-- Testing new module configurations
-- A player reports false positives
-- An admin is doing legitimate testing
-
-## Live Watching
-
-Use `/ac-watch <player> [minutes]` to stream all of a player's violations to your chat in real-time. Use `/ac-watch stop` to stop.
+The release passed native regressions and scripted connected-client lag/gameplay acceptance on both platforms. Retail controller/touch clients, unusual physics and custom plugin combinations still require local testing. See [exact validation scope](validation.md) and [the full module audit](module-audit.md).

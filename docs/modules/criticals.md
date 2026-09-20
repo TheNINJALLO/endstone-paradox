@@ -1,18 +1,17 @@
-# Criticals Detection
+# criticals
 
-> Detects players who always get critical hits without actually falling.
+Paradox Native 2.0.1 | **Combat** | New-install default: **On**
 
-## How It Works
+## Native behavior
 
-Monitors attacks where the client reports a critical hit (falling flag set) but the player has minimal Y-axis movement. If ground-level hits consistently claim critical status, the module flags it. Requires **5 flags** before emitting a violation.
+Airborne attack observation only; jump apex/effects are not punished.
 
-## Detection Details
+## Controls
 
-| Parameter | Value |
-|-----------|-------|
-| Flags required | 5 |
-| Level 4 exempt | Yes |
+Use `/ac-modstate criticals on` or `/ac-modstate criticals off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-## Default State
+## Evidence and limits
 
-**ON**
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

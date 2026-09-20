@@ -1,27 +1,17 @@
-# KillAura Detection
+# killaura
 
-## Overview
-Detects combat bot (KillAura/Forcefield) hacks using dynamic threshold adaptation and proper attacker/victim event mapping.
+Paradox Native 2.0.1 | **Combat** | New-install default: **On**
 
-## How It Works
-1. **Correct Combat Mapping**: Uses `event.damager` as the attacker and `event.actor` as the victim — ensures distance and facing checks measure the real attacker-to-victim relationship
-2. **Distance Check**: Measures 3D distance between attacker and victim with configurable latency tolerance (+0.5 blocks default)
-3. **Facing Angle Validation**: Checks if the attacker is actually facing the target within a reasonable angle
-4. **Attack Rate Analysis**: Monitors attacks per second — human players have natural variation
-5. **Pattern Analysis**: Looks for perfectly timed, evenly spaced attacks (bot signature) using interval difference analysis
-6. **Dynamic Thresholds**: Thresholds adapt based on sensitivity settings to reduce false positives
+## Native behavior
 
-## Configuration
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Sensitivity | 5 | Higher = stricter facing angle and rate checks |
-| Latency Tolerance | 0.5 blocks | Extra distance allowance for laggy players |
-| Command | `/ac-killaura` | Toggle on/off |
+Behind-view hit observation only; interpolation/input devices are not proof.
 
-Latency tolerance can be adjusted globally via the database: `config.latency_tolerance`
+## Controls
 
-## Actions
-All detections are routed through the [Violation Engine](violation-engine.md):
-- **Severity 3** (MEDIUM) — flags with reasons (dist, angle, rate, pattern)
-- Enforcement determined by current mode and cumulative score
-- Evidence logged with attack details for `/ac-case` review
+Use `/ac-modstate killaura on` or `/ac-modstate killaura off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
+
+## Evidence and limits
+
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

@@ -1,15 +1,17 @@
-# Vision / Aimbot Detection
+# vision
 
-## Overview
-Detects aimbot and snap-aim hacks by analyzing rotation patterns.
+Paradox Native 2.0.1 | **Combat** | New-install default: **On**
 
-## How It Works
-1. **Rotation Snap Analysis**: Counts instances where a player's look direction snaps to a target with inhuman precision
-2. **Turn Speed Check**: Monitors angular velocity — instant 180° turns are suspicious
-3. **Pattern Accumulation**: Single snaps are ignored; repeated/consistent snaps accumulate suspicion
+## Native behavior
 
-## Configuration
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Sensitivity | 5 | Higher = more sensitive to rotation snaps |
-| Command | `/ac-vision` | Toggle on/off |
+Shares the conservative line-of-sight review. Observation only.
+
+## Controls
+
+Use `/ac-modstate vision on` or `/ac-modstate vision off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
+
+## Evidence and limits
+
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

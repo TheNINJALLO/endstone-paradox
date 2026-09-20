@@ -13,3 +13,5 @@ Validation: the local Windows/Linux native regressions pass, plus 17 BDS integra
 The supplied stripped Linux binary cannot yield full private DWARF ABI headers; this plugin uses Endstone's supported C++ ABI and existing server hooks. Grave protection, container inspection and hopper/piston coverage have documented API limits. Review `native/MIGRATION.md` and `native/MODULE_AUDIT.md` before deployment.
 
 Migration: stop the server, back up `plugins/paradox`, remove/uninstall the old Paradox Python wheel, and install exactly one native binary. Keep the existing data folder. Do not run the Python and C++ versions together. BDS binaries are not included.
+
+Documentation: [installation](https://theninjallo.github.io/endstone-paradox/#/gettingstarted), [configuration](https://theninjallo.github.io/endstone-paradox/#/configuration), [commands and permissions](https://theninjallo.github.io/endstone-paradox/#/commands/moderation), [all 54 modules](https://theninjallo.github.io/endstone-paradox/#/modules/overview), and [validation details](https://theninjallo.github.io/endstone-paradox/#/validation).

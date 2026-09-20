@@ -1,36 +1,39 @@
-# Moderation Commands
+# Moderation and administration commands
 
-All moderation commands require appropriate [clearance level](security.md).
+Use `/` in chat and omit it in the console. Quote player names containing spaces. **L3 / node** below means clearance at least 3 **or** that checked Endstone permission; L4 works the same way. Operators receive registered staff permissions by default. Authorized console calls do not need player clearance. See [security](../security.md).
 
-| Command | Description | Min. Clearance |
-|---------|-------------|----------------|
-| `/ac-op` | Authenticate as admin (set or enter password) | Anyone (sets L4) |
-| `/ac-deop` | Remove admin status from a player | L4 |
-| `/ac-ban <player> [reason]` | Ban a player from the server | L3 |
-| `/ac-unban <player>` | Unban a player | L3 |
-| `/ac-kick <player> [reason]` | Kick a player | L3 |
-| `/ac-freeze <player>` | Freeze/unfreeze a player (prevent movement) | L3 |
-| `/ac-vanish` | Toggle invisibility (admins only) | L3 |
-| `/ac-lockdown [level]` | Toggle server lockdown (only high-clearance players can join) | L4 |
-| `/ac-punish <player> <action>` | Punish a player (warn, kick, ban) | L3 |
-| `/ac-tpa <player>` | Teleport to a player | L3 |
-| `/ac-allowlist <add/remove> <player>` | Manage the server allowlist | L4 |
-| `/ac-whitelist <add/remove> <player>` | Manage the whitelist | L4 |
-| `/ac-opsec` | View security status and authentication info | L4 |
-| `/ac-despawn` | Remove nearby entities | L3 |
-| `/ac-modules <name> <on/off>` | Toggle any module on or off | L4 |
-| `/ac-spooflog` | View name spoof detection logs | L3 |
-| `/ac-command <cmd>` | Execute a server command as console | L4 |
-| `/ac-prefix <prefix>` | Change the command prefix | L4 |
+| Command | Behavior | Authorization |
+| --- | --- | --- |
+| `/ac-setclearance <player> <1..4>` | Assign clearance to an online player | L4 / `paradox.opsec` |
+| `/ac-op <password>` | Validate an existing legacy password hash; no new-admin setup | Player, valid legacy password |
+| `/ac-deop [player]` | Reset Paradox clearance to 1 | Self, or L4 / `paradox.deop` for another player |
+| `/ac-ban <player> [reason]` | Persist a manual local ban and disconnect the online target | L3 / `paradox.ban` |
+| `/ac-unban <name-or-UUID>` | Remove matching local bans; offline records supported | L3 / `paradox.unban` |
+| `/ac-kick <player> [reason]` | Disconnect an online target | L3 / `paradox.kick` |
+| `/ac-freeze <player>` | Toggle movement freeze for an online target | L3 / `paradox.freeze` |
+| `/ac-punish <player> <action> [reason]` | `warn`, `mute`, `kick`, `ban`, `tempban` or `freeze`; mute is 10 minutes, tempban is 1 hour | L3 / `paradox.punish` |
+| `/ac-vanish` | Toggle invisibility and name-tag hiding for yourself | L3 / `paradox.vanish`; player only |
+| `/ac-lockdown on\|off [kick]` | Restrict new joins; retain current players unless `kick` is explicit | L4 / `paradox.lockdown` |
+| `/ac-allowlist add\|remove <player>`, `/ac-allowlist list` | Manage detection exemptions using stored identity | L4 / `paradox.allowlist` |
+| `/ac-whitelist add\|remove <player>`, `/ac-whitelist list\|on\|off` | Manage and enable server access policy | L4 / `paradox.whitelist` |
+| `/ac-opsec [player]`, `/ac-whois [player]` | Review stored player records; a target argument must be online | L3 / `paradox.opsec` |
+| `/ac-invsee <player>` | Inspect an online player's inventory | L3 / `paradox.invsee` |
+| `/ac-inventory-editor <player> <slot> clear\|<item> [amount]` | Change an online player's slot; amount 1-64 | L3 / `paradox.invsee`, plus L4 / `paradox.settings` |
+| `/ac-invclone <player>` | Copy an online player's inventory into your own | Same two checks as inventory editing; player only |
+| `/ac-rank <player> <rank>` | Set an online player's score-tag rank | L3 / `paradox.rank` |
+| `/ac-transfer <player> <host> [port]` | Transfer an online player; default port 19132 | L3 / `paradox.transfer` |
+| `/ac-switch-game-mode <0..3> [player]` | Request server game-mode change, subject to policy; target defaults to self | L4 / `paradox.settings` |
+| `/ac-broadcast <message>` | Broadcast to the server | L3 / `paradox.broadcast` |
+| `/ac-environment time <value>` | `sunrise`, `day`, `noon`, `sunset`, `night` or `midnight` | L4 / `paradox.settings` |
+| `/ac-environment weather <value>` | `clear`, `rain` or `thunder` | L4 / `paradox.settings` |
+| `/ac-despawn [item\|arrow\|xp_orb] [radius]` | Remove eligible unnamed drops; player-centered radius defaults to 100; console cleanup has no player center | L3 / `paradox.despawn` |
+| `/ac-command enable\|disable <command>` | Set availability for players below clearance 4 | L4 / `paradox.command` |
+| `/ac-prefix <text>` | Change the message prefix, not command names | L4 / `paradox.prefix` |
+| `/ac-debug-db` | Flush persistence and report errors | L4 / `paradox.opsec` |
+| `/ac-spooflog` | Read stored spoof log records | L3 / `paradox.spooflog` |
 
-## Violation Engine Commands
+Allow/whitelist additions can target previously joined offline players because identity history exists. A never-seen name cannot be authenticated this way. Manual bans and other online-target commands require a connected target unless noted above.
 
-| Command | Description | Min. Clearance |
-|---------|-------------|----------------|
-| `/ac-case <player> [count]` | View last N violation entries for a player | L3 |
-| `/ac-watch <player> [minutes]` | Stream a player's violations in real-time | L3 |
-| `/ac-watch stop` | Stop watching | L3 |
-| `/ac-mode <logonly\|soft\|hard>` | Set enforcement mode | L4 |
-| `/ac-exempt <player> <module\|all> [min]` | Temporarily exempt a player from detection | L4 |
+Moderating equal/higher-clearance targets requires `paradox.settings` in addition to the action's authorization. Vanish does not remove player-list entries or suppress every actor packet. Despawn excludes protected/named drops; review it before use.
 
-See [Violation Engine](violation-engine.md) for full documentation.
+See [module controls](toggles.md), [evidence and mode commands](violation.md) and [player utilities](utility.md).

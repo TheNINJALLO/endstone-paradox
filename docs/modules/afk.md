@@ -1,15 +1,17 @@
-# AFK Detection
+# afk
 
-## Overview
-Tracks idle players and kicks them after configurable inactivity.
+Paradox Native 2.0.1 | **Management** | New-install default: **On**
 
-## How It Works
-1. **Position Tracking**: Monitors each player's position at regular intervals
-2. **Warning System**: Sends chat warnings before kicking (30s, 15s, 5s countdown)
-3. **Activity Reset**: Any movement resets the AFK timer
+## Native behavior
 
-## Configuration
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Sensitivity | 5 | Higher = shorter AFK timeout |
-| Command | `/ac-afk` | Toggle on/off |
+Monotonic inactivity tracking; default tips only. Optional configured kick requires healthy connection; legacy timeout is preserved.
+
+## Controls
+
+Use `/ac-modstate afk on` or `/ac-modstate afk off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
+
+## Evidence and limits
+
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

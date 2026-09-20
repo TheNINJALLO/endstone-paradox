@@ -1,44 +1,38 @@
-# Security & Clearance System
+# Security and staff clearance
 
-## Overview
+Native handlers identify real player and console senders through Endstone's supported accessors and reject unrecognized senders. **Use v2.0.1:** the superseded v2.0.0 preview could mistake a wrapped player for the console. Connected-client acceptance verifies that ordinary players cannot change enforcement settings.
 
-Paradox uses a **4-level clearance system** instead of relying on Minecraft's built-in operator system. This prevents operator abuse and provides granular permission control.
+## Assigning staff
 
-## Clearance Levels
+From the server console, with the player online:
 
-| Level | Name | Permissions |
-|-------|------|-------------|
-| **L1** | Default | Basic commands (home, tpr, pvp, channels) |
-| **L2** | Moderate | Access to the GUI menu |
-| **L3** | High | Moderation commands (ban, kick, freeze, vanish, teleport) |
-| **L4** | Full Admin | Everything — module management, lockdown, config, exempt from all checks |
-
-## Authentication
-
-### Initial Setup
-The first player to run `/ac-op` sets the admin password. The password is stored as a **SHA-256 hash** — it is never stored in plaintext.
-
-### Logging In
+```text
+ac-setclearance "Player Name" 4
 ```
-/ac-op
-```
-A GUI form appears to enter the password. On successful authentication, the player is set to L4.
 
-### Revoking Access
-```
-/ac-deop <player>
-```
-Reduces a player back to L1.
+Clearance values range from 1 to 4. New players receive 1. Most moderation/evidence handlers accept level 3; settings/security changes generally require 4. A handler also accepts its explicitly checked Endstone permission. See [command permissions](commands/moderation.md) for exceptions and exact nodes.
 
-### Setting Levels
-Clearance levels can be set via:
-- **In-game**: `/ac-deop` (to L1) or `/ac-op` (to L4)
-- **Web UI**: Permissions page — set any player to any level
-- **Database**: Directly modify the `players` table
+Endstone operators receive registered staff permissions by default. Revoking Paradox clearance does not revoke Endstone operator status or permissions granted by another permissions plugin. `/ac-deop` removes your own Paradox clearance; targeting another player requires level 4 or `paradox.deop`.
 
-## Security Features
+`/ac-op <password>` only validates a previously stored legacy password hash. It does not create the first administrator or open the Python password form. Use console clearance assignment for new installations.
 
-- **SHA-256 Password Hashing**: Passwords are never stored in plaintext
-- **L4 Exemption**: Level 4 admins are exempt from all detection modules
-- **Global Ban List**: 509 known cheaters from the original Paradox are checked on join
-- **Lockdown Mode**: Only players at or above the lockdown level can join during lockdown
+## Permission defaults
+
+| Permission | Default | Meaning |
+| --- | --- | --- |
+| `paradox.use` | Everyone | Access to registered command entry points; handlers still authorize actions |
+| `paradox.<utility>` | Everyone | Ordinary utilities: home, tpa, tpr, pvp, pvptoggle, channels, gui, guiitem, about, ping, tps, waypoint, chunkborders, report and landclaim |
+| Registered staff command permissions | Operators | Administrative handlers check their specific node or staff clearance |
+| `paradox.settings` | Operators | Native settings changes and privileged GUI controls |
+| `paradox.alerts` | Operators | Receive finding notifications |
+| `paradox.bypass` | Nobody | Explicit detection bypass; do not grant globally |
+
+Some handlers share a permission instead of the command's name: inventory viewing uses `paradox.invsee`; inventory changes additionally require level 4 or `paradox.settings`; case/history/replay use `paradox.case`; clearance assignment and database diagnostics use `paradox.opsec`. Opening a GUI never grants the permissions required for its buttons.
+
+## Administration boundaries
+
+The dashboard's bearer token grants console-level access to supported Paradox commands. It is not a player clearance token. Protect it and the data directory, bind locally by default, and use an HTTPS reverse proxy or SSH tunnel for remote administration. See [web interface](webui.md).
+
+`/ac-command enable|disable <command>` changes command availability for players below clearance 4. It is not an arbitrary console-command executor. `/ac-prefix` changes message text, not command registration names.
+
+Allowlist detection exemptions, whitelist access policy, staff bans, AFK kicks, land/container restrictions and lockdown are administrative policies, distinct from automated cheating findings. Review [migration limits](migration.md) before enabling policies on an existing world.

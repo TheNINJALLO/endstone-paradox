@@ -1,19 +1,17 @@
-# TriggerBot Detection
+# triggerbot
 
-> Detects auto-attack bots that fire immediately when crosshair enters a target hitbox.
+Paradox Native 2.0.1 | **Combat** | New-install default: **On**
 
-## How It Works
+## Native behavior
 
-Tracks the time between a player's rotation entering a target's hitbox and the subsequent attack input. If the delay is consistently less than 100ms, it indicates a TriggerBot. Requires **4 out of 10** suspicious attacks in the analysis window before emitting a violation.
+Regular attack cadence observation only; controller/held-input behavior is not proof.
 
-## Detection Details
+## Controls
 
-| Parameter | Value |
-|-----------|-------|
-| Reaction threshold | <100ms (rotation → attack) |
-| Suspicious ratio | 4/10 in analysis window |
-| Level 4 exempt | Yes |
+Use `/ac-modstate triggerbot on` or `/ac-modstate triggerbot off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-## Default State
+## Evidence and limits
 
-**ON**
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

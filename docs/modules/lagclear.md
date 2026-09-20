@@ -1,15 +1,17 @@
-# Lag Clear
+# lagclear
 
-## Overview
-Scheduled entity cleanup to reduce server lag.
+Paradox Native 2.0.1 | **Management** | New-install default: **On**
 
-## How It Works
-1. **Scheduled Clearing**: Removes ground item entities at configurable intervals
-2. **Warning System**: 30-second countdown warning in chat before clearing
-3. **Entity Types**: Primarily targets dropped items, configurable entity types
+## Native behavior
 
-## Configuration
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Interval | Configurable | Time between clears |
-| Command | `/ac-lagclear` | Toggle on/off |
+Scheduled administrative cleanup with warning; named/unlimited/protected drops excluded. New installs require explicit removal configuration.
+
+## Controls
+
+Use `/ac-modstate lagclear on` or `/ac-modstate lagclear off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
+
+## Evidence and limits
+
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

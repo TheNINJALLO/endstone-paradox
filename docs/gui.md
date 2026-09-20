@@ -1,41 +1,14 @@
-# In-Game GUI
+# In-game GUI
 
-## Overview
+Run `/ac-gui` to open the native Endstone form, or `/ac-guiitem` to receive a compass named **Paradox Menu**. Using that compass opens the same controls. A full inventory prevents adding it.
 
-Paradox includes a full in-game GUI accessible via `/ac-gui` (requires L2 clearance). The GUI uses Endstone's form system to provide a visual interface for all plugin features.
+| Button | Behavior and authorization |
+| --- | --- |
+| Module settings | List and toggle modules; clearance 4 or `paradox.settings` |
+| Recent evidence | Display the recent bounded evidence list; clearance 3 or `paradox.case` |
+| My homes | Run the current player's home listing; `paradox.home` |
+| Connection health | Show ping and detection readiness; `paradox.ping` |
 
-## Sections
+The menu rechecks authorization when buttons run. Opening it does not grant staff privileges. The native GUI has these four entry points; the Python eight-section menu and sensitivity forms are historical.
 
-The GUI contains **8 sections**:
-
-### 1. Module Management
-Toggle any of the 21 modules on or off, and adjust sensitivity settings.
-
-### 2. Player Management
-View online players, check their clearance levels, and perform moderation actions.
-
-### 3. Ban Management
-View banned players, add new bans, and remove existing bans.
-
-### 4. Allowlist / Whitelist
-Manage the server's allowlist and whitelist.
-
-### 5. Home Management
-Set, delete, and teleport to home points.
-
-### 6. Server Settings
-Configure lockdown mode, command prefix, and other server-wide settings.
-
-### 7. PvP Settings
-Toggle PvP globally or per-player.
-
-### 8. About
-View plugin version, credits, and system information.
-
-## Access
-
-```
-/ac-gui
-```
-
-Requires **Clearance Level 2** or higher.
+Module switches persist to SQLite. Utilities such as PvP, chunk display and claims also have player commands; see [utility commands](commands/utility.md) and [module controls](commands/toggles.md).

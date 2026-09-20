@@ -1,15 +1,17 @@
-# Scaffold Detection
+# scaffold
 
-## Overview
-Detects speed bridging / scaffold hacks by analyzing block placement patterns.
+Paradox Native 2.0.1 | **Building** | New-install default: **On**
 
-## How It Works
-1. **Air-Below Filtering**: Only analyzes placements where the block below is air (bridging)
-2. **Axis Pattern Analysis**: Detects placements that follow a perfectly straight line on one axis at high speed
-3. **Exclusions**: Sneaking players and farmland interactions are excluded to avoid false positives
+## Native behavior
 
-## Configuration
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Sensitivity | 5 | Higher = stricter bridge speed and pattern thresholds |
-| Command | `/ac-scaffold` | Toggle on/off |
+Neighbor support review for block placement. Observation only; custom placement tools are legitimate.
+
+## Controls
+
+Use `/ac-modstate scaffold on` or `/ac-modstate scaffold off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
+
+## Evidence and limits
+
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

@@ -1,3 +1,7 @@
+# Historical Python 1.9.4 documentation
+
+**Archived; not current installation instructions.** Use [Paradox Native 2.0.1](../../README.md) and its [migration guide](../../native/MIGRATION.md). The Python features, screenshots, badges and enforcement claims below are retained as history, not promises about native behavior. Do not load both implementations.
+
 <!-- endstone-professional-header:start -->
 <p align="center">
   <img src="docs/assets/banner.svg" width="100%" alt="Endstone Paradox AntiCheat &mdash; Paradox AntiCheat - A comprehensive anti-cheat system for Endstone Bedrock servers">

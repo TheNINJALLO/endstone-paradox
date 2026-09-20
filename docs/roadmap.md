@@ -1,81 +1,11 @@
-# Roadmap
+# Release status and remaining validation
 
-> Track our progress toward making Paradox the most comprehensive Bedrock anti-cheat available.
+**2.0.1 is the stable native C++ release.** It includes the 54-module audit, Windows/Linux packages, SQLite migration, upstream review through Visual1mpact v6.9.1, supported Endstone hooks, native forms and the authenticated dashboard. It supersedes the v2.0.0 preview.
 
----
+Completed automated coverage includes core regressions, actual BDS loading/integration and scripted connected-client gameplay/network checks on Windows and Linux. The [validation record](validation.md) and release `release-validation.json` identify the scope and artifact provenance.
 
-## ✅ Tier 1 — Movement, Combat & Item Protection — Complete
+Further acceptance work remains for retail controller/touch clients, portals, elytra/riptide/vehicles, slime/honey/pistons, custom items, optional graves and other plugin combinations. These are validation boundaries, not promises of a delivery date or claims that every module has been exercised by a retail client.
 
-### Movement Validation Suite
+Future BDS/protocol targets require fresh ABI/schema review and acceptance runs. Changes to container/hopper/piston coverage depend on supported server APIs. Crowd-sourced automatic enforcement tuning and the archived Python UI are not native release commitments.
 
-| Detection | How It Works | Status |
-|-----------|-------------|--------|
-| **NoClip / Phase** | Ray-traces player movement path between ticks — if it passes through solid blocks, flag | ✅ Complete |
-| **Jesus / WaterWalk** | Flags players standing on water without Frost Walker or lily pads | ✅ Complete |
-| **Step Hack** | Detects stepping up full blocks without a jump flag in PlayerAuthInputPacket | ✅ Complete |
-| **Timer Hack** | Tracks PlayerAuthInputPacket frequency — 20/s is normal; >22 = timer, <18 = slow-timer | ✅ Complete |
-| **Blink / Teleport** | Flags position jumps >10 blocks between ticks without a server teleport event | ✅ Complete |
-
-### Combat Validation Suite
-
-| Detection | How It Works | Status |
-|-----------|-------------|--------|
-| **Anti-Knockback** | Tracks velocity after damage — if player doesn't move within 3 ticks of being hit, flag | ✅ Complete |
-| **Criticals** | Tracks if player always gets critical hits (falling flag set without actually falling) | ✅ Complete |
-| **Hit Through Walls** | Raycasts from attacker eye to victim — if any solid block blocks line of sight, flag | ✅ Complete |
-| **TriggerBot** | Tracks time between crosshair entering target hitbox and attack — <50ms consistently = bot | ✅ Complete |
-
-### Illegal Item Scanner
-
-| Feature | Description | Status |
-|---------|-------------|--------|
-| **Enchantment Validation** | Detects illegal enchantment levels (Sharpness 32767, etc.) | ✅ Complete |
-| **Stack Size Validation** | Flags items with impossible stack sizes | ✅ Complete |
-| **Creative-Only Items** | Flags creative-only items in survival mode | ✅ Complete |
-| **Auto-Remove** | Automatically removes illegal items with evidence logging | ✅ Complete |
-
----
-
-## ✅ Tier 2 — Community & Moderation — Complete
-
-| Feature | Description | Status |
-|---------|-------------|--------|
-| **Discord Integration** | Webhook alerts for bans, violations, and staff notifications with colour-coded severity embeds. Rate-limited background thread sender. | ✅ Complete |
-| **Chat Protection** | Spam detection (flood + repeat), advertising filter (IPs/URLs/domains), swear/profanity filter (configurable word list), caps limiter, mute system with timed/permanent support | ✅ Complete |
-| **Anti-Grief / World Protection** | Anti-nuke (mass block break detection), rapid placement rate-limit, explosion logging (TNT/creeper audit trail), configurable thresholds | ✅ Complete |
-| **Evidence Replay** | Ring-buffer recording of player state (position, rotation, actions) every tick. Auto-snapshots on violations. Staff can review replay frames, get summaries, and filter by player | ✅ Complete |
-
----
-
-## ✅ Tier 3 — Intelligence & Analytics — Complete
-
-| Feature | Description | Status |
-|---------|-------------|--------|
-| **Analytics Dashboard** | Violation time-series charts (Chart.js), module breakdown bars, enforcement action doughnut, summary stats in web UI | ✅ Complete |
-| **Bot Detection** | 3-layer: behavioral entropy analysis, connection cycling detection, honeypot block traps | ✅ Complete |
-| **Player Report System** | `/ac-report` command for all players, web UI queue with claim/resolve, auto-escalation, rate limiting | ✅ Complete |
-| **Session Fingerprinting** | Composite device/IP/XUID hash → alt account detection, ban evasion tracking, global fingerprint sharing | ✅ Complete |
-| **Adaptive Check Frequency** | Risk-tier-based check intervals — clean players checked less, flagged players every tick | ✅ Complete |
-| **Global Intelligence Network** | Crowd-sourced fingerprints, behavioral telemetry, reputation scores, auto-tune thresholds | ✅ Complete |
-
----
-
-## 📋 Completed Milestones
-
-| Feature | Version | Description |
-|---------|---------|-------------|
-| Tier 3 Complete | v1.7.0 | Analytics dashboard, bot detection, reports, fingerprinting, adaptive checks, intelligence network |
-| Global Intelligence Network | v1.7.0 | Cross-server fingerprint sharing, behavioral telemetry, crowd-sourced thresholds, reputation scoring |
-| Tier 2 Complete | v1.6.1 | Discord webhooks, chat protection, anti-grief, evidence replay |
-| Tier 1 Complete | v1.6.0 | 10 new detection modules (movement + combat + illegal items) |
-| ContainerSee Overhaul | v1.6.1 | Action bar display, player inventory vision, container identification |
-| Web UI Modules Redesign | v1.6.1 | Two-section layout: detection modules with sliders, features with toggle-only |
-| Player Baseline (EMA) | v1.5.6 | Per-player behavioral profiling with Exponential Moving Averages |
-| Speed Hack Detection | v1.5.7 | Position-delta tracking with 7.3 bps threshold |
-| Multi-Target KillAura | v1.5.7 | Detects >2 unique targets in 0.5s window |
-| Aimbot Acceleration | v1.5.7 | Rotation acceleration + pre-attack snap correlation |
-| Backwards Scaffold | v1.5.7 | Block behind facing direction detection |
-| Smart Lag Clear | v1.5.7 | Excludes name-tagged and NPC entities |
-| Global Ban API | v1.5.5 | Zero-config cross-server ban synchronization |
-| 4-Layer Anti-Dupe | v1.5.0 | Bundle, hopper, piston, and packet analysis |
-
+See [release notes](release-notes.md), [module audit](module-audit.md) and [migration limits](migration.md) before deployment.

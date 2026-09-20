@@ -1,78 +1,27 @@
-# Web Admin Panel
+# Native web interface
 
-## Overview
+The native dashboard replaces the archived Python/Flask interface. It shows online players, ping and detection health, all module switches, recent evidence and a Paradox command field. Historical screenshots and old pages for password sessions, sensitivity tuning and report claim/resolve do not describe this interface.
 
-Paradox includes a built-in **Flask-based web admin panel** that runs alongside your server. It provides a full-featured dashboard for remote server management.
+## Connect
 
-## Accessing the Web UI
+1. Start the plugin with `[web_ui] enabled = true`.
+2. On the server machine, open `http://127.0.0.1:8080` (the new-install default).
+3. Read `plugins/paradox/web-token.txt` locally and enter it in the Access token field.
+4. Select **Connect**. The dashboard refreshes approximately every five seconds.
 
-The web UI starts automatically on port **8080**:
+The token grants full administration of supported Paradox commands. It is held in page memory; reloading requires entering it again. A successful command submission means it was queued. Its result or failure appears in the server console, and the dashboard reflects subsequent state updates.
 
-```
-http://your-server-ip:8080
-```
+Existing configured host/port values are preserved. For remote access, use an SSH tunnel to localhost or an HTTPS reverse proxy. Do not expose a plaintext administration connection over an untrusted network. To rotate a token, stop Endstone, remove only `plugins/paradox/web-token.txt`, and restart; the plugin generates a new token. Rotation also changes the salt used by optional device fingerprint records.
 
-### Authentication
-Login with the secret key configured in `config.toml`:
-```toml
-[web_ui]
-enabled = true
-port = 8080
-host = "0.0.0.0"
-secret_key = "your-secret-key"
-```
+## HTTP API
 
-## Pages
+The dashboard shell (`/` and `/app.js`) is public. Both API routes require `Authorization: Bearer <token>`.
 
-### Dashboard
-Overview of your server including:
-- Total modules, ban count, player count
-- Frozen/vanished player counts
-- Lockdown status
-- Module status summary
+| Request | Result |
+| --- | --- |
+| `GET /api/status` | JSON snapshot containing version, TPS, players, modules, evidence, mode and protocol support |
+| `POST /api/command` with `{"command":"ac-modules"}` | `202` when queued; execution occurs on the server thread |
 
-### Modules
-Toggle all 39 modules on/off and adjust sensitivity (1-10) per module.
+Missing or invalid credentials return `401`. Invalid JSON/command input returns `400`; a full command queue returns `429`. Commands must begin with `ac-`, contain no line breaks or NULs, and fit the 1,024-character limit. The queue holds at most 32 commands; HTTP bodies are limited to 8,192 bytes. Player-only commands still require a player and cannot acquire one from a web request.
 
-### Bans
-- View all server bans
-- Add/remove bans
-- View global ban list (509 known cheaters)
-- Search across all ban entries
-
-### Players
-View all known players with their:
-- UUID
-- Name
-- Last join time
-- Clearance level
-
-### Permissions
-Set clearance levels (L1-L4) for any player directly from the web UI.
-
-### Anti-Dupe Monitor
-Dedicated monitoring page for duplication exploits:
-- **Dupe Detection Events**: Hopper clusters, piston anomalies, rapid inventory transactions, container access patterns
-- **Crash-Drop Events**: Disconnect tracking, removed items, rapid disconnect patterns
-- **Inventory Sync Events**: Rejoin inventory anomalies
-- Searchable/filterable event log
-
-### Logs
-View recent server and module logs.
-
-### Config
-Edit TOML configuration values directly from the web UI.
-
-### Allow/Whitelist
-Manage server allowlist and whitelist entries.
-
-### Global DB
-View and manage global ban database entries.
-
-### Violations
-Per-player violation history and evidence browser:
-- **Violation list**: All players with violations sorted by count, showing severity badge, modules flagged, and last violation time
-- **Player detail**: Full violation timeline with severity filters (Critical/High/Medium/Low/Info)
-- **Descriptions**: Each violation shows a human-readable description explaining what triggered the detection
-- **Evidence grid**: Raw evidence key-value pairs for each violation
-- **Clear**: Clear violations per-player or globally
+The native HTTP server, SQLite worker and HTTPS integration worker use bounded queues. There is no Python Flask process to install for this plugin. See [configuration](configuration.md) and [security](security.md).

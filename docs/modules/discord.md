@@ -1,39 +1,17 @@
-# Discord Integration
+# discord
 
-> Webhook alerts for violations, bans, and kicks — sent to Discord via colour-coded embeds.
+Paradox Native 2.0.1 | **Integration** | New-install default: **On**
 
-## Overview
+## Native behavior
 
-The Discord Integration module forwards anti-cheat events to one or more Discord channels via webhooks. All messages are sent from a **non-blocking background thread** with rate limiting to avoid Discord API throttling.
+Bounded asynchronous HTTPS webhook for non-observational findings; configured destination required.
 
-## Features
+## Controls
 
-| Feature | Description |
-|---------|-------------|
-| **Violation Alerts** | Colour-coded embeds by severity (grey → blue → yellow → orange → red) |
-| **Ban Notifications** | Rich embed when a player is banned (manual or auto) |
-| **Kick Notifications** | Embed when a player is kicked |
-| **Severity Filter** | Only sends alerts above a configurable minimum severity |
-| **Rate Limiting** | Max 5 messages per 5 seconds to avoid Discord throttling |
-| **Background Thread** | Non-blocking daemon thread — won't slow down the server |
+Use `/ac-modstate discord on` or `/ac-modstate discord off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-## Configuration
+## Evidence and limits
 
-Set the webhook URL in `config.toml`:
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
 
-```toml
-[discord]
-webhook_url = "https://discord.com/api/webhooks/..."
-min_severity = 3       # 1=Info, 2=Low, 3=Medium, 4=High, 5=Critical
-send_bans = true
-send_kicks = true
-```
-
-Or set via database:
-```
-/ac-debug-db config discord_webhook_url https://discord.com/api/webhooks/...
-```
-
-## Default State
-
-**OFF** — Requires webhook URL configuration to function.
+[All modules](overview.md)

@@ -1,32 +1,17 @@
-# Adaptive Check Frequency
+# adaptivecheck
 
-> **Module name:** `adaptivecheck` | **Command:** `/ac-adaptivecheck` | **Default:** OFF
+Paradox Native 2.0.1 | **Evidence** | New-install default: **Off**
 
-Dynamically adjusts how often detection modules check each player based on their risk tier.
+## Native behavior
 
-## Risk Tiers
+Records connection baselines. It never lowers enforcement thresholds from lagging samples or untrusted crowd data.
 
-| Tier | Condition | Check Multiplier |
-|------|-----------|-----------------|
-| **Low** | Violation score < 2.0 | 2× interval (less frequent) |
-| **Medium** | Score 2.0 – 8.0 | 1× normal |
-| **High** | Score > 8.0 | 0.5× interval (more frequent) |
+## Controls
 
-## How It Works
+Use `/ac-modstate adaptivecheck on` or `/ac-modstate adaptivecheck off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-Every 10 seconds, the module:
+## Evidence and limits
 
-1. Calculates each online player's violation score from the engine
-2. Assigns a risk tier (low / medium / high)
-3. Adjusts all detection module intervals based on the highest active tier
-4. Alerts admins when a player's tier escalates
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
 
-## Benefits
-
-- **Resource optimization** — Clean servers with no flagged players run checks at half frequency
-- **Faster detection** — Flagged players are checked twice as often
-- **Automatic** — No manual configuration needed
-
-## Global Intelligence Integration
-
-When enabled, pushes tier distribution telemetry (high-risk ratios, tier counts) to the Global API for crowd-sourced analysis.
+[All modules](overview.md)

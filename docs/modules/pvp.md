@@ -1,14 +1,17 @@
-# PvP Manager
+# pvp
 
-## Overview
-Per-player PvP toggle system with combat tagging and combat log detection.
+Paradox Native 2.0.1 | **Management** | New-install default: **On**
 
-## How It Works
-1. **PvP Toggle**: Players can enable/disable PvP for themselves via `/ac-pvp`
-2. **Combat Tagging**: When a player attacks another, both are "combat tagged" for a duration
-3. **Combat Log Detection**: If a combat-tagged player disconnects, admins are alerted
+## Native behavior
 
-## Configuration
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Command | `/ac-pvp` | Toggle PvP for yourself |
+Global/personal policy includes projectile attribution, ten-second toggle cooldown, fifteen-second combat interval. Disconnect never bans.
+
+## Controls
+
+Use `/ac-modstate pvp on` or `/ac-modstate pvp off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
+
+## Evidence and limits
+
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

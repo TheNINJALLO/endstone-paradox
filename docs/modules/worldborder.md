@@ -1,17 +1,17 @@
-# World Border
+# worldborder
 
-## Overview
-Enforces a configurable world border with automatic teleport-back.
+Paradox Native 2.0.1 | **Management** | New-install default: **On**
 
-## How It Works
-1. **Radius Check**: Monitors player positions against a configurable center + radius
-2. **Teleport-Back**: Players who cross the border are teleported to the nearest valid position
-3. **Per-Dimension**: Can be configured independently for each dimension
+## Native behavior
 
-## Configuration
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Sensitivity | N/A | Border radius is set separately |
-| Command | `/ac-worldborder` | Toggle on/off |
+Explicit circular boundary policy permits movement back inward when already outside; legacy center fields preserved.
 
-Set border via the GUI or config file.
+## Controls
+
+Use `/ac-modstate worldborder on` or `/ac-modstate worldborder off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
+
+## Evidence and limits
+
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

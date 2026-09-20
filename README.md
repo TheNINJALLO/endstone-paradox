@@ -4,14 +4,18 @@ C++23 anti-cheat monitoring, moderation and administration for **Endstone 0.11.1
 
 The plugin runs as a native `.dll` or `.so`. Endstone itself still uses its normal runtime and bootstrap. The Python implementation is archived under [`legacy/python`](legacy/python); do not load both implementations.
 
+**[Download stable v2.0.1](https://github.com/TheNINJALLO/endstone-paradox/releases/tag/v2.0.1)** · **[Documentation](https://theninjallo.github.io/endstone-paradox/)** · **[Release notes](native/RELEASE_NOTES.md)**
+
+Upgrade from the superseded v2.0.0 preview: v2.0.1 fixes wrapped-player command authorization and premature AFK initialization. The [installation guide](https://theninjallo.github.io/endstone-paradox/#/gettingstarted), [configuration reference](https://theninjallo.github.io/endstone-paradox/#/configuration), [command reference](https://theninjallo.github.io/endstone-paradox/#/commands/moderation) and [all 54 module pages](https://theninjallo.github.io/endstone-paradox/#/modules/overview) describe the native release.
+
 ## Install or migrate
 
 1. Stop the server and back up `plugins/paradox` and your world.
 2. Remove the old Paradox wheel from `plugins`, or uninstall `endstone-paradox` from the Python environment used by Endstone if installed there.
-3. Copy **one** native binary into `plugins/`: `endstone_paradox.dll` on Windows, or `endstone_paradox.so` on Linux. Linux requires OpenSSL 3 (`libssl3` / `libssl3t64`).
+3. Download the platform ZIP and matching SHA-256 file from the stable release, verify the checksum, and extract it. Copy **one** native binary from the archive's `plugins/` folder into your server's `plugins/`: `endstone_paradox.dll` on Windows, or `endstone_paradox.so` on Linux. Linux requires OpenSSL 3 (`libssl3` / `libssl3t64`). Remove any previous Paradox binary when upgrading.
 4. Keep the existing `plugins/paradox/config.toml` and `paradox.db`. The loader creates `paradox.db.pre-native.bak` using SQLite's consistent backup API. Existing tables remain intact.
 5. Start Endstone and check for `Paradox 2.0.1 native enabled; 54 modules`. The server must report supported protocol 2193. `ac-about` and `ac-debug-db` work from the console.
-6. Grant staff clearance from the console: `ac-setclearance "Player Name" 4`. Review the [migration notes](native/MIGRATION.md) before enabling server policies.
+6. With the intended staff member online, grant clearance from the console: `ac-setclearance "Player Name" 4`. Review the [migration notes](native/MIGRATION.md) before enabling server policies.
 
 The supplied BDS ZIPs are verification inputs and are **not redistributed**. [`verify-server.py`](native/tools/verify-server.py) checks both archive and executable against pinned official metadata.
 
@@ -65,5 +69,7 @@ The dashboard shows online connection health, module switches and recent evidenc
 See [native/BUILDING.md](native/BUILDING.md). CMake pins dependencies; the decoder applies allocation/depth inspection budgets. [`references.lock.json`](native/references.lock.json) records all seven requested Endstone repositories, upstream Paradox and both server checksums.
 
 Endstone's native plugin API supplies the server hooks and ABI boundary. This port does not guess private BDS offsets or install a second set of detours. The supplied Linux binary is stripped, so `dwarf2cpp` cannot generate complete private class headers from it. This constraint and the protocol-dumper evidence are documented in [VALIDATION.md](native/VALIDATION.md).
+
+The documentation site and wiki export share the sources in `docs/`. Module pages are generated from the audited native registry. Run `python native/tools/sync-docs.py --check` to check consistency; see [documentation maintenance](docs/maintenance.md) for editing and wiki publication.
 
 GPL-3.0-or-later. Original Paradox by Visual1mpact; Endstone port by TheNINJALLO. Third-party notices are in [`native/licenses`](native/licenses).

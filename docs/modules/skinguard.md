@@ -1,56 +1,17 @@
-# SkinGuard
+# skinguard
 
-Detects and rejects invalid skins on player join: 4D geometry, tiny models, invisible/transparent textures, and non-standard dimensions.
+Paradox Native 2.0.1 | **Validation** | New-install default: **On**
 
-## How It Works
+## Native behavior
 
-SkinGuard runs **4 checks** on every player join:
+Decoded image consistency review only; no bans for transparency, persona or marketplace geometry.
 
-### 1. Geometry Name Validation
-Only standard Bedrock geometry models are allowed:
-- `geometry.humanoid.custom`
-- `geometry.humanoid.customSlim`
-- `geometry.humanoid` (and baby variants)
+## Controls
 
-Custom model names (e.g., `geometry.4d_wings`, `geometry.tiny`) → **kicked**.
+Use `/ac-modstate skinguard on` or `/ac-modstate skinguard off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-### 2. Geometry Data Parsing
-If the skin includes custom geometry JSON, SkinGuard parses it:
-- **Bone count**: Must have at least 4 bones (head, body, arms)
-- **Model volume**: Total cube volume must exceed 500 units (standard Steve ≈ 2000+)
-- **Sub-pixel bones**: Cubes smaller than 0.5 pixels in any dimension → **flagged**
+## Evidence and limits
 
-This prevents tiny/microscopic models that shrink the player's hitbox.
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
 
-### 3. Transparency Detection
-Scans the RGBA pixel data of the skin texture:
-- If **>95% of pixels** are fully transparent → **invisible skin → kicked**
-- If fewer than **50 visible pixels** → **near-invisible → kicked**
-
-### 4. Dimension Validation
-Only valid Bedrock skin sizes are accepted:
-- 64×32, 64×64, 128×128, 256×256
-
-Non-standard dimensions → **kicked**.
-
-## Configuration
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Toggle | ON | `/ac-skinguard` |
-| Sensitivity | 1–10 | `/ac-modules skinguard sensitivity <1-10>` |
-
-## Why This Matters
-
-4D skins and tiny geometries create unfair PvP advantages:
-- **Tiny hitbox**: Other players' attacks miss because the collision box is microscopic
-- **Invisible**: Players can move unseen without admin vanish
-- **Custom geometry**: Can add wings, extra limbs, or other distracting visual elements
-
-SkinGuard ensures all players use standard-sized, visible models.
-
-## Toggle Command
-
-```
-/ac-skinguard
-```
+[All modules](overview.md)

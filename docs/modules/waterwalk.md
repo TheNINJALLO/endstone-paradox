@@ -1,20 +1,17 @@
-# WaterWalk / Jesus Detection
+# waterwalk
 
-> Detects players standing on water without Frost Walker, ice, or lily pads.
+Paradox Native 2.0.1 | **Movement** | New-install default: **On**
 
-## How It Works
+## Native behavior
 
-Checks if a player is standing on water blocks without legitimate means (Frost Walker enchantment, ice blocks, or lily pads beneath them). Uses a **hitbox footprint check** — the player's ~0.6-wide foot rectangle is sampled at all 4 corners so that standing on solid block edges near water does not trigger a false positive. Requires **4 flags** before emitting a violation.
+Liquid-surface observation only; swimming and effects suspend movement analysis.
 
-## Detection Details
+## Controls
 
-| Parameter | Value |
-|-----------|-------|
-| Flags required | 4 |
-| Footprint width | ±0.3 blocks from center |
-| Exemptions | Frost Walker boots, ice blocks, lily pads, solid block support |
-| Level 4 exempt | Yes |
+Use `/ac-modstate waterwalk on` or `/ac-modstate waterwalk off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-## Default State
+## Evidence and limits
 
-**ON**
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
+
+[All modules](overview.md)

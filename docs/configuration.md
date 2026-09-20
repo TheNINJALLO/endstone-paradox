@@ -1,73 +1,73 @@
 # Configuration
 
-## Overview
+Paradox Native uses `plugins/paradox/config.toml` and `plugins/paradox/paradox.db`. Stop the server before editing files and restart after TOML changes. Use commands or the native UI for supported runtime changes.
 
-Paradox uses a **TOML configuration file** located in the plugin's data folder:
+## New-install example
 
-```
-server/plugins/endstone-paradox/config.toml
-```
+These are native settings, including optional integration and policy examples:
 
-## Configuration Sections
-
-### Database
-```toml
-[database]
-mode = "sqlite"     # SQLite with WAL mode
-```
-
-### Web UI
 ```toml
 [web_ui]
 enabled = true
+host = "127.0.0.1"
 port = 8080
-host = "0.0.0.0"
-secret_key = "change-this-secret-key"
-```
 
-### Global Database
-```toml
 [global_database]
-enabled = true             # On by default — auto-connects to official API
-api_url = ""               # Leave empty for official; set custom for self-hosted
-api_key = ""               # Auto-populated on first connect
-server_name = ""           # Defaults to hostname
-sync_interval = 300        # Sync every 5 minutes
+enabled = false
+api_url = ""
+api_key = ""
+sync_interval = 300
+
+[discord]
+webhook_url = ""
+
+[afk]
+timeout = 600
+kick = false
+
+[lagclear]
+interval = 300
+enabled_removal = false
+
+[worldborder]
+radius = 0
+x = 0
+z = 0
+
+[gamemodepolicy]
+survival = true
+creative = true
+adventure = true
+spectator = true
+
+[modules.gamemodepolicy]
+enabled = false
+
+[modules.landclaim]
+enabled = false
+
+[modules.gravesaver]
+enabled = false
 ```
 
-See [Global Ban Database](global-database.md) for full documentation.
+A zero world-border radius leaves the boundary inactive. AFK defaults to tips, and new-install scheduled entity removal requires `enabled_removal = true`. Existing lag-clear configurations retain their previous enabled behavior when that key is absent. Inspect migrated settings before starting the server.
 
-### Modules
-Module states and sensitivity values are stored in the **SQLite database**, not the config file. This ensures they persist independently and can be modified at runtime via commands, GUI, or web UI.
+## Which setting wins?
 
-## Runtime Configuration
+For module states, a persisted SQLite value takes precedence over `[modules.<name>].enabled`, which takes precedence over the native default. Use `/ac-modstate <module> on|off` to update the active and persisted state. Editing a TOML module default does not override an existing database value.
 
-Most settings can be changed at runtime without restarting the server:
-- **Module toggles**: `/ac-modules <name> <on/off>`
-- **Sensitivity**: `/ac-modules <name> sensitivity <1-10>`
-- **Lockdown**: `/ac-lockdown`
-- **Web UI config**: Edit via the Config page
+The enforcement mode is persisted in SQLite and changed with `/ac-mode soft|hard|logonly`. The default is `soft`. Runtime AFK intervals, lag-clear intervals and world-border commands also save database overrides. Check those overrides when changing their TOML defaults.
 
-## Data Storage
+The Python sensitivity scale and remote threshold tuning do not control native enforcement. There is no native `/ac-modules <name> sensitivity <value>` command. Review each [module's actual behavior](modules/overview.md).
 
-All runtime data is stored in SQLite (WAL mode) at:
-```
-server/plugins/endstone-paradox/paradox.db
-```
+## Integrations and credentials
 
-Tables include:
-- `modules` — Module enabled states and sensitivity values
-- `bans` — Server ban list
-- `players` — Player records, clearance levels, join times
-- `frozen_players` — Currently frozen players
-- `vanished_players` — Currently vanished players
-- `homes` — Player home points
-- `inv_snapshots` — Inventory sync snapshots
-- `violations` — Violation engine evidence and enforcement history
-- `global_bans` — Synced global ban cache (from Global Ban API)
-- `global_flags` — Synced global flags cache (high_risk, flagged)\r\n- `baselines` — Per-player EMA behavioral profiles (rolling averages, variance per metric)
-- `skin_log` — SkinGuard violation records
-- `spoof_log` — NameSpoof detection events
-- `antidupe_log` — Anti-dupe detection events
-- `crashdrop_log` — Crash-drop detection events
-- `invsync_log` — Inventory sync detection events
+Global synchronization is off by default and requires an explicitly configured HTTPS `api_url`; there is no implicit public endpoint. Discord requires an HTTPS `webhook_url`. See [global integration](global-database.md) for its identity and data-sharing rules.
+
+Web authentication uses `web-token.txt`, not the old Flask secret key or password sessions. Treat this token as full administration access and keep it out of logs, screenshots and repositories. See [web setup](webui.md).
+
+## Storage and backups
+
+The SQLite store retains legacy tables and adds native evidence, identity history, policies and audit records. Writes use a bounded worker queue, WAL, transactions and shutdown flushing. `/ac-debug-db` flushes the queue and reports persistence errors; investigate any error before relying on saved state.
+
+Back up the complete data directory while the server is stopped, or use SQLite's consistent backup facility. Do not copy only a live `.db` file while ignoring its WAL. The migration backup is not a substitute for routine backups. See [migration and rollback](migration.md).

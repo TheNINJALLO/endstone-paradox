@@ -1,27 +1,17 @@
-# Illegal Items Scanner
+# illegalitems
 
-> Detects and removes illegal items from player inventories.
+Paradox Native 2.0.1 | **Inventory** | New-install default: **On**
 
-## How It Works
+## Native behavior
 
-Scans player inventories for items that shouldn't exist in survival mode:
+Overstack review only; custom plugin items are not destroyed.
 
-| Check | Description |
-|-------|-------------|
-| **Enchantment Levels** | Detects enchantments above max vanilla levels (e.g., Sharpness 32767) |
-| **Stack Sizes** | Flags items with impossible stack sizes (e.g., 64 swords) |
-| **Creative-Only Items** | Detects items that can only be obtained in creative mode |
+## Controls
 
-Items are automatically removed with evidence logged to the violation engine.
+Use `/ac-modstate illegalitems on` or `/ac-modstate illegalitems off`. The generic module handler requires clearance 3 or `paradox.modules`, plus clearance 4 or `paradox.settings` to change state. Operators have these permissions by default. Changes persist to SQLite and override TOML defaults. For utility commands and special cases, see [module controls](../commands/toggles.md) and [player utilities](../commands/utility.md).
 
-## Detection Details
+## Evidence and limits
 
-| Parameter | Value |
-|-----------|-------|
-| Scan trigger | On player join, periodically, on inventory change |
-| Action | Auto-remove + violation emit |
-| Level 4 exempt | Yes |
+Observations never escalate into punishment, including in hard mode. Administrative policies are separate from cheating findings. Read the [lag and enforcement guide](../violation-engine.md) and [full module audit](../module-audit.md) before changing policy. The [validation record](../validation.md) distinguishes automated coverage from gameplay still needing local acceptance.
 
-## Default State
-
-**ON**
+[All modules](overview.md)
