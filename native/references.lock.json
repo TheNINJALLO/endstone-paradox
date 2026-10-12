@@ -1,13 +1,13 @@
 {
-  "server": "1.26.51.1",
+  "server": "1.26.52.3",
   "protocol": 2193,
-  "endstone": "0.11.11",
+  "endstone": "0.11.14",
   "upstream": "6.9.1",
   "references": {
     "bedrock-protocol": "e15ec630d3d1fb983e8601571e54b59a886896c4",
     "bedrock-server-data": "6a0233d17e397713c021e18ac0fbf309e06166c6",
     "dwarf2cpp": "a7d9ff3d188c4a7d19920d76fa9ae3370fc75776",
-    "endstone": "0c7cf5ecf48a62c5d079626c6455e237c139c912",
+    "endstone": "03f4189b1535af0870861748fc569f6deac0ad65",
     "protocol-docs": "0db6185921974b5aba4a30af33a5eed842dd2cb9",
     "protocol-dumper": "dc823fc11d69a8ed53774b1a84c99cf12e75b401",
     "remote-dev": "f1c81922ec248dc715125af0f7c9216e13f84085",
@@ -15,12 +15,12 @@
   },
   "archives": {
     "linux": {
-      "sha256": "ad91d3b824e51ea50b5bb601c295cbd8f543a29b14315c2ad89ff27311e2d860",
-      "binary_sha256": "e93e739f373a84edfff7c9cd76fcb090c2176744b412e1143f1b38e91a49bed4"
+      "sha256": "f6348d84fa714d04ca194f207e89453ca6bba0a1359396475271a52a150471c6",
+      "binary_sha256": "0a490c711d4a2ce075debcd979e8862b7eaba008373f9970f0edbb67f98f9207"
     },
     "windows": {
-      "sha256": "a1c1ebefde3036223234179f7c1eab4b445b4727f0482a0554818c9bcaf8e4a5",
-      "binary_sha256": "76d547f82e02c18d0986c30b47132c9cc4171d0f2df1c00649e50ff35788b321"
+      "sha256": "2c9b98d07d2504786996f2335980e88bd969b4a77514925e75471a1349995825",
+      "binary_sha256": "19c88569af2e4b7d984e999055a31cbcb0799dacf8bbbf7371eda42f5772a443"
     }
   }
 }

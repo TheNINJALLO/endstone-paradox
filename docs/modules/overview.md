@@ -1,6 +1,6 @@
 # All 54 native modules
 
-These are the Paradox 2.0.1 defaults for a new installation. Persisted settings take precedence. Modules include observations, validation, policies and utilities; enabling a module does not imply it can punish a player. Review [enforcement and lag recovery](../violation-engine.md), [module controls](../commands/toggles.md) and [migration limits](../migration.md).
+These are the Paradox 2.0.2 defaults for a new installation. Persisted settings take precedence. Modules include observations, validation, policies and utilities; enabling a module does not imply it can punish a player. Review [enforcement and lag recovery](../violation-engine.md), [module controls](../commands/toggles.md) and [migration limits](../migration.md).
 
 | Module | Kind | Default | Native behavior |
 | --- | --- | --- | --- |

@@ -1,6 +1,6 @@
 # discord
 
-Paradox Native 2.0.1 | **Integration** | New-install default: **On**
+Paradox Native 2.0.2 | **Integration** | New-install default: **On**
 
 ## Native behavior
 

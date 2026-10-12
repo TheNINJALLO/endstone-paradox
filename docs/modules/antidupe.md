@@ -1,6 +1,6 @@
 # antidupe
 
-Paradox Native 2.0.1 | **Inventory** | New-install default: **Off**
+Paradox Native 2.0.2 | **Inventory** | New-install default: **Off**
 
 ## Native behavior
 

@@ -15,7 +15,7 @@ expected = lock["archives"][args.platform]
 with args.archive.open("rb") as source:
     actual = hashlib.file_digest(source, "sha256").hexdigest()
 if actual != expected["sha256"]:
-    raise SystemExit("Archive does not match the supported BDS 1.26.51.1 build")
+    raise SystemExit("Archive does not match the supported BDS 1.26.52.3 build")
 filename = "bedrock_server" + (".exe" if args.platform == "windows" else "")
 with zipfile.ZipFile(args.archive) as archive:
     with archive.open(filename) as binary:

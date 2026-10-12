@@ -1,6 +1,6 @@
 # chatprotection
 
-Paradox Native 2.0.1 | **Chat** | New-install default: **On**
+Paradox Native 2.0.2 | **Chat** | New-install default: **On**
 
 ## Native behavior
 

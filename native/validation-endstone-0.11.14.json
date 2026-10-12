@@ -1,0 +1,32 @@
+{
+  "version": "2.0.2",
+  "endstone": "0.11.14",
+  "sdk_commit": "03f4189b1535af0870861748fc569f6deac0ad65",
+  "bds_package": "1.26.52.3",
+  "protocol": 2193,
+  "platform": "linux-x86_64",
+  "native_build_passed": true,
+  "ctest_passed": 1,
+  "checks": {
+    "enabled": true,
+    "anonymous_status_rejected": true,
+    "invalid_token_rejected": true,
+    "authenticated_status": true,
+    "protocol_supported": true,
+    "all_modules_registered": true,
+    "malformed_command_rejected": true,
+    "multiline_command_rejected": true,
+    "oversized_body_rejected": true,
+    "arbitrary_console_rejected": true,
+    "native_command_queued": true,
+    "native_command_executed": true,
+    "exit_zero": true,
+    "only_native_plugin": true,
+    "mode_persisted": true,
+    "module_persisted": true,
+    "no_plugin_runtime_errors": true
+  },
+  "artifact_sha256": "425ce31946f80d2457d999d463b18b3e9425881e37f09c985f67e8106bf5a1f1",
+  "publication_status": "release-prepared",
+  "windows_live_qualification": "not run"
+}

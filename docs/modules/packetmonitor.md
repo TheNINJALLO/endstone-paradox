@@ -1,6 +1,6 @@
 # packetmonitor
 
-Paradox Native 2.0.1 | **Network** | New-install default: **Off**
+Paradox Native 2.0.2 | **Network** | New-install default: **Off**
 
 ## Native behavior
 

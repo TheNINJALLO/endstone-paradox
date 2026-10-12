@@ -215,8 +215,9 @@ void test_protocol() {
         auto result = inspect_packet(i % 3 == 0 ? 144 : i % 3 == 1 ? 48 : 175, bytes);
         check(!result.input || result.decoded, "fuzz yielded partial input");
     }
-    check(supported_runtime("26.51", 2193), "actual Endstone version refused");
-    check(supported_runtime("1.26.51.1", 2193), "target refused");
+    check(supported_runtime("26.52", 2193), "actual Endstone version refused");
+    check(!supported_runtime("26.51", 2193), "previous server runtime accepted");
+    check(supported_runtime("1.26.52.3", 2193), "target refused");
     check(!supported_runtime("1.26.60", 2211), "wrong ABI accepted");
 }
 void test_paced_backlog() {

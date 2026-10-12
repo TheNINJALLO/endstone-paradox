@@ -1,4 +1,10 @@
-# Release notes: 2.0.1
+# Release notes: 2.0.2
+
+# Endstone 0.11.14 compatibility check — 2026-10-12
+
+Paradox Native 2.0.2 targets Endstone 0.11.14 / SDK `03f4189b1535af0870861748fc569f6deac0ad65` and BDS 1.26.52.3 / protocol 2193. Linux native compilation and CTest passed. The disposable live smoke passed all 18 checks: native startup, protocol/module status, web authentication and invalid input, queued command execution, SQLite persistence, and clean shutdown. The pinned and hardened protocol compiler/schema are unchanged. Optional httplib Zstd auto-detection is disabled so builds use their declared dependencies. Windows compilation and connected-client acceptance were not run for this update.
+
+Artifact identity: `native/validation-endstone-0.11.14.json`. Earlier validation follows.
 
 Paradox 2.0.1 is the stable native C++ release for Endstone 0.11.11 and BDS 1.26.51.1 / protocol 2193, with Windows x86-64 and Linux x86-64 packages.
 

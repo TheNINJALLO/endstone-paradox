@@ -1,6 +1,6 @@
 # Native build
 
-Target: x86-64 Endstone 0.11.11, BDS 1.26.51.1, protocol 2193. Use LLVM/Clang 20, C++23, CMake 3.29+, Ninja, Git, Python 3.12+ and uv. Linux must use libc++ rather than libstdc++ to match Endstone's C++ ABI. Windows uses clang-cl with the Visual Studio 2022 SDK and dynamic MSVC runtime.
+Target: x86-64 Endstone 0.11.14, BDS 1.26.52.3, protocol 2193. Use LLVM/Clang 20, C++23, CMake 3.29+, Ninja, Git, Python 3.12+ and uv. Linux must use libc++ rather than libstdc++ to match Endstone's C++ ABI. Windows uses clang-cl with the Visual Studio 2022 SDK and dynamic MSVC runtime.
 
 ## Linux
 
@@ -32,17 +32,17 @@ The process-only execution-policy option does not change machine policy. CMake f
 ## Server verification and smoke test
 
 ```sh
-python native/tools/verify-server.py bedrock-server-linux-1.26.51.1.zip --platform linux
-python native/tools/verify-server.py bedrock-server-windows-1.26.51.1.zip --platform windows
+python native/tools/verify-server.py bedrock-server-linux-1.26.52.3.zip --platform linux
+python native/tools/verify-server.py bedrock-server-windows-1.26.52.3.zip --platform windows
 ```
 
-`native/tools/smoke-server.py` accepts an **isolated extracted server folder**, plugin binary and output directory. It overwrites that disposable server's properties/configuration, uses dedicated ports, disables external Paradox integrations, tests native loading and authenticated HTTP commands, then stops the server. Run it with the Python interpreter from an Endstone 0.11.11 environment. It refuses paths outside a directory named `scratch` or `/runtime/` and must not be pointed at production data. Windows uses a hidden process and Endstone's official DLL-injection bootstrap. No gameplay client is connected by this test.
+`native/tools/smoke-server.py` accepts an **isolated extracted server folder**, plugin binary and output directory. It overwrites that disposable server's properties/configuration, uses dedicated ports, disables external Paradox integrations, tests native loading and authenticated HTTP commands, then stops the server. Run it with the Python interpreter from an Endstone 0.11.14 environment. It refuses paths outside a directory named `scratch` or `/runtime/` and must not be pointed at production data. Windows uses a hidden process and Endstone's official DLL-injection bootstrap. No gameplay client is connected by this test.
 
 ## Connected-client acceptance tests
 
 The additional harness uses two offline scripted clients built from the pinned Go module in `native/tests/bedrock-client` (Go 1.26.8, gophertunnel v1.62.0, protocol 2193). These clients complete the spawn and loading-screen handshakes and send real movement, command, inventory, combat and form-response packets to BDS. Combat must produce a server health update to pass; sending an attack packet alone is insufficient. They are not a replacement for retail controller/touch/physics testing.
 
-1. Use a disposable server directory and an Endstone 0.11.11 Python environment. Run `acceptance-server.py SERVER PLUGIN OUTPUT --seconds 2400` and wait for `OUTPUT/ready.json`. The runner replaces only the disposable server configuration, disables Paradox's external integrations, creates a separate arena world, and enables offline LAN discovery. Keep the test server on an isolated network.
+1. Use a disposable server directory and an Endstone 0.11.14 Python environment. Run `acceptance-server.py SERVER PLUGIN OUTPUT --seconds 2400` and wait for `OUTPUT/ready.json`. The runner replaces only the disposable server configuration, disables Paradox's external integrations, creates a separate arena world, and enables offline LAN discovery. Keep the test server on an isolated network.
 2. Build the helper with `go build -o /work/scratch/validation/bedrock-client .` from `native/tests/bedrock-client` in a dedicated Linux client container. Mount this checkout at `/work`; install `iproute2`; grant `NET_ADMIN` only to this test container. No host network or production container should be used. The validation run used `golang:1.26.8-bookworm` with digest `sha256:a688600ca24f8a4d3ca77f95b0dd40704a9fc787c826660eb7ba0b641b8b175d`.
 3. Run `python native/tools/network-acceptance.py OUTPUT --server-container SERVER_CONTAINER --server-path /runtime/paradox --client-container CLIENT_CONTAINER --address SERVER_IP:39301`. For a Windows server, use `--server-container=` and its absolute scratch directory as `--server-path`. Windows and Linux runs need separate client containers if run concurrently.
 4. Inspect `network-results.json`, `network-samples.ndjson`, `client.log` and `server.log`. Every required check must pass. The Linux server stall test verifies the executable path before stopping only the owned BDS process for two seconds, then resumes it in a `finally` block.

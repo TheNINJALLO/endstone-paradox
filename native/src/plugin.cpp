@@ -311,7 +311,7 @@ void ParadoxPlugin::onEnable() {
             mode_ = "soft";
         protocol_ok_ = supported_runtime(getServer().getMinecraftVersion(), getServer().getProtocolVersion());
         if (!protocol_ok_)
-            getLogger().warning("Packet inspection unavailable for this BDS/protocol. Supported target: 1.26.51.1 / "
+            getLogger().warning("Packet inspection unavailable for this BDS/protocol. Supported target: 1.26.52.3 / "
                                 "2193. Management and API event monitoring remain active.");
         if (auto *level = getServer().getLevel())
             for (auto *dimension : level->getDimensions())
@@ -1546,7 +1546,7 @@ bool ParadoxPlugin::command(es::CommandSender &sender, std::string name, const s
         return true;
     }
     if (name == "about" || name == "paradox-info") {
-        say("Paradox " + std::string(PARADOX_VERSION) + " native | Endstone 0.11.11 | upstream review 6.9.1");
+        say("Paradox " + std::string(PARADOX_VERSION) + " native | Endstone 0.11.14 | upstream review 6.9.1");
         return true;
     }
     if (name == "ping") {

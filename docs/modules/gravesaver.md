@@ -1,6 +1,6 @@
 # gravesaver
 
-Paradox Native 2.0.1 | **Management** | New-install default: **Off**
+Paradox Native 2.0.2 | **Management** | New-install default: **Off**
 
 ## Native behavior
 

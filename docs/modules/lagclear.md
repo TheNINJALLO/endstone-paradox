@@ -1,6 +1,6 @@
 # lagclear
 
-Paradox Native 2.0.1 | **Management** | New-install default: **On**
+Paradox Native 2.0.2 | **Management** | New-install default: **On**
 
 ## Native behavior
 

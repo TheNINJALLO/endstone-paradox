@@ -1,6 +1,6 @@
 # namespoof
 
-Paradox Native 2.0.1 | **Validation** | New-install default: **On**
+Paradox Native 2.0.2 | **Validation** | New-install default: **On**
 
 ## Native behavior
 

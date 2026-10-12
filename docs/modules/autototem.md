@@ -1,6 +1,6 @@
 # autototem
 
-Paradox Native 2.0.1 | **Inventory** | New-install default: **On**
+Paradox Native 2.0.2 | **Inventory** | New-install default: **On**
 
 ## Native behavior
 

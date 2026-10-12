@@ -18,7 +18,7 @@ Disabling global synchronization stops future requests; it does not erase existi
 - Inventory synchronization records current deltas and full item-NBT hashes, including shulkers. It never destroys items because they differ from an earlier snapshot. Copies use Endstone ItemStacks to preserve metadata.
 - Skin geometry, persona skins, transparency, shared devices and unusual/custom items do not cause automatic kicks.
 - `gravesaver` protects attributable original nearby death-drop entities and preserves their ItemStacks. It does not replace blocks with grave chests/signs. It is off by default. Attribution and pickup behavior need gameplay validation; this is not guaranteed item recovery.
-- `containersee` displays looked-at player inventory pages and identifies containers. Endstone 0.11.11 does not expose block-container inventory through its public API.
+- `containersee` displays looked-at player inventory pages and identifies containers. Endstone 0.11.14 does not expose block-container inventory through its public API.
 - Container/land policies cover player interactions, block changes, explosions, liquid ingress and a conservative piston envelope. Endstone provides no hopper-transfer callback or complete piston moved-block list. Existing hopper automation and unusual slime/honey structures require server-specific protection/testing.
 - Random teleport selects already loaded, supported terrain with headroom and reports failure when none is found.
 - Vanish applies invisibility and hides the name tag. It does not remove the player from the player list or suppress all actor packets.

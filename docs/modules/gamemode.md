@@ -1,6 +1,6 @@
 # gamemode
 
-Paradox Native 2.0.1 | **Policy** | New-install default: **On**
+Paradox Native 2.0.2 | **Policy** | New-install default: **On**
 
 ## Native behavior
 
