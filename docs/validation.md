@@ -2,7 +2,7 @@
 
 Local Paradox 2.0.3 targets SDK `b4aaa87d2c5305e7d340168f824ac2e2ea722e44`, BDS 1.26.60.6 and protocol 2225. The decoder uses bedrock-protocol `ec394c9a437386448f60f33a7610ca3fb90fa089` (0.4.6), retaining inspection budgets and the unknown-runtime gate. Linux native compilation and CTest passed. All 17 disposable server checks passed, including authentication, invalid-command rejection, queued execution, persistence and shutdown.
 
-A separate protocol-2225 client joined the server and executed a player command. The wire checker independently decoded 83 actual PlayerAuthInput payloads and one actual MobEffect payload captured through Endstone events; none were marked malformed. This is automated protocol-client evidence, not retail/client-device, network-impairment or complete anti-cheat acceptance. Windows qualification remains pending. No release was published. Artifact evidence: `native/validation-endstone-0.11.15.json`.
+A separate protocol-2225 client joined the server and executed a player command. The wire checker independently decoded 83 actual PlayerAuthInput payloads and one actual MobEffect payload captured through Endstone events; none were marked malformed. This is automated protocol-client evidence, not retail/client-device, network-impairment or complete anti-cheat acceptance. Windows qualification remains pending. Validation was recorded locally before publication. Artifact evidence: `native/validation-endstone-0.11.15.json`.
 
 # Endstone 0.11.14 compatibility check — 2026-10-12
 
