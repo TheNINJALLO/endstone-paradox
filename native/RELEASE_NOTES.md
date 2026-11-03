@@ -1,6 +1,8 @@
 # Paradox 2.0.3 — Endstone 0.11.15
 
-Rebuilt for BDS 1.26.60.6 / protocol 2225 and the exact Endstone 0.11.15 SDK. Updated all inspected packet types to the 2225 schema and preserved decoder limits and unsupported-runtime safeguards. Linux native tests, 17 disposable server checks and a connected-client/native-payload check passed. Windows and full acceptance remain unqualified. Validation was recorded locally before publication. See VALIDATION.md for evidence and scope.
+Rebuilt for BDS 1.26.60.6 / protocol 2225 and the exact Endstone 0.11.15 SDK. Updated all inspected packet types to the 2225 schema and preserved decoder limits and unsupported-runtime safeguards. Both native CI builds/tests passed in [run 41569229273](https://github.com/TheNINJALLO/endstone-paradox/actions/runs/41569229273). Both release binaries passed 17 disposable-server checks. The Linux release binary also passed a connected-client check and independent decoding of 84 actual native packet payloads. Windows connected-client, retail/full anti-cheat and network-impairment acceptance remain pending.
+
+The Linux release retains its exact locally qualified binary; the Windows DLL comes from the successful CI run. Release-documentation changes preserve runtime sources. Exact hashes and scope are in `native/validation-endstone-0.11.15.json` and `native/validation-windows-endstone-0.11.15.json`. Preserve existing configuration and databases when replacing the plugin, then fully restart.
 
 # Endstone 0.11.14 compatibility check — 2026-10-12
 

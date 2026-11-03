@@ -1,8 +1,8 @@
 # Paradox Native 2.0.3
 
-> Endstone 0.11.15 release 2.0.3: Linux native build, unit and disposable server checks passed on BDS 1.26.60.6. A protocol-2225 client joined and all 84 captured native packet payloads decoded without malformed flags. Windows qualification remains pending. See the release notes for available platforms and exact validation scope.
+> Endstone 0.11.15 release 2.0.3: Linux and Windows native CI passed, and both release binaries passed 17 disposable BDS 1.26.60.6 server checks. A protocol-2225 client joined the Linux server and all 84 captured native packet payloads decoded without malformed flags. See the release notes for exact validation scope.
 
-C++23 anti-cheat monitoring, moderation and administration targeting **Endstone 0.11.15 / BDS 1.26.60.6 (protocol 2225)**. This candidate is qualified on Linux x86-64; Windows builds/runtime remain pending. Based on [Visual1mpact's Paradox](https://github.com/Visual1mpact/Paradox_AntiCheat), reviewed through v6.9.1.
+C++23 anti-cheat monitoring, moderation and administration targeting **Endstone 0.11.15 / BDS 1.26.60.6 (protocol 2225)**. Native builds and disposable server checks cover Linux and Windows x86-64; retail/full anti-cheat acceptance remains pending. Based on [Visual1mpact's Paradox](https://github.com/Visual1mpact/Paradox_AntiCheat), reviewed through v6.9.1.
 
 The plugin runs as a native `.dll` or `.so`. Endstone itself still uses its normal runtime and bootstrap. The Python implementation is archived under [`legacy/python`](legacy/python); do not load both implementations.
 
@@ -14,9 +14,9 @@ Upgrade from the superseded v2.0.0 preview: v2.0.2 fixes wrapped-player command 
 
 1. Stop the server and back up `plugins/paradox` and your world.
 2. Remove the old Paradox wheel from `plugins`, or uninstall `endstone-paradox` from the Python environment used by Endstone if installed there.
-3. For 26.60, download the 2.0.3 Linux ZIP and matching SHA-256 file from the release. Copy **one** `endstone_paradox.so` from its `plugins/` folder into the server's `plugins/`. Linux requires OpenSSL 3 (`libssl3` / `libssl3t64`). Windows qualification for this candidate is pending. Remove any previous Paradox binary when upgrading.
+3. For 26.60, download the 2.0.3 ZIP for your OS and matching SHA-256 file from the release. Copy **one** `endstone_paradox.so` (Linux) or `endstone_paradox.dll` (Windows) from its `plugins/` folder into the server's `plugins/`. Linux requires OpenSSL 3 (`libssl3` / `libssl3t64`). Remove any previous Paradox binary when upgrading.
 4. Keep the existing `plugins/paradox/config.toml` and `paradox.db`. The loader creates `paradox.db.pre-native.bak` using SQLite's consistent backup API. Existing tables remain intact.
-5. Start Endstone and check for `Paradox 2.0.2 native enabled; 54 modules`. The server must report supported protocol 2193. `ac-about` and `ac-debug-db` work from the console.
+5. Start Endstone and check for `Paradox 2.0.3 native enabled; 54 modules`. The server must report supported protocol 2225. `ac-about` and `ac-debug-db` work from the console.
 6. With the intended staff member online, grant clearance from the console: `ac-setclearance "Player Name" 4`. Review the [migration notes](native/MIGRATION.md) before enabling server policies.
 
 The supplied BDS ZIPs are verification inputs and are **not redistributed**. [`verify-server.py`](native/tools/verify-server.py) checks both archive and executable against pinned official metadata.
