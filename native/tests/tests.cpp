@@ -176,7 +176,7 @@ template <class T> std::string encode(const T &packet) {
     return buffer;
 }
 void test_protocol() {
-    bp::PlayerHotbarPacket_<2193> hotbar;
+    bp::PlayerHotbarPacket_<2225> hotbar;
     hotbar.should_select_slot = true;
     hotbar.selected_slot = 8;
     auto good = inspect_packet(48, encode(hotbar));
@@ -190,15 +190,15 @@ void test_protocol() {
     check(inspect_packet(48, std::string("\x08\x00\x01", 3)).decoded, "real hotbar field order");
     auto effect = inspect_packet(28, std::string("\x01\x01\x02\x00\x01\x90\x03\x7b\x01", 9), true);
     check(effect.decoded && effect.effect == 1 && effect.effect_duration == 200, "BDS Ambient effect field lost");
-    bp::PlayerAuthInputPacket_<2193> input;
+    bp::PlayerAuthInputPacket_<2225> input;
     input.client_tick = bp::PlayerInputTick{123};
     input.pos = {1, 64, 2};
     input.move = {1, 1};
     auto decoded = inspect_packet(144, encode(input));
-    check(decoded.decoded && decoded.tick == 123 && !decoded.malformed, "protocol 2193 auth input did not round trip");
+    check(decoded.decoded && decoded.tick == 123 && !decoded.malformed, "protocol 2225 auth input did not round trip");
     check(!inspect_packet(144, "\xff\xff\xff").decoded, "truncated input decoded");
     check(!inspect_packet(175, std::string(300000, 'x')).malformed, "large packet alone treated as cheating");
-    bp::SubChunkRequestPacket_<2193> chunks;
+    bp::SubChunkRequestPacket_<2225> chunks;
     chunks.sub_chunk_pos_offsets.resize(8192);
     auto large = encode(chunks);
     check(large.size() > 16384, "large chunk fixture is too small");
@@ -207,7 +207,7 @@ void test_protocol() {
     auto input_wire = encode(input);
     for (std::size_t i = 0; i < input_wire.size(); ++i)
         check(!inspect_packet(144, std::string_view(input_wire).substr(0, i)).decoded, "truncated prefix decoded");
-    std::mt19937 random(2193);
+    std::mt19937 random(2225);
     for (unsigned i = 0; i < 3000; ++i) {
         std::string bytes(random() % 256, '\0');
         for (auto &c : bytes)
@@ -215,9 +215,12 @@ void test_protocol() {
         auto result = inspect_packet(i % 3 == 0 ? 144 : i % 3 == 1 ? 48 : 175, bytes);
         check(!result.input || result.decoded, "fuzz yielded partial input");
     }
-    check(supported_runtime("26.52", 2193), "actual Endstone version refused");
-    check(!supported_runtime("26.51", 2193), "previous server runtime accepted");
-    check(supported_runtime("1.26.52.3", 2193), "target refused");
+    check(supported_runtime("26.60", 2225), "actual Endstone version refused");
+    check(!supported_runtime("26.52", 2193), "previous server runtime accepted");
+    check(supported_runtime("1.26.60", 2225), "full version alias refused");
+    check(supported_runtime("1.26.60.6", 2225), "target refused");
+    check(!supported_runtime("1.26.52.3", 2225), "old BDS accepted with new protocol");
+    check(!supported_runtime("1.26.60.6", 2193), "new BDS accepted with old protocol");
     check(!supported_runtime("1.26.60", 2211), "wrong ABI accepted");
 }
 void test_paced_backlog() {

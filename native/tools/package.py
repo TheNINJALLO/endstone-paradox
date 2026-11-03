@@ -35,6 +35,10 @@ documents += [
     for p in sorted((root / "native/validation").glob("*.json"))
 ]
 documents += [
+    p.relative_to(root).as_posix()
+    for p in sorted((root / "native").glob("validation-endstone-*.json"))
+]
+documents += [
     str(p.relative_to(root)).replace("\\", "/")
     for p in sorted((root / "native/licenses").iterdir())
     if p.is_file()

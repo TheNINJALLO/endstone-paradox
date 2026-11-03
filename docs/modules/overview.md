@@ -1,6 +1,6 @@
 # All 54 native modules
 
-These are the Paradox 2.0.2 defaults for a new installation. Persisted settings take precedence. Modules include observations, validation, policies and utilities; enabling a module does not imply it can punish a player. Review [enforcement and lag recovery](../violation-engine.md), [module controls](../commands/toggles.md) and [migration limits](../migration.md).
+These are the Paradox 2.0.3 defaults for a new installation. Persisted settings take precedence. Modules include observations, validation, policies and utilities; enabling a module does not imply it can punish a player. Review [enforcement and lag recovery](../violation-engine.md), [module controls](../commands/toggles.md) and [migration limits](../migration.md).
 
 | Module | Kind | Default | Native behavior |
 | --- | --- | --- | --- |
@@ -44,7 +44,7 @@ These are the Paradox 2.0.2 defaults for a new installation. Persisted settings 
 | [reportsystem](reportsystem.md) | evidence | Off | Player reports with cooldown; reports are evidence for staff, never automatic punishments. |
 | [fingerprint](fingerprint.md) | evidence | Off | Salted device hash for review. Shared devices and families are not banned; raw device IDs are not persisted. |
 | [aimbotmonitor](aimbotmonitor.md) | combat | On | View-change observation only; mouse/controller snaps are not proof of aiming assistance. |
-| [anticrash](anticrash.md) | network | On | Typed protocol-2193 decoding with byte, element and depth budgets. Known malformed inspected packets may cancel; budget excess is fail-open, never a ban. |
+| [anticrash](anticrash.md) | network | On | Typed protocol-2225 decoding with byte, element and depth budgets. Known malformed inspected packets may cancel; budget excess is fail-open, never a ban. |
 | [autototem](autototem.md) | inventory | On | Rapid totem inventory-change review only; no punishment for pickup, lag or custom inventory tools. |
 | [containerlock](containerlock.md) | policy | Off | Owner locks and legacy migration; adjacent chests protected; explosions/flows/piston envelope handled. Hopper API limitation documented. |
 | [deathcoords](deathcoords.md) | management | On | Fractional death coordinates and dimension are persisted and shown. |

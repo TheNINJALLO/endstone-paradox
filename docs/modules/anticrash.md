@@ -1,10 +1,10 @@
 # anticrash
 
-Paradox Native 2.0.2 | **Network** | New-install default: **On**
+Paradox Native 2.0.3 | **Network** | New-install default: **On**
 
 ## Native behavior
 
-Typed protocol-2193 decoding with byte, element and depth budgets. Known malformed inspected packets may cancel; budget excess is fail-open, never a ban.
+Typed protocol-2225 decoding with byte, element and depth budgets. Known malformed inspected packets may cancel; budget excess is fail-open, never a ban.
 
 ## Controls
 

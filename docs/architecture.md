@@ -6,7 +6,7 @@ Paradox 2.0.1 is a C++23 Endstone plugin. The active implementation lives in `na
 | --- | --- |
 | `native/src/plugin.cpp` | Endstone lifecycle, public API events, packet hooks, commands, forms and server policies |
 | `native/src/engine.cpp` | Module registry, health/recovery guards, detector evidence and enforcement decisions |
-| `native/src/protocol.cpp` | Typed decoding of inspected protocol-2193 packets with bounded inspection |
+| `native/src/protocol.cpp` | Typed decoding of inspected protocol-2225 packets with bounded inspection |
 | `native/src/store.cpp` | Compatible SQLite store, consistent backup and bounded asynchronous writes |
 | `native/src/web.cpp` | Bearer-authenticated dashboard and bounded HTTPS integration worker |
 

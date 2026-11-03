@@ -1,6 +1,6 @@
 # Native build
 
-Target: x86-64 Endstone 0.11.14, BDS 1.26.52.3, protocol 2193. Use LLVM/Clang 20, C++23, CMake 3.29+, Ninja, Git, Python 3.12+ and uv. Linux must use libc++ rather than libstdc++ to match Endstone's C++ ABI. Windows uses clang-cl with the Visual Studio 2022 SDK and dynamic MSVC runtime.
+Target: x86-64 Endstone 0.11.15, BDS 1.26.60.6, protocol 2225. Use LLVM/Clang 20, C++23, CMake 3.29+, Ninja, Git, Python 3.12+ and uv. Linux must use libc++ rather than libstdc++ to match Endstone's C++ ABI. Windows uses clang-cl with the Visual Studio 2022 SDK and dynamic MSVC runtime.
 
 ## Linux
 
@@ -32,7 +32,7 @@ The process-only execution-policy option does not change machine policy. CMake f
 ## Server verification and smoke test
 
 ```sh
-python native/tools/verify-server.py bedrock-server-linux-1.26.52.3.zip --platform linux
+python native/tools/verify-server.py bedrock-server-linux-1.26.60.6.zip --platform linux
 python native/tools/verify-server.py bedrock-server-windows-1.26.52.3.zip --platform windows
 ```
 

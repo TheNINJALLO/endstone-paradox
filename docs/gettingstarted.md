@@ -1,19 +1,19 @@
-# Install Paradox Native 2.0.2
+# Install Paradox Native 2.0.3 (local candidate)
 
 ## Requirements
 
 | Component | Supported target |
 | --- | --- |
-| Server framework | Endstone 0.11.14 with its normal runtime/bootstrap |
-| Minecraft server | BDS 1.26.52.3, protocol 2193 |
-| Platform | Windows x86-64 or Linux x86-64 |
+| Server framework | Endstone 0.11.15 with its normal runtime/bootstrap |
+| Minecraft server | BDS 1.26.60.6, protocol 2225 |
+| Platform | Linux x86-64 qualified locally; Windows pending |
 | Linux runtime dependency | OpenSSL 3 (`libssl3` / `libssl3t64`) |
 
-Use the supported target even if a newer Endstone or BDS version exists. An unknown runtime disables packet inspection; management features continuing to run does not establish compatibility. Endstone may display the verified server version as `26.51`.
+Use the supported target even if a newer Endstone or BDS version exists. An unknown runtime disables packet inspection; management features continuing to run does not establish compatibility. Endstone displays this server version as `26.60`.
 
 ## Installation and upgrade
 
-1. Download your platform's ZIP and matching `.sha256` file from [stable v2.0.2](https://github.com/TheNINJALLO/endstone-paradox/releases/tag/v2.0.2). Review [release notes](release-notes.md). The v2.0.0 preview is superseded because of a command authorization defect.
+1. For 26.60, use the local 2.0.3 Linux ZIP and matching `.sha256` file. This candidate has not been published. The older [stable v2.0.2](https://github.com/TheNINJALLO/endstone-paradox/releases/tag/v2.0.2) remains for its 26.52 target. Review [release notes](release-notes.md).
 2. Stop Endstone and back up the world and `plugins/paradox` directory.
 3. Remove the old Paradox `.whl` from `plugins/`, or uninstall `endstone-paradox` from the Python environment used by Endstone if it was installed there. Also remove any previous native Paradox binary.
 4. Extract the ZIP and copy **one** plugin binary from its `plugins/` folder into the server's `plugins/` folder: `endstone_paradox.dll` on Windows or `endstone_paradox.so` on Linux. Retain the package's notices and validation files for reference.

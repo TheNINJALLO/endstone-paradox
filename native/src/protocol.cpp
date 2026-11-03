@@ -20,10 +20,10 @@ PacketResult inspect_packet(int id, std::string_view payload, bool outgoing) {
     bp::BinaryReader stream(payload);
     try {
         if (!outgoing && id == 144) {
-            auto packet = bp::deserialize<bp::PlayerAuthInputPacket_<2193>>(stream);
+            auto packet = bp::deserialize<bp::PlayerAuthInputPacket_<2225>>(stream);
             if (!packet || stream.getUnreadLength() != 0) {
                 r.malformed = true;
-                r.reason = "Malformed protocol 2193 input";
+                r.reason = "Malformed protocol 2225 input";
                 return r;
             }
             r.decoded = true;
@@ -31,7 +31,7 @@ PacketResult inspect_packet(int id, std::string_view payload, bool outgoing) {
             r.tick = packet->client_tick;
             r.movement = {packet->move.x, 0, packet->move.y};
             r.position = {packet->pos.x, packet->pos.y, packet->pos.z};
-            using Flag = bp::PlayerAuthInputPacket_<2193>::InputData;
+            using Flag = bp::PlayerAuthInputPacket_<2225>::InputData;
             for (auto flag : packet->input_data) {
                 if (flag == Flag::HandledTeleport || flag == Flag::IsInClientPredictedVehicle ||
                     flag == Flag::StartGliding || flag == Flag::StartSpinAttack)
@@ -44,10 +44,10 @@ PacketResult inspect_packet(int id, std::string_view payload, bool outgoing) {
                 r.reason = "Non-finite movement fields";
             }
         } else if (!outgoing && id == 48) {
-            auto packet = bp::deserialize<bp::PlayerHotbarPacket_<2193>>(stream);
+            auto packet = bp::deserialize<bp::PlayerHotbarPacket_<2225>>(stream);
             if (!packet || stream.getUnreadLength() != 0) {
                 r.malformed = true;
-                r.reason = "Malformed protocol 2193 hotbar selection";
+                r.reason = "Malformed protocol 2225 hotbar selection";
                 return r;
             }
             r.decoded = true;
@@ -57,10 +57,10 @@ PacketResult inspect_packet(int id, std::string_view payload, bool outgoing) {
                 r.reason = "Selected hotbar slot outside 0..8";
             }
         } else if (!outgoing && id == 175) {
-            auto packet = bp::deserialize<bp::SubChunkRequestPacket_<2193>>(stream);
+            auto packet = bp::deserialize<bp::SubChunkRequestPacket_<2225>>(stream);
             if (!packet || stream.getUnreadLength() != 0) {
                 r.malformed = true;
-                r.reason = "Malformed protocol 2193 subchunk request";
+                r.reason = "Malformed protocol 2225 subchunk request";
                 return r;
             }
             r.decoded = true;
@@ -72,20 +72,20 @@ PacketResult inspect_packet(int id, std::string_view payload, bool outgoing) {
             r.transition = true;
             r.actor = packet->runtime_id;
         } else if (outgoing && id == 19) {
-            auto packet = bp::deserialize<bp::MovePlayerPacket_<2193>>(stream);
+            auto packet = bp::deserialize<bp::MovePlayerPacket_<2225>>(stream);
             if (!packet || stream.getUnreadLength() != 0)
                 return r;
             r.decoded = true;
             r.transition = packet->teleport_data.has_value();
             r.actor = packet->player_id;
         } else if (outgoing && id == 28) {
-            auto packet = bp::deserialize<bp::MobEffectPacket_<2193>>(stream);
+            auto packet = bp::deserialize<bp::MobEffectPacket_<2225>>(stream);
             if (!packet || stream.getUnreadLength() != 0)
                 return r;
             r.decoded = true;
             r.effect = static_cast<int>(packet->effect_id);
             r.effect_duration =
-                packet->event_id == bp::MobEffectPacket_<2193>::Event::Remove ? 0 : packet->effect_duration_ticks;
+                packet->event_id == bp::MobEffectPacket_<2225>::Event::Remove ? 0 : packet->effect_duration_ticks;
             r.actor = packet->runtime_id;
         } else if (!outgoing && (id == 147 || id == 30))
             r.inventory = true;

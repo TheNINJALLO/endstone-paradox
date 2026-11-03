@@ -1,4 +1,8 @@
-# Release notes: 2.0.2
+# Release notes: 2.0.3
+
+# Paradox 2.0.3 — Endstone 0.11.15 local candidate
+
+Rebuilt for BDS 1.26.60.6 / protocol 2225 and the exact Endstone 0.11.15 SDK. Updated all inspected packet types to the 2225 schema and preserved decoder limits and unsupported-runtime safeguards. Linux native tests, 17 disposable server checks and a connected-client/native-payload check passed. Windows and full acceptance remain unqualified. No release was published. See VALIDATION.md for evidence and scope.
 
 # Endstone 0.11.14 compatibility check — 2026-10-12
 

@@ -59,7 +59,7 @@ Every observational finding is centrally prevented from escalating, even under h
 | reportsystem | Off | Player reports with cooldown; reports are evidence for staff, never automatic punishments. |
 | fingerprint | Off | Salted device hash for review. Shared devices and families are not banned; raw device IDs are not persisted. |
 | aimbotmonitor | On | View-change observation only; mouse/controller snaps are not proof of aiming assistance. |
-| anticrash | On | Typed protocol-2193 decoding with byte, element and depth budgets. Known malformed inspected packets may cancel; budget excess is fail-open, never a ban. |
+| anticrash | On | Typed protocol-2225 decoding with byte, element and depth budgets. Known malformed inspected packets may cancel; budget excess is fail-open, never a ban. |
 | autototem | On | Rapid totem inventory-change review only; no punishment for pickup, lag or custom inventory tools. |
 | containerlock | Off | Owner locks and legacy migration; adjacent chests protected; explosions/flows/piston envelope handled. Hopper API limitation documented. |
 | deathcoords | On | Fractional death coordinates and dimension are persisted and shown. |
