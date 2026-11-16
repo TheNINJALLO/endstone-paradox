@@ -1,8 +1,10 @@
-# Paradox Native 2.0.3 (local candidate)
+> Endstone 0.11.16 compatibility candidate: fresh platform builds and runtime checks are pending. Earlier acceptance evidence applies to its original release.
 
-Paradox is a C++23 plugin for anti-cheat monitoring, moderation and server administration. This local candidate targets **Endstone 0.11.15** and **BDS 1.26.60.6 / protocol 2225**. Linux x86-64 build and runtime checks passed; Windows remains unqualified for this candidate. It adapts [Visual1mpact's Paradox](https://github.com/Visual1mpact/Paradox_AntiCheat), reviewed through v6.9.1.
+# Paradox Native 2.0.4 (local candidate)
 
-Use the local 2.0.3 artifact and follow [installation](gettingstarted.md) or [migration](migration.md). The older [stable v2.0.2](https://github.com/TheNINJALLO/endstone-paradox/releases/tag/v2.0.2) remains available for its documented 26.52 target. The older v2.0.0 preview has a command authorization defect and is superseded.
+Paradox is a C++23 plugin for anti-cheat monitoring, moderation and server administration. This local candidate targets **Endstone 0.11.16** and **BDS 1.26.65.1 / protocol 2225**. Linux x86-64 build and runtime checks passed; Windows remains unqualified for this candidate. It adapts [Visual1mpact's Paradox](https://github.com/Visual1mpact/Paradox_AntiCheat), reviewed through v6.9.1.
+
+Use the local 2.0.4 artifact and follow [installation](gettingstarted.md) or [migration](migration.md). The older [stable v2.0.2](https://github.com/TheNINJALLO/endstone-paradox/releases/tag/v2.0.2) remains available for its documented 26.52 target. The older v2.0.0 preview has a command authorization defect and is superseded.
 
 ## What the native release provides
 

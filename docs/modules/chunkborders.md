@@ -1,6 +1,6 @@
 # chunkborders
 
-Paradox Native 2.0.3 | **Management** | New-install default: **Off**
+Paradox Native 2.0.4 | **Management** | New-install default: **Off**
 
 ## Native behavior
 

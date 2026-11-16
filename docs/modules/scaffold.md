@@ -1,6 +1,6 @@
 # scaffold
 
-Paradox Native 2.0.3 | **Building** | New-install default: **On**
+Paradox Native 2.0.4 | **Building** | New-install default: **On**
 
 ## Native behavior
 

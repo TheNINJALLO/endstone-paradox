@@ -1,11 +1,13 @@
-# Install Paradox Native 2.0.3 (local candidate)
+> Endstone 0.11.16 compatibility candidate: fresh platform builds and runtime checks are pending. Earlier acceptance evidence applies to its original release.
+
+# Install Paradox Native 2.0.4 (local candidate)
 
 ## Requirements
 
 | Component | Supported target |
 | --- | --- |
-| Server framework | Endstone 0.11.15 with its normal runtime/bootstrap |
-| Minecraft server | BDS 1.26.60.6, protocol 2225 |
+| Server framework | Endstone 0.11.16 with its normal runtime/bootstrap |
+| Minecraft server | BDS 1.26.65.1, protocol 2225 |
 | Platform | Linux x86-64 qualified locally; Windows pending |
 | Linux runtime dependency | OpenSSL 3 (`libssl3` / `libssl3t64`) |
 
@@ -13,7 +15,7 @@ Use the supported target even if a newer Endstone or BDS version exists. An unkn
 
 ## Installation and upgrade
 
-1. For 26.60, use the local 2.0.3 Linux ZIP and matching `.sha256` file. This candidate has not been published. The older [stable v2.0.2](https://github.com/TheNINJALLO/endstone-paradox/releases/tag/v2.0.2) remains for its 26.52 target. Review [release notes](release-notes.md).
+1. For 26.60, use the local 2.0.4 Linux ZIP and matching `.sha256` file. This candidate has not been published. The older [stable v2.0.2](https://github.com/TheNINJALLO/endstone-paradox/releases/tag/v2.0.2) remains for its 26.52 target. Review [release notes](release-notes.md).
 2. Stop Endstone and back up the world and `plugins/paradox` directory.
 3. Remove the old Paradox `.whl` from `plugins/`, or uninstall `endstone-paradox` from the Python environment used by Endstone if it was installed there. Also remove any previous native Paradox binary.
 4. Extract the ZIP and copy **one** plugin binary from its `plugins/` folder into the server's `plugins/` folder: `endstone_paradox.dll` on Windows or `endstone_paradox.so` on Linux. Retain the package's notices and validation files for reference.

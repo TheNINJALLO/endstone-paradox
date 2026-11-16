@@ -1,3 +1,7 @@
+# Endstone 0.11.16 compatibility qualification - 2026-11-16
+
+Target: Paradox 2.0.4, Endstone 0.11.16, BDS 1.26.65.1, protocol 2225. Both official server archives and executable SHA-256 hashes were verified. Fresh Windows/Linux builds, CTest and disposable-server smoke checks are pending. Historical validation below applies to the original versions listed.
+
 # Endstone 0.11.15 compatibility check — 2026-11-02
 
 Local Paradox 2.0.3 targets SDK `b4aaa87d2c5305e7d340168f824ac2e2ea722e44`, BDS 1.26.60.6 and protocol 2225. The decoder uses bedrock-protocol `ec394c9a437386448f60f33a7610ca3fb90fa089` (0.4.6), retaining inspection budgets and the unknown-runtime gate. Linux native compilation and CTest passed. All 17 disposable server checks passed, including authentication, invalid-command rejection, queued execution, persistence and shutdown.

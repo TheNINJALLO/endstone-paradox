@@ -1,6 +1,6 @@
 # inventorymovement
 
-Paradox Native 2.0.3 | **Movement** | New-install default: **On**
+Paradox Native 2.0.4 | **Movement** | New-install default: **On**
 
 ## Native behavior
 

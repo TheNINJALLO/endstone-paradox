@@ -1,3 +1,5 @@
+> Compatibility candidate **2.0.4** targets **Endstone 0.11.16 / BDS 1.26.65.1**, protocol **2225**. Fresh native builds and runtime qualification are tracked in [the compatibility PR](https://github.com/TheNINJALLO/endstone-paradox/pull/2). Earlier acceptance records below apply to their original builds.
+
 # Paradox Native 2.0.3
 
 > Endstone 0.11.15 release 2.0.3: Linux and Windows native CI passed, and both release binaries passed 17 disposable BDS 1.26.60.6 server checks. A protocol-2225 client joined the Linux server and all 84 captured native packet payloads decoded without malformed flags. See the release notes for exact validation scope.

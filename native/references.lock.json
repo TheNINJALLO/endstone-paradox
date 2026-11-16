@@ -5,7 +5,7 @@
   "upstream": "6.9.1",
   "references": {
     "bedrock-protocol": "ec394c9a437386448f60f33a7610ca3fb90fa089",
-    "bedrock-server-data": "abacd5e1d45178612ec39acbd40445c8ce7c1b0e",
+    "bedrock-server-data": "f94b921d1f61243aa86ce3e0415a23ffb65076a8",
     "dwarf2cpp": "a7d9ff3d188c4a7d19920d76fa9ae3370fc75776",
     "endstone": "23cb5758bdc070888cb89ecd1541ef25c4305b5c",
     "protocol-docs": "0db6185921974b5aba4a30af33a5eed842dd2cb9",

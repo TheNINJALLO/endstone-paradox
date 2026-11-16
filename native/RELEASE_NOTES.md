@@ -1,3 +1,7 @@
+# Paradox 2.0.4 - Endstone 0.11.16
+
+Compatibility candidate for BDS 1.26.65.1 / protocol 2225. Rebuild against SDK commit `23cb5758bdc070888cb89ecd1541ef25c4305b5c`, retain the reviewed wire decoder, and update the runtime gate and official binary fingerprints. Fresh platform builds and runtime qualification are pending. Earlier release evidence follows unchanged.
+
 # Paradox 2.0.3 — Endstone 0.11.15
 
 Rebuilt for BDS 1.26.60.6 / protocol 2225 and the exact Endstone 0.11.15 SDK. Updated all inspected packet types to the 2225 schema and preserved decoder limits and unsupported-runtime safeguards. Both native CI builds/tests passed in [run 41569229273](https://github.com/TheNINJALLO/endstone-paradox/actions/runs/41569229273). Both release binaries passed 17 disposable-server checks. The Linux release binary also passed a connected-client check and independent decoding of 84 actual native packet payloads. Windows connected-client, retail/full anti-cheat and network-impairment acceptance remain pending.

@@ -1,6 +1,6 @@
 # hotbarcheck
 
-Paradox Native 2.0.3 | **Validation** | New-install default: **On**
+Paradox Native 2.0.4 | **Validation** | New-install default: **On**
 
 ## Native behavior
 

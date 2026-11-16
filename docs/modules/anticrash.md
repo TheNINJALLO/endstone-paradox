@@ -1,6 +1,6 @@
 # anticrash
 
-Paradox Native 2.0.3 | **Network** | New-install default: **On**
+Paradox Native 2.0.4 | **Network** | New-install default: **On**
 
 ## Native behavior
 

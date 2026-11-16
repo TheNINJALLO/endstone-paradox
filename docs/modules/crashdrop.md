@@ -1,6 +1,6 @@
 # crashdrop
 
-Paradox Native 2.0.3 | **Inventory** | New-install default: **Off**
+Paradox Native 2.0.4 | **Inventory** | New-install default: **Off**
 
 ## Native behavior
 
