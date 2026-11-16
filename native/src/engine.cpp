@@ -72,7 +72,7 @@ std::string normalize_name(std::string_view name) {
     return out;
 }
 bool supported_runtime(std::string_view version, int protocol) {
-    return protocol == 2225 && (version == "26.60" || version == "1.26.60" || version == "1.26.60.6");
+    return protocol == 2225 && (version == "26.65" || version == "1.26.65" || version == "1.26.65.1");
 }
 void LagGuard::suspend(double now, std::string_view reason, double duration) {
     until_ = std::max(until_, now + duration);
