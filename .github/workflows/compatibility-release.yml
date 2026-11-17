@@ -1,0 +1,47 @@
+name: Publish qualified Endstone 0.11.16 binaries
+
+'on':
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify qualification and unchanged runtime sources
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$(gh api repos/${{ github.repository }}/actions/runs/43983702752 --jq .conclusion)" = success
+          test "$(gh api repos/${{ github.repository }}/actions/runs/43983702752 --jq .head_sha)" = a915ac6367d19f35568d11d5d41264a41dab1d77
+          git diff --exit-code a915ac6367d19f35568d11d5d41264a41dab1d77 "$GITHUB_SHA" -- CMakeLists.txt native/src native/include native/tools/harden_protocol.py
+      - name: Download and repackage the exact qualified binaries
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 43983702752 --name paradox-linux --dir ci-artifacts/linux
+          gh run download 43983702752 --name paradox-windows --dir ci-artifacts/windows
+          python native/tools/publish-qualified.py
+      - name: Publish verified platform packages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if gh release view v2.0.4 >/dev/null 2>&1; then
+            echo 'Release already exists; preserving its qualified artifacts.'
+            exit 0
+          fi
+          gh release create v2.0.4 --draft --target "$GITHUB_SHA" --title v2.0.4 --notes-file native/RELEASE_NOTES.md
+          gh release upload v2.0.4 dist/native/*
+          gh release edit v2.0.4 --draft=false --latest

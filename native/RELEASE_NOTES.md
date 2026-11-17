@@ -1,6 +1,6 @@
 # Paradox 2.0.4 - Endstone 0.11.16
 
-Compatibility candidate for BDS 1.26.65.1 / protocol 2225. Rebuild against SDK commit `23cb5758bdc070888cb89ecd1541ef25c4305b5c`, retain the reviewed wire decoder, and update the runtime gate and official binary fingerprints. Fresh platform builds and runtime qualification are pending. Earlier release evidence follows unchanged.
+Compatibility candidate for BDS 1.26.65.1 / protocol 2225. Rebuild against SDK commit `23cb5758bdc070888cb89ecd1541ef25c4305b5c`, retain the reviewed wire decoder, and update the runtime gate and official binary fingerprints. Both platform builds and CTest passed. Each exact CI binary passed all 17 disposable BDS runtime checks. Qualified binary bytes are preserved when packaging the release; retail client and complete anti-cheat acceptance remain unqualified. Earlier release evidence follows unchanged.
 
 # Paradox 2.0.3 — Endstone 0.11.15
 

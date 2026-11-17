@@ -1,4 +1,4 @@
-> Endstone 0.11.16 compatibility candidate: fresh platform builds and runtime checks are pending. Earlier acceptance evidence applies to its original release.
+> Endstone 0.11.16 compatibility candidate: both native builds, CTest and 17 runtime smoke checks per platform passed. Earlier acceptance evidence applies to its original release.
 
 # Install Paradox Native 2.0.4 (local candidate)
 

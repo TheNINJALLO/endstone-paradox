@@ -1,6 +1,6 @@
 # Endstone 0.11.16 compatibility qualification - 2026-11-16
 
-Target: Paradox 2.0.4, Endstone 0.11.16, BDS 1.26.65.1, protocol 2225. Both official server archives and executable SHA-256 hashes were verified. Fresh Windows/Linux builds, CTest and disposable-server smoke checks are pending. Historical validation below applies to the original versions listed.
+Target: Paradox 2.0.4, Endstone 0.11.16, BDS 1.26.65.1, protocol 2225. Both official server archives and executable SHA-256 hashes were verified. Fresh Windows/Linux builds and CTest passed. Both exact CI binaries passed all 17 disposable BDS startup, authentication, native command, persistence and shutdown checks. Evidence is recorded in `native/validation/endstone-0.11.16-linux.json` and `native/validation/endstone-0.11.16-windows.json`. No retail client was attached. Historical validation below applies to the original versions listed.
 
 # Endstone 0.11.15 compatibility check — 2026-11-02
 
